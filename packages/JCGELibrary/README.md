@@ -25,3 +25,13 @@ Typical usage should look like:
   - `models/<ModelName>/<ModelName>.jl`: model submodule
   - `models/<ModelName>/data/`: optional small benchmark inputs
   - `models/<ModelName>/docs/`: optional model notes and documentation
+
+## Optional solve tests (CI)
+Solver-based tests are gated behind `JCGE_SOLVE_TESTS=1` and are run via a manual GitHub Actions workflow:
+- Workflow: `.github/workflows/solve-tests.yml`
+- Trigger: workflow_dispatch only
+
+## Optional StandardCGE.jl comparison
+A separate manual workflow compares results against the external `StandardCGE.jl` package:
+- Workflow: `.github/workflows/compare-standardcge.yml`
+- Env flags: `JCGE_SOLVE_TESTS=1`, `JCGE_COMPARE_STANDARD=1`
