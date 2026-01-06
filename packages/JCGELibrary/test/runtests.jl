@@ -5,6 +5,7 @@ using JCGELibrary.SimpleCGE
 using JCGEKernel
 using JuMP
 using Ipopt
+import MathOptInterface as MOI
 
 @testset "JCGELibrary" begin
     sam_path = joinpath(StandardCGE.datadir(), "sam_2_2.csv")
@@ -17,11 +18,13 @@ if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
         sam_path = joinpath(StandardCGE.datadir(), "sam_2_2.csv")
         spec = StandardCGE.model(sam_path=sam_path)
         result = JCGEKernel.run!(spec; optimizer=Ipopt.Optimizer, dataset_id="standard_cge_test")
-        @test result.summary.count > 0
+        status = MOI.get(result.context.model, MOI.TerminationStatus())
+        @test status in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
 
         spec_simple = SimpleCGE.model()
         result_simple = JCGEKernel.run!(spec_simple; optimizer=Ipopt.Optimizer, dataset_id="simple_cge_test")
-        @test result_simple.summary.count > 0
+        status_simple = MOI.get(result_simple.context.model, MOI.TerminationStatus())
+        @test status_simple in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
     end
 end
 

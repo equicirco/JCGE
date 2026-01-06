@@ -34,47 +34,32 @@ function model(; sam_path::Union{Nothing,AbstractString}=nothing)
     prod_params = (
         b = b,
         beta = beta,
-        ay = Dict(j => 1.0 for j in goods),
-        ax = Dict((i, j) => 0.0 for i in goods for j in goods),
     )
-    prod_block = JCGEBlocks.ProductionBlock(:prod, goods, factors, goods, prod_params)
-
-    factor_block = JCGEBlocks.FactorSupplyBlock(:factor_supply, factors, (FF = FF,))
+    prod_block = JCGEBlocks.CobbDouglasProductionBlock(:prod, goods, factors, prod_params)
 
     hh_params = (
-        FF = Dict((h, hh) => FF[h] for h in factors),
-        ssp = Dict(hh => 0.0),
-        tau_d = Dict(hh => 0.0),
-        alpha = Dict((i, hh) => alpha[i] for i in goods),
+        FF = FF,
+        alpha = alpha,
     )
-    household_block = JCGEBlocks.HouseholdDemandBlock(:household, [hh], goods, factors, hh_params)
+    household_block = JCGEBlocks.HouseholdDemandSimpleBlock(:household, goods, factors, hh_params)
 
-    market_block = JCGEBlocks.MarketClearingBlock(:market, goods, factors)
+    goods_market_block = JCGEBlocks.GoodsMarketClearingBlock(:goods_market, goods)
+
+    factor_market_block = JCGEBlocks.FactorMarketClearingBlock(:factor_market, goods, factors, (FF = FF,))
+
+    price_block = JCGEBlocks.PriceEqualityBlock(:price_link, goods)
 
     numeraire_block = JCGEBlocks.NumeraireBlock(:numeraire, :factor, :LAB, 1.0)
 
-    fixed = Dict{Symbol,Float64}()
-    for i in goods
-        fixed[Symbol("Xg_", i)] = 0.0
-        fixed[Symbol("Xv_", i)] = 0.0
-    end
-    for i in goods, j in goods
-        fixed[Symbol("X_", i, "_", j)] = 0.0
-    end
-    equalities = Tuple{Symbol,Symbol}[]
-    append!(equalities, [(Symbol("Q_", i), Symbol("Z_", i)) for i in goods])
-    append!(equalities, [(Symbol("pq_", i), Symbol("pz_", i)) for i in goods])
-    closure_block = JCGEBlocks.ClosureBlock(:closure, (fixed=fixed, equalities=equalities))
-
-    util_block = JCGEBlocks.UtilityBlock(:utility, [hh], goods, (alpha = Dict((i, hh) => alpha[i] for i in goods),))
+    util_block = JCGEBlocks.UtilityCobbDouglasBlock(:utility, goods, (alpha = alpha,))
 
     blocks = Any[
         prod_block,
-        factor_block,
         household_block,
-        market_block,
+        goods_market_block,
+        factor_market_block,
+        price_block,
         numeraire_block,
-        closure_block,
         util_block,
     ]
 
