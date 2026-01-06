@@ -5,7 +5,7 @@ Julia implementation of the standard CGE model from Hosoe, Gasawa, and Hashimoto
 ## Block usage (form-aware)
 This model uses the form-aware wrappers for production, household demand, and utility:
 ```julia
-prod = JCGEBlocks.ProductionBlock(:prod, activities, factors, commodities, :cd_leontief, params)
-hh = JCGEBlocks.HouseholdDemandBlock(:household, Symbol[], commodities, factors, :cd, :Xp, params)
-util = JCGEBlocks.UtilityBlock(:utility, Symbol[], commodities, :cd, :Xp, (alpha=params.alpha,))
+prod = JCGEBlocks.production(:prod, activities, factors, commodities; form=:cd_leontief, params=params)
+hh = JCGEBlocks.household_demand(:household, Symbol[], commodities, factors; form=:cd, consumption_var=:Xp, params=params)
+util = JCGEBlocks.utility(:utility, Symbol[], commodities; form=:cd, consumption_var=:Xp, params=(alpha=params.alpha,))
 ```

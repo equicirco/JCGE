@@ -10,7 +10,7 @@ This model is intended for testing and development, using the SAM in `data/sam_2
 ## Block usage (form-aware)
 The simple model uses the form-aware wrappers for production, household demand, and utility:
 ```julia
-prod = JCGEBlocks.ProductionBlock(:prod, goods, factors, Symbol[], :cd, params)
-hh = JCGEBlocks.HouseholdDemandBlock(:household, Symbol[], goods, factors, :cd, :X, params)
-util = JCGEBlocks.UtilityBlock(:utility, Symbol[], goods, :cd, :X, (alpha=alpha,))
+prod = JCGEBlocks.production(:prod, goods, factors, Symbol[]; form=:cd, params=params)
+hh = JCGEBlocks.household_demand(:household, Symbol[], goods, factors; form=:cd, consumption_var=:X, params=params)
+util = JCGEBlocks.utility(:utility, Symbol[], goods; form=:cd, consumption_var=:X, params=(alpha=alpha,))
 ```

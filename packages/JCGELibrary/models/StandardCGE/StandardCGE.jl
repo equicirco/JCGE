@@ -52,9 +52,9 @@ function model(; sam_table::Union{Nothing,JCGECalibrate.SAMTable} = nothing,
     mappings = JCGECore.Mappings(Dict(a => a for a in activities))
 
     prod_params = (b = params.b, beta = params.beta, ay = params.ay, ax = params.ax)
-    prod_block = JCGEBlocks.ProductionBlock(:prod, activities, factors_sym, commodities, :cd_leontief, prod_params)
+    prod_block = JCGEBlocks.production(:prod, activities, factors_sym, commodities; form=:cd_leontief, params=prod_params)
 
-    factor_market_block = JCGEBlocks.FactorMarketClearingBlock(:factor_market, activities, factors_sym, (FF = start.FF,))
+    factor_market_block = JCGEBlocks.factor_market_clearing(:factor_market, activities, factors_sym; params=(FF = start.FF,))
 
     gov_params = (
         tau_d = params.tau_d,
@@ -64,20 +64,20 @@ function model(; sam_table::Union{Nothing,JCGECalibrate.SAMTable} = nothing,
         ssg = params.ssg,
         FF = start.FF,
     )
-    gov_block = JCGEBlocks.GovernmentBlock(:government, commodities, factors_sym, gov_params)
+    gov_block = JCGEBlocks.government(:government, commodities, factors_sym, gov_params)
 
-    saving_block = JCGEBlocks.PrivateSavingBlock(:private_saving, factors_sym, (ssp = params.ssp, FF = start.FF))
+    saving_block = JCGEBlocks.private_saving(:private_saving, factors_sym, (ssp = params.ssp, FF = start.FF))
 
     hh_params = (alpha = params.alpha, FF = start.FF)
-    household_block = JCGEBlocks.HouseholdDemandBlock(:household, Symbol[], commodities, factors_sym, :cd, :Xp, hh_params)
+    household_block = JCGEBlocks.household_demand(:household, Symbol[], commodities, factors_sym; form=:cd, consumption_var=:Xp, params=hh_params)
 
-    invest_block = JCGEBlocks.InvestmentBlock(:investment, commodities, (lambda = params.lambda, Sf = start.Sf))
+    invest_block = JCGEBlocks.investment(:investment, commodities, (lambda = params.lambda, Sf = start.Sf))
 
     price_params = (pWe = start.pWe, pWm = start.pWm)
-    price_block = JCGEBlocks.PriceLinkBlock(:prices, commodities, price_params)
+    price_block = JCGEBlocks.price_link(:prices, commodities, price_params)
 
     bop_params = (pWe = start.pWe, pWm = start.pWm, Sf = start.Sf)
-    bop_block = JCGEBlocks.ExternalBalanceBlock(:bop, commodities, bop_params)
+    bop_block = JCGEBlocks.external_balance(:bop, commodities, bop_params)
 
     arm_params = (
         gamma = params.gamma,
@@ -86,7 +86,7 @@ function model(; sam_table::Union{Nothing,JCGECalibrate.SAMTable} = nothing,
         eta = params.eta,
         tau_m = start.tau_m,
     )
-    arm_block = JCGEBlocks.ArmingtonCESBlock(:armington, commodities, arm_params)
+    arm_block = JCGEBlocks.armington(:armington, commodities, arm_params)
 
     trans_params = (
         theta = params.theta,
@@ -95,11 +95,11 @@ function model(; sam_table::Union{Nothing,JCGECalibrate.SAMTable} = nothing,
         phi = params.phi,
         tau_z = start.tau_z,
     )
-    trans_block = JCGEBlocks.TransformationCETBlock(:transformation, commodities, trans_params)
+    trans_block = JCGEBlocks.transformation(:transformation, commodities, trans_params)
 
-    market_block = JCGEBlocks.CompositeMarketClearingBlock(:market, commodities, activities)
+    market_block = JCGEBlocks.composite_market_clearing(:market, commodities, activities)
 
-    util_block = JCGEBlocks.UtilityBlock(:utility, Symbol[], commodities, :cd, :Xp, (alpha = params.alpha,))
+    util_block = JCGEBlocks.utility(:utility, Symbol[], commodities; form=:cd, consumption_var=:Xp, params=(alpha = params.alpha,))
 
     start_vals = Dict{Symbol,Float64}()
     lower_vals = Dict{Symbol,Float64}()
@@ -143,9 +143,9 @@ function model(; sam_table::Union{Nothing,JCGECalibrate.SAMTable} = nothing,
         lower_vals[JCGEBlocks.global_var(:Tz, j)] = 0.0
         lower_vals[JCGEBlocks.global_var(:Tm, j)] = 0.0
     end
-    init_block = JCGEBlocks.InitialValuesBlock(:init, (start = start_vals, lower = lower_vals))
+    init_block = JCGEBlocks.initial_values(:init, (start = start_vals, lower = lower_vals))
 
-    numeraire_block = JCGEBlocks.NumeraireBlock(:numeraire, :factor, sam_table.numeraire_factor_label, 1.0)
+    numeraire_block = JCGEBlocks.numeraire(:numeraire, :factor, sam_table.numeraire_factor_label, 1.0)
 
     blocks = Any[
         prod_block,

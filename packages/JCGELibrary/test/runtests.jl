@@ -3,6 +3,7 @@ using JCGELibrary
 using JCGELibrary.StandardCGE
 using JCGELibrary.SimpleCGE
 using JCGELibrary.LargeCountryCGE
+using JCGELibrary.TwoCountryCGE
 using JCGEKernel
 using JuMP
 using Ipopt
@@ -16,6 +17,9 @@ import MathOptInterface as MOI
     lrg_sam = joinpath(LargeCountryCGE.datadir(), "sam_2_2.csv")
     lrg_spec = LargeCountryCGE.model(sam_path=lrg_sam)
     @test lrg_spec.name == "LargeCountryCGE"
+
+    two_spec = TwoCountryCGE.model()
+    @test two_spec.name == "TwoCountryCGE"
 end
 
 if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
@@ -36,6 +40,11 @@ if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
         result_large = JCGEKernel.run!(spec_large; optimizer=Ipopt.Optimizer, dataset_id="large_country_cge_test")
         status_large = MOI.get(result_large.context.model, MOI.TerminationStatus())
         @test status_large in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
+
+        spec_two = TwoCountryCGE.model()
+        result_two = JCGEKernel.run!(spec_two; optimizer=Ipopt.Optimizer, dataset_id="two_country_cge_test")
+        status_two = MOI.get(result_two.context.model, MOI.TerminationStatus())
+        @test status_two in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
     end
 end
 

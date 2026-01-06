@@ -103,6 +103,22 @@ end
     @test !isempty(ctx.equations)
 end
 
+@testset "JCGEBlocks.HouseholdDemandCDXpRegionalBlock" begin
+    sets = JCGECore.Sets([:g1_r1], [:a1_r1], [:lab_r1], [:hh1])
+    mappings = JCGECore.Mappings(Dict(:a1_r1 => :g1_r1))
+    params = (
+        FF = Dict(:lab_r1 => 10.0),
+        alpha = Dict(:g1_r1 => 1.0),
+    )
+    block = JCGEBlocks.household_demand_regional(:hh_r, [:g1_r1], [:lab_r1], :r1; params=params)
+    ms = JCGECore.ModelSpec(Any[block], sets, mappings)
+    spec = JCGECore.RunSpec("BlocksTest", ms, JCGECore.ClosureSpec(:W), JCGECore.ScenarioSpec(:baseline, Dict{Symbol,Any}()))
+    ctx = JCGEKernel.KernelContext()
+    JCGECore.build!(block, ctx, spec)
+    @test !isempty(ctx.variables)
+    @test !isempty(ctx.equations)
+end
+
 @testset "JCGEBlocks.GoodsMarketClearingBlock" begin
     sets = JCGECore.Sets([:g1, :g2], [:a1, :a2], [:lab], [:hh1])
     mappings = JCGECore.Mappings(Dict(:a1 => :g1, :a2 => :g2))
@@ -176,6 +192,18 @@ end
     @test !isempty(ctx.equations)
 end
 
+@testset "JCGEBlocks.ExchangeRateLinkRegionBlock" begin
+    sets = JCGECore.Sets([:g1_r1], [:a1_r1], [:lab_r1], [:hh1])
+    mappings = JCGECore.Mappings(Dict(:a1_r1 => :g1_r1))
+    block = JCGEBlocks.exchange_rate_link_region(:xr_region, [:g1_r1], :r1)
+    ms = JCGECore.ModelSpec(Any[block], sets, mappings)
+    spec = JCGECore.RunSpec("BlocksTest", ms, JCGECore.ClosureSpec(:W), JCGECore.ScenarioSpec(:baseline, Dict{Symbol,Any}()))
+    ctx = JCGEKernel.KernelContext()
+    JCGECore.build!(block, ctx, spec)
+    @test !isempty(ctx.variables)
+    @test !isempty(ctx.equations)
+end
+
 @testset "JCGEBlocks.PriceLinkBlock" begin
     sets = JCGECore.Sets([:g1, :g2], [:a1], [:lab], [:hh1])
     mappings = JCGECore.Mappings(Dict(:a1 => :g1))
@@ -222,6 +250,26 @@ end
     @test !isempty(ctx.equations)
 end
 
+@testset "JCGEBlocks.GovernmentRegionalBlock" begin
+    sets = JCGECore.Sets([:g1_r1], [:a1_r1], [:lab_r1], [:hh1])
+    mappings = JCGECore.Mappings(Dict(:a1_r1 => :g1_r1))
+    params = (
+        tau_d = 0.1,
+        tau_z = Dict(:g1_r1 => 0.05),
+        tau_m = Dict(:g1_r1 => 0.02),
+        mu = Dict(:g1_r1 => 1.0),
+        ssg = 0.2,
+        FF = Dict(:lab_r1 => 10.0),
+    )
+    block = JCGEBlocks.government_regional(:gov_r, [:g1_r1], [:lab_r1], :r1, params)
+    ms = JCGECore.ModelSpec(Any[block], sets, mappings)
+    spec = JCGECore.RunSpec("BlocksTest", ms, JCGECore.ClosureSpec(:W), JCGECore.ScenarioSpec(:baseline, Dict{Symbol,Any}()))
+    ctx = JCGEKernel.KernelContext()
+    JCGECore.build!(block, ctx, spec)
+    @test !isempty(ctx.variables)
+    @test !isempty(ctx.equations)
+end
+
 @testset "JCGEBlocks.PrivateSavingBlock" begin
     sets = JCGECore.Sets([:g1], [:a1], [:lab, :cap], [:hh1])
     mappings = JCGECore.Mappings(Dict(:a1 => :g1))
@@ -238,6 +286,19 @@ end
     @test !isempty(ctx.equations)
 end
 
+@testset "JCGEBlocks.PrivateSavingRegionalBlock" begin
+    sets = JCGECore.Sets([:g1_r1], [:a1_r1], [:lab_r1], [:hh1])
+    mappings = JCGECore.Mappings(Dict(:a1_r1 => :g1_r1))
+    params = (ssp = 0.2, FF = Dict(:lab_r1 => 10.0))
+    block = JCGEBlocks.private_saving_regional(:ps_r, [:lab_r1], :r1, params)
+    ms = JCGECore.ModelSpec(Any[block], sets, mappings)
+    spec = JCGECore.RunSpec("BlocksTest", ms, JCGECore.ClosureSpec(:W), JCGECore.ScenarioSpec(:baseline, Dict{Symbol,Any}()))
+    ctx = JCGEKernel.KernelContext()
+    JCGECore.build!(block, ctx, spec)
+    @test !isempty(ctx.variables)
+    @test !isempty(ctx.equations)
+end
+
 @testset "JCGEBlocks.InvestmentBlock" begin
     sets = JCGECore.Sets([:g1, :g2], [:a1], [:lab], [:hh1])
     mappings = JCGECore.Mappings(Dict(:a1 => :g1))
@@ -246,6 +307,19 @@ end
         Sf = 1.0,
     )
     block = JCGEBlocks.InvestmentBlock(:inv, Symbol[], params)
+    ms = JCGECore.ModelSpec(Any[block], sets, mappings)
+    spec = JCGECore.RunSpec("BlocksTest", ms, JCGECore.ClosureSpec(:W), JCGECore.ScenarioSpec(:baseline, Dict{Symbol,Any}()))
+    ctx = JCGEKernel.KernelContext()
+    JCGECore.build!(block, ctx, spec)
+    @test !isempty(ctx.variables)
+    @test !isempty(ctx.equations)
+end
+
+@testset "JCGEBlocks.InvestmentRegionalBlock" begin
+    sets = JCGECore.Sets([:g1_r1], [:a1_r1], [:lab_r1], [:hh1])
+    mappings = JCGECore.Mappings(Dict(:a1_r1 => :g1_r1))
+    params = (lambda = Dict(:g1_r1 => 1.0), Sf = 1.0)
+    block = JCGEBlocks.investment_regional(:inv_r, [:g1_r1], :r1, params)
     ms = JCGECore.ModelSpec(Any[block], sets, mappings)
     spec = JCGECore.RunSpec("BlocksTest", ms, JCGECore.ClosureSpec(:W), JCGECore.ScenarioSpec(:baseline, Dict{Symbol,Any}()))
     ctx = JCGEKernel.KernelContext()
@@ -343,6 +417,19 @@ end
     @test !isempty(ctx.equations)
 end
 
+@testset "JCGEBlocks.UtilityCDRegionalBlock" begin
+    sets = JCGECore.Sets([:g1_r1, :g1_r2], [:a1_r1], [:lab_r1], [:hh1])
+    mappings = JCGECore.Mappings(Dict(:a1_r1 => :g1_r1))
+    params = (alpha = Dict(:g1_r1 => 1.0, :g1_r2 => 1.0),)
+    goods_by_region = Dict(:r1 => [:g1_r1], :r2 => [:g1_r2])
+    block = JCGEBlocks.utility_regional(:util_r, goods_by_region, params)
+    ms = JCGECore.ModelSpec(Any[block], sets, mappings)
+    spec = JCGECore.RunSpec("BlocksTest", ms, JCGECore.ClosureSpec(:W), JCGECore.ScenarioSpec(:baseline, Dict{Symbol,Any}()))
+    ctx = JCGEKernel.KernelContext()
+    JCGECore.build!(block, ctx, spec)
+    @test !isempty(ctx.equations)
+end
+
 @testset "JCGEBlocks.ExternalBalanceBlock" begin
     sets = JCGECore.Sets([:g1, :g2], [:a1], [:lab], [:hh1])
     mappings = JCGECore.Mappings(Dict(:a1 => :g1))
@@ -406,6 +493,18 @@ end
     ctx = JCGEKernel.KernelContext()
     JCGECore.build!(block, ctx, spec)
     @test !isempty(ctx.variables)
+    @test !isempty(ctx.equations)
+end
+
+@testset "JCGEBlocks.InternationalMarketBlock" begin
+    sets = JCGECore.Sets([:g1_r1, :g1_r2], [:a1_r1, :a1_r2], [:lab_r1], [:hh1])
+    mappings = JCGECore.Mappings(Dict(:a1_r1 => :g1_r1))
+    mapping = Dict{Tuple{Symbol,Symbol},Symbol}((:g1, :r1) => :g1_r1, (:g1, :r2) => :g1_r2)
+    block = JCGEBlocks.international_market(:world, [:g1], [:r1, :r2], mapping)
+    ms = JCGECore.ModelSpec(Any[block], sets, mappings)
+    spec = JCGECore.RunSpec("BlocksTest", ms, JCGECore.ClosureSpec(:W), JCGECore.ScenarioSpec(:baseline, Dict{Symbol,Any}()))
+    ctx = JCGEKernel.KernelContext()
+    JCGECore.build!(block, ctx, spec)
     @test !isempty(ctx.equations)
 end
 

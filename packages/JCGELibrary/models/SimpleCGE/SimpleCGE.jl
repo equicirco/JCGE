@@ -35,23 +35,23 @@ function model(; sam_path::Union{Nothing,AbstractString}=nothing)
         b = b,
         beta = beta,
     )
-    prod_block = JCGEBlocks.ProductionBlock(:prod, goods, factors, Symbol[], :cd, prod_params)
+    prod_block = JCGEBlocks.production(:prod, goods, factors, Symbol[]; form=:cd, params=prod_params)
 
     hh_params = (
         FF = FF,
         alpha = alpha,
     )
-    household_block = JCGEBlocks.HouseholdDemandBlock(:household, Symbol[], goods, factors, :cd, :X, hh_params)
+    household_block = JCGEBlocks.household_demand(:household, Symbol[], goods, factors; form=:cd, consumption_var=:X, params=hh_params)
 
-    goods_market_block = JCGEBlocks.GoodsMarketClearingBlock(:goods_market, goods)
+    goods_market_block = JCGEBlocks.goods_market_clearing(:goods_market, goods)
 
-    factor_market_block = JCGEBlocks.FactorMarketClearingBlock(:factor_market, goods, factors, (FF = FF,))
+    factor_market_block = JCGEBlocks.factor_market_clearing(:factor_market, goods, factors; params=(FF = FF,))
 
-    price_block = JCGEBlocks.PriceEqualityBlock(:price_link, goods)
+    price_block = JCGEBlocks.price_equality(:price_link, goods)
 
-    numeraire_block = JCGEBlocks.NumeraireBlock(:numeraire, :factor, :LAB, 1.0)
+    numeraire_block = JCGEBlocks.numeraire(:numeraire, :factor, :LAB, 1.0)
 
-    util_block = JCGEBlocks.UtilityBlock(:utility, Symbol[], goods, :cd, :X, (alpha = alpha,))
+    util_block = JCGEBlocks.utility(:utility, Symbol[], goods; form=:cd, consumption_var=:X, params=(alpha = alpha,))
 
     start_vals = Dict{Symbol,Float64}()
     lower_vals = Dict{Symbol,Float64}()
@@ -70,7 +70,7 @@ function model(; sam_path::Union{Nothing,AbstractString}=nothing)
     for (name, value) in start_vals
         lower_vals[name] = 0.001
     end
-    init_block = JCGEBlocks.InitialValuesBlock(:init, (start = start_vals, lower = lower_vals))
+    init_block = JCGEBlocks.initial_values(:init, (start = start_vals, lower = lower_vals))
 
     blocks = Any[
         prod_block,
