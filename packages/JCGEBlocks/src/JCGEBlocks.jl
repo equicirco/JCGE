@@ -705,15 +705,12 @@ function JCGECore.build!(block::UtilityBlock, ctx::JCGEKernel.KernelContext, spe
     model = ctx.model
 
     if model isa JuMP.Model
+        alpha_vals = Dict(hh => Dict(i => JCGECore.getparam(block.params, :alpha, i, hh) for i in commodities) for hh in households)
         if length(households) == 1
             hh = only(households)
-            alpha_vals = Dict(i => JCGECore.getparam(block.params, :alpha, i, hh) for i in commodities)
-            @NLobjective(model, Max, prod(ensure_var!(ctx, model, global_var(:Xp, i, hh)) ^ alpha_vals[i] for i in commodities))
+            @NLobjective(model, Max, prod(ensure_var!(ctx, model, global_var(:Xp, i, hh)) ^ alpha_vals[hh][i] for i in commodities))
         else
-            @NLobjective(model, Max, sum(begin
-                alpha_vals = Dict(i => JCGECore.getparam(block.params, :alpha, i, hh) for i in commodities)
-                prod(ensure_var!(ctx, model, global_var(:Xp, i, hh)) ^ alpha_vals[i] for i in commodities)
-            end for hh in households))
+            @NLobjective(model, Max, sum(prod(ensure_var!(ctx, model, global_var(:Xp, i, hh)) ^ alpha_vals[hh][i] for i in commodities) for hh in households))
         end
     end
     register_eq!(ctx, block, :objective; info="maximize household utility", constraint=nothing)
