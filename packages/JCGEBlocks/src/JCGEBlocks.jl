@@ -9,6 +9,7 @@ export ProductionBlock
 export ProductionCDBlock
 export ProductionCDLeontiefBlock
 export ProductionCDLeontiefSectorPFBlock
+export ProductionMultilaborCDBlock
 export FactorSupplyBlock
 export HouseholdDemandBlock
 export HouseholdDemandCDBlock
@@ -20,6 +21,7 @@ export MarketClearingBlock
 export GoodsMarketClearingBlock
 export FactorMarketClearingBlock
 export CompositeMarketClearingBlock
+export LaborMarketClearingBlock
 export PriceLinkBlock
 export ExchangeRateLinkBlock
 export ExchangeRateLinkRegionBlock
@@ -54,11 +56,28 @@ export ExternalBalanceVarPriceBlock
 export ForeignTradeBlock
 export PriceAggregationBlock
 export InternationalMarketBlock
+export ActivityPriceIOBlock
+export CapitalPriceCompositionBlock
+export TradePriceLinkBlock
+export AbsorptionSalesBlock
+export ArmingtonMXxdBlock
+export CETXXDEBlock
+export ExportDemandBlock
+export NontradedSupplyBlock
+export HouseholdShareDemandBlock
+export GovernmentShareDemandBlock
+export InventoryDemandBlock
+export GovernmentFinanceBlock
+export GDPIncomeBlock
+export SavingsInvestmentBlock
+export FinalDemandClearingBlock
+export ConsumptionObjectiveBlock
 export InitialValuesBlock
 export apply_start
 export rerun!
 export production
 export production_sector_pf
+export production_multilabor_cd
 export factor_supply
 export household_demand
 export household_demand_regional
@@ -67,6 +86,7 @@ export market_clearing
 export goods_market_clearing
 export factor_market_clearing
 export composite_market_clearing
+export labor_market_clearing
 export price_link
 export exchange_rate_link
 export exchange_rate_link_region
@@ -98,6 +118,22 @@ export external_balance_var_price
 export foreign_trade
 export price_aggregation
 export international_market
+export activity_price_io
+export capital_price_composition
+export trade_price_link
+export absorption_sales
+export armington_m_xxd
+export cet_xxd_e
+export export_demand
+export nontraded_supply
+export household_share_demand
+export government_share_demand
+export inventory_demand
+export government_finance
+export gdp_income
+export savings_investment
+export final_demand_clearing
+export consumption_objective
 export initial_values
 
 "Minimal example block used to validate end-to-end wiring."
@@ -126,6 +162,9 @@ production_sector_pf(name::Symbol, activities::Vector{Symbol}, factors::Vector{S
     params::NamedTuple) =
     ProductionCDLeontiefSectorPFBlock(name, activities, factors, commodities, params)
 
+production_multilabor_cd(name::Symbol, activities::Vector{Symbol}, labor::Vector{Symbol}; params::NamedTuple) =
+    ProductionMultilaborCDBlock(name, activities, labor, params)
+
 factor_supply(name::Symbol, factors::Vector{Symbol}, params::NamedTuple) =
     FactorSupplyBlock(name, factors, params)
 
@@ -152,6 +191,9 @@ factor_market_clearing(name::Symbol, activities::Vector{Symbol}, factors::Vector
 
 composite_market_clearing(name::Symbol, commodities::Vector{Symbol}, activities::Vector{Symbol}) =
     CompositeMarketClearingBlock(name, commodities, activities)
+
+labor_market_clearing(name::Symbol, labor::Vector{Symbol}, activities::Vector{Symbol}; params::NamedTuple) =
+    LaborMarketClearingBlock(name, labor, activities, params)
 
 price_link(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     PriceLinkBlock(name, commodities, params)
@@ -248,6 +290,54 @@ international_market(name::Symbol, goods::Vector{Symbol}, regions::Vector{Symbol
     mapping::Dict{Tuple{Symbol,Symbol},Symbol}) =
     InternationalMarketBlock(name, goods, regions, mapping)
 
+activity_price_io(name::Symbol, activities::Vector{Symbol}, commodities::Vector{Symbol}, params::NamedTuple) =
+    ActivityPriceIOBlock(name, activities, commodities, params)
+
+capital_price_composition(name::Symbol, activities::Vector{Symbol}, commodities::Vector{Symbol}, params::NamedTuple) =
+    CapitalPriceCompositionBlock(name, activities, commodities, params)
+
+trade_price_link(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    TradePriceLinkBlock(name, commodities, params)
+
+absorption_sales(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    AbsorptionSalesBlock(name, commodities, params)
+
+armington_m_xxd(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    ArmingtonMXxdBlock(name, commodities, params)
+
+cet_xxd_e(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    CETXXDEBlock(name, commodities, params)
+
+export_demand(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    ExportDemandBlock(name, commodities, params)
+
+nontraded_supply(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    NontradedSupplyBlock(name, commodities, params)
+
+household_share_demand(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    HouseholdShareDemandBlock(name, commodities, params)
+
+government_share_demand(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    GovernmentShareDemandBlock(name, commodities, params)
+
+inventory_demand(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    InventoryDemandBlock(name, commodities, params)
+
+government_finance(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    GovernmentFinanceBlock(name, commodities, params)
+
+gdp_income(name::Symbol, activities::Vector{Symbol}, params::NamedTuple) =
+    GDPIncomeBlock(name, activities, params)
+
+savings_investment(name::Symbol, activities::Vector{Symbol}, commodities::Vector{Symbol}, params::NamedTuple) =
+    SavingsInvestmentBlock(name, activities, commodities, params)
+
+final_demand_clearing(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    FinalDemandClearingBlock(name, commodities, params)
+
+consumption_objective(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
+    ConsumptionObjectiveBlock(name, commodities, params)
+
 initial_values(name::Symbol, params::NamedTuple) =
     InitialValuesBlock(name, params)
 
@@ -280,6 +370,13 @@ struct ProductionCDLeontiefSectorPFBlock <: JCGECore.AbstractBlock
     activities::Vector{Symbol}
     factors::Vector{Symbol}
     commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct ProductionMultilaborCDBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    activities::Vector{Symbol}
+    labor::Vector{Symbol}
     params::NamedTuple
 end
 
@@ -359,6 +456,13 @@ struct CompositeMarketClearingBlock <: JCGECore.AbstractBlock
     name::Symbol
     commodities::Vector{Symbol}
     activities::Vector{Symbol}
+end
+
+struct LaborMarketClearingBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    labor::Vector{Symbol}
+    activities::Vector{Symbol}
+    params::NamedTuple
 end
 
 struct PriceLinkBlock <: JCGECore.AbstractBlock
@@ -575,6 +679,105 @@ struct InternationalMarketBlock <: JCGECore.AbstractBlock
     goods::Vector{Symbol}
     regions::Vector{Symbol}
     mapping::Dict{Tuple{Symbol,Symbol},Symbol}
+end
+
+struct ActivityPriceIOBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    activities::Vector{Symbol}
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct CapitalPriceCompositionBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    activities::Vector{Symbol}
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct TradePriceLinkBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct AbsorptionSalesBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct ArmingtonMXxdBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct CETXXDEBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct ExportDemandBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct NontradedSupplyBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct HouseholdShareDemandBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct GovernmentShareDemandBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct InventoryDemandBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct GovernmentFinanceBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct GDPIncomeBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    activities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct SavingsInvestmentBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    activities::Vector{Symbol}
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct FinalDemandClearingBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct ConsumptionObjectiveBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    params::NamedTuple
 end
 
 struct InitialValuesBlock <: JCGECore.AbstractBlock
@@ -2465,6 +2668,479 @@ function JCGECore.build!(block::InternationalMarketBlock, ctx::JCGEKernel.Kernel
         end
     end
 
+    return nothing
+end
+
+function JCGECore.build!(block::ProductionMultilaborCDBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
+    labor = isempty(block.labor) ? spec.model.sets.factors : block.labor
+    model = ctx.model
+
+    xd = Dict{Symbol,Any}()
+    pva = Dict{Symbol,Any}()
+    k = Dict{Symbol,Any}()
+    l = Dict{Tuple{Symbol,Symbol},Any}()
+    wa = Dict{Symbol,Any}()
+
+    for i in activities
+        xd[i] = ensure_var!(ctx, model, global_var(:xd, i))
+        pva[i] = ensure_var!(ctx, model, global_var(:pva, i))
+        k[i] = ensure_var!(ctx, model, global_var(:k, i))
+    end
+
+    for lc in labor
+        wa[lc] = ensure_var!(ctx, model, global_var(:wa, lc))
+    end
+
+    for i in activities, lc in labor
+        l[(i, lc)] = ensure_var!(ctx, model, global_var(:l, i, lc))
+    end
+
+    for i in activities
+        ad_i = JCGECore.getparam(block.params, :ad, i)
+        wdist_vals = Dict(lc => JCGECore.getparam(block.params, :wdist, i, lc) for lc in labor)
+        alphl_vals = Dict(lc => JCGECore.getparam(block.params, :alphl, lc, i) for lc in labor)
+        active_labor = [lc for lc in labor if wdist_vals[lc] > 0.0]
+        labor_share = sum(alphl_vals[lc] for lc in labor)
+
+        constraint = model isa JuMP.Model ? @NLconstraint(
+            model,
+            xd[i] == ad_i * prod(l[(i, lc)] ^ alphl_vals[lc] for lc in active_labor) *
+                     k[i] ^ (1.0 - labor_share)
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:activity, block=block.name,
+            payload=(indices=(i,), info="xd[i] = ad[i]*prod(l^alphl)*k^(1-sum(alphl))", constraint=constraint))
+
+        for lc in active_labor
+            wdist_i = wdist_vals[lc]
+            alpha_i = alphl_vals[lc]
+            constraint = model isa JuMP.Model ? @NLconstraint(
+                model,
+                wa[lc] * wdist_i * l[(i, lc)] == xd[i] * pva[i] * alpha_i
+            ) : nothing
+            JCGEKernel.register_equation!(ctx; tag=:profitmax, block=block.name,
+                payload=(indices=(i, lc), info="wa*wdist*l = xd*pva*alphl", constraint=constraint))
+        end
+    end
+
+    return nothing
+end
+
+function JCGECore.build!(block::LaborMarketClearingBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    labor = isempty(block.labor) ? spec.model.sets.factors : block.labor
+    activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
+    model = ctx.model
+
+    for lc in labor
+        ls = ensure_var!(ctx, model, global_var(:ls, lc))
+        l = Dict(i => ensure_var!(ctx, model, global_var(:l, i, lc)) for i in activities)
+        constraint = model isa JuMP.Model ? @constraint(model, sum(l[i] for i in activities) == ls) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:lmequil, block=block.name,
+            payload=(indices=(lc,), info="sum_i l[i,lc] = ls[lc]", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::ActivityPriceIOBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+
+    for i in activities
+        px = ensure_var!(ctx, model, global_var(:px, i))
+        pva = ensure_var!(ctx, model, global_var(:pva, i))
+        xd = ensure_var!(ctx, model, global_var(:xd, i))
+        int = ensure_var!(ctx, model, global_var(:int, i))
+        p = Dict(j => ensure_var!(ctx, model, global_var(:p, j)) for j in commodities)
+        itax_i = JCGECore.getparam(block.params, :itax, i)
+        io_vals = Dict(j => JCGECore.getparam(block.params, :io, j, i) for j in commodities)
+
+        constraint = model isa JuMP.Model ? @constraint(
+            model,
+            px * (1.0 - itax_i) == pva + sum(io_vals[j] * p[j] for j in commodities)
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:actp, block=block.name,
+            payload=(indices=(i,), info="px*(1-itax) = pva + sum(io*p)", constraint=constraint))
+
+        constraint = model isa JuMP.Model ? @constraint(
+            model,
+            int == sum(JCGECore.getparam(block.params, :io, i, j) * ensure_var!(ctx, model, global_var(:xd, j)) for j in activities)
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:inteq, block=block.name,
+            payload=(indices=(i,), info="int[i] = sum(io[i,j]*xd[j])", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::CapitalPriceCompositionBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+
+    for i in activities
+        pk = ensure_var!(ctx, model, global_var(:pk, i))
+        p = Dict(j => ensure_var!(ctx, model, global_var(:p, j)) for j in commodities)
+        imat_vals = Dict(j => JCGECore.getparam(block.params, :imat, j, i) for j in commodities)
+        constraint = model isa JuMP.Model ? @constraint(
+            model,
+            pk == sum(p[j] * imat_vals[j] for j in commodities)
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:pkdef, block=block.name,
+            payload=(indices=(i,), info="pk[i] = sum(p[j]*imat[j,i])", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::TradePriceLinkBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
+    model = ctx.model
+    er = ensure_var!(ctx, model, global_var(:er))
+
+    for i in traded
+        pm = ensure_var!(ctx, model, global_var(:pm, i))
+        pwm = ensure_var!(ctx, model, global_var(:pwm, i))
+        tm = ensure_var!(ctx, model, global_var(:tm, i))
+        constraint = model isa JuMP.Model ? @NLconstraint(model, pm == pwm * er * (1.0 + tm)) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:pmdef, block=block.name,
+            payload=(indices=(i,), info="pm = pwm*er*(1+tm)", constraint=constraint))
+
+        pe = ensure_var!(ctx, model, global_var(:pe, i))
+        pwe = ensure_var!(ctx, model, global_var(:pwe, i))
+        te_i = JCGECore.getparam(block.params, :te, i)
+        constraint = model isa JuMP.Model ? @NLconstraint(model, pe * (1.0 + te_i) == pwe * er) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:pedef, block=block.name,
+            payload=(indices=(i,), info="pe*(1+te) = pwe*er", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::AbsorptionSalesBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
+    model = ctx.model
+
+    for i in commodities
+        p = ensure_var!(ctx, model, global_var(:p, i))
+        x = ensure_var!(ctx, model, global_var(:x, i))
+        pd = ensure_var!(ctx, model, global_var(:pd, i))
+        xxd = ensure_var!(ctx, model, global_var(:xxd, i))
+        pm = ensure_var!(ctx, model, global_var(:pm, i))
+        m = ensure_var!(ctx, model, global_var(:m, i))
+        term_m = i in traded ? pm * m : 0.0
+        constraint = model isa JuMP.Model ? @NLconstraint(model, p * x == pd * xxd + term_m) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:absorption, block=block.name,
+            payload=(indices=(i,), info="p*x = pd*xxd + pm*m", constraint=constraint))
+
+        px = ensure_var!(ctx, model, global_var(:px, i))
+        xd = ensure_var!(ctx, model, global_var(:xd, i))
+        pe = ensure_var!(ctx, model, global_var(:pe, i))
+        e = ensure_var!(ctx, model, global_var(:e, i))
+        term_e = i in traded ? pe * e : 0.0
+        constraint = model isa JuMP.Model ? @NLconstraint(model, px * xd == pd * xxd + term_e) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:sales, block=block.name,
+            payload=(indices=(i,), info="px*xd = pd*xxd + pe*e", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::ArmingtonMXxdBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
+    model = ctx.model
+
+    for i in traded
+        x = ensure_var!(ctx, model, global_var(:x, i))
+        m = ensure_var!(ctx, model, global_var(:m, i))
+        xxd = ensure_var!(ctx, model, global_var(:xxd, i))
+        pd = ensure_var!(ctx, model, global_var(:pd, i))
+        pm = ensure_var!(ctx, model, global_var(:pm, i))
+        ac_i = JCGECore.getparam(block.params, :ac, i)
+        delta_i = JCGECore.getparam(block.params, :delta, i)
+        rhoc_i = JCGECore.getparam(block.params, :rhoc, i)
+
+        constraint = model isa JuMP.Model ? @NLconstraint(
+            model,
+            x == ac_i * (delta_i * m ^ (-rhoc_i) + (1.0 - delta_i) * xxd ^ (-rhoc_i)) ^ (-1.0 / rhoc_i)
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:armington, block=block.name,
+            payload=(indices=(i,), info="x = ac*(delta*m^-rhoc + (1-delta)*xxd^-rhoc)^(-1/rhoc)", constraint=constraint))
+
+        constraint = model isa JuMP.Model ? @NLconstraint(
+            model,
+            m / xxd == (pd / pm * delta_i / (1.0 - delta_i)) ^ (1.0 / (1.0 + rhoc_i))
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:costmin, block=block.name,
+            payload=(indices=(i,), info="m/xxd = (pd/pm*delta/(1-delta))^(1/(1+rhoc))", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::CETXXDEBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
+    model = ctx.model
+
+    for i in traded
+        xd = ensure_var!(ctx, model, global_var(:xd, i))
+        e = ensure_var!(ctx, model, global_var(:e, i))
+        xxd = ensure_var!(ctx, model, global_var(:xxd, i))
+        pe = ensure_var!(ctx, model, global_var(:pe, i))
+        pd = ensure_var!(ctx, model, global_var(:pd, i))
+        at_i = JCGECore.getparam(block.params, :at, i)
+        gamma_i = JCGECore.getparam(block.params, :gamma, i)
+        rhot_i = JCGECore.getparam(block.params, :rhot, i)
+
+        constraint = model isa JuMP.Model ? @NLconstraint(
+            model,
+            xd == at_i * (gamma_i * e ^ rhot_i + (1.0 - gamma_i) * xxd ^ rhot_i) ^ (1.0 / rhot_i)
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:cet, block=block.name,
+            payload=(indices=(i,), info="xd = at*(gamma*e^rhot + (1-gamma)*xxd^rhot)^(1/rhot)", constraint=constraint))
+
+        constraint = model isa JuMP.Model ? @NLconstraint(
+            model,
+            e / xxd == (pe / pd * (1.0 - gamma_i) / gamma_i) ^ (1.0 / (rhot_i - 1.0))
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:esupply, block=block.name,
+            payload=(indices=(i,), info="e/xxd = (pe/pd*(1-gamma)/gamma)^(1/(rhot-1))", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::ExportDemandBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
+    model = ctx.model
+
+    for i in traded
+        e = ensure_var!(ctx, model, global_var(:e, i))
+        pwe = ensure_var!(ctx, model, global_var(:pwe, i))
+        e0_i = JCGECore.getparam(block.params, :e0, i)
+        pwe0_i = JCGECore.getparam(block.params, :pwe0, i)
+        eta_i = JCGECore.getparam(block.params, :eta, i)
+        constraint = model isa JuMP.Model ? @NLconstraint(model, e / e0_i == (pwe0_i / pwe) ^ eta_i) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:edemand, block=block.name,
+            payload=(indices=(i,), info="e/e0 = (pwe0/pwe)^eta", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::NontradedSupplyBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    nontraded = hasproperty(block.params, :nontraded) ? block.params.nontraded : Symbol[]
+    model = ctx.model
+    for i in nontraded
+        xxd = ensure_var!(ctx, model, global_var(:xxd, i))
+        xd = ensure_var!(ctx, model, global_var(:xd, i))
+        x = ensure_var!(ctx, model, global_var(:x, i))
+        constraint = model isa JuMP.Model ? @constraint(model, xxd == xd) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:xxdsn, block=block.name,
+            payload=(indices=(i,), info="xxd = xd (nontraded)", constraint=constraint))
+        constraint = model isa JuMP.Model ? @constraint(model, x == xxd) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:xsn, block=block.name,
+            payload=(indices=(i,), info="x = xxd (nontraded)", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::HouseholdShareDemandBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+
+    y = ensure_var!(ctx, model, global_var(:y))
+    mps = ensure_var!(ctx, model, global_var(:mps))
+    for i in commodities
+        p = ensure_var!(ctx, model, global_var(:p, i))
+        cd = ensure_var!(ctx, model, global_var(:cd, i))
+        cles_i = JCGECore.getparam(block.params, :cles, i)
+        constraint = model isa JuMP.Model ? @NLconstraint(model, p * cd == cles_i * (1.0 - mps) * y) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:cdeq, block=block.name,
+            payload=(indices=(i,), info="p*cd = cles*(1-mps)*y", constraint=constraint))
+    end
+
+    hhsav = ensure_var!(ctx, model, global_var(:hhsav))
+    constraint = model isa JuMP.Model ? @NLconstraint(model, hhsav == mps * y) : nothing
+    JCGEKernel.register_equation!(ctx; tag=:hhsaveq, block=block.name,
+        payload=(indices=(), info="hhsav = mps*y", constraint=constraint))
+    return nothing
+end
+
+function JCGECore.build!(block::GovernmentShareDemandBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+    gdtot = ensure_var!(ctx, model, global_var(:gdtot))
+    for i in commodities
+        gd = ensure_var!(ctx, model, global_var(:gd, i))
+        gles_i = JCGECore.getparam(block.params, :gles, i)
+        constraint = model isa JuMP.Model ? @constraint(model, gd == gles_i * gdtot) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:gdeq, block=block.name,
+            payload=(indices=(i,), info="gd = gles*gdtot", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::InventoryDemandBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+    for i in commodities
+        dst = ensure_var!(ctx, model, global_var(:dst, i))
+        xd = ensure_var!(ctx, model, global_var(:xd, i))
+        dstr_i = JCGECore.getparam(block.params, :dstr, i)
+        constraint = model isa JuMP.Model ? @constraint(model, dst == dstr_i * xd) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:dsteq, block=block.name,
+            payload=(indices=(i,), info="dst = dstr*xd", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::GovernmentFinanceBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
+    model = ctx.model
+
+    er = ensure_var!(ctx, model, global_var(:er))
+    gr = ensure_var!(ctx, model, global_var(:gr))
+    tariff = ensure_var!(ctx, model, global_var(:tariff))
+    indtax = ensure_var!(ctx, model, global_var(:indtax))
+    duty = ensure_var!(ctx, model, global_var(:duty))
+    govsav = ensure_var!(ctx, model, global_var(:govsav))
+    itax_vals = Dict(i => JCGECore.getparam(block.params, :itax, i) for i in commodities)
+    te_vals = Dict(i => JCGECore.getparam(block.params, :te, i) for i in traded)
+
+    tm_vars = Dict(i => ensure_var!(ctx, model, global_var(:tm, i)) for i in traded)
+    m_vars = Dict(i => ensure_var!(ctx, model, global_var(:m, i)) for i in traded)
+    pwm_vars = Dict(i => ensure_var!(ctx, model, global_var(:pwm, i)) for i in traded)
+    px_vars = Dict(i => ensure_var!(ctx, model, global_var(:px, i)) for i in commodities)
+    xd_vars = Dict(i => ensure_var!(ctx, model, global_var(:xd, i)) for i in commodities)
+    e_vars = Dict(i => ensure_var!(ctx, model, global_var(:e, i)) for i in traded)
+    pe_vars = Dict(i => ensure_var!(ctx, model, global_var(:pe, i)) for i in traded)
+    p_vars = Dict(i => ensure_var!(ctx, model, global_var(:p, i)) for i in commodities)
+    gd_vars = Dict(i => ensure_var!(ctx, model, global_var(:gd, i)) for i in commodities)
+
+    constraint = model isa JuMP.Model ? @NLconstraint(
+        model,
+        tariff == sum(tm_vars[i] * m_vars[i] * pwm_vars[i] for i in traded) * er
+    ) : nothing
+    JCGEKernel.register_equation!(ctx; tag=:tariffdef, block=block.name,
+        payload=(indices=(), info="tariff = sum(tm*m*pwm)*er", constraint=constraint))
+
+    constraint = model isa JuMP.Model ? @NLconstraint(model, indtax == sum(itax_vals[i] *
+        px_vars[i] * xd_vars[i] for i in commodities)) : nothing
+    JCGEKernel.register_equation!(ctx; tag=:indtaxdef, block=block.name,
+        payload=(indices=(), info="indtax = sum(itax*px*xd)", constraint=constraint))
+
+    constraint = model isa JuMP.Model ? @NLconstraint(model, duty == sum(te_vals[i] *
+        e_vars[i] * pe_vars[i] for i in traded)) : nothing
+    JCGEKernel.register_equation!(ctx; tag=:dutydef, block=block.name,
+        payload=(indices=(), info="duty = sum(te*e*pe)", constraint=constraint))
+
+    constraint = model isa JuMP.Model ? @constraint(model, gr == tariff + duty + indtax) : nothing
+    JCGEKernel.register_equation!(ctx; tag=:greq, block=block.name,
+        payload=(indices=(), info="gr = tariff + duty + indtax", constraint=constraint))
+
+    constraint = model isa JuMP.Model ? @NLconstraint(model, gr == sum(p_vars[i] * gd_vars[i] for i in commodities) + govsav) : nothing
+    JCGEKernel.register_equation!(ctx; tag=:gruse, block=block.name,
+        payload=(indices=(), info="gr = sum(p*gd) + govsav", constraint=constraint))
+
+    return nothing
+end
+
+function JCGECore.build!(block::GDPIncomeBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
+    model = ctx.model
+    y = ensure_var!(ctx, model, global_var(:y))
+    deprecia = ensure_var!(ctx, model, global_var(:deprecia))
+    pva_vars = Dict(i => ensure_var!(ctx, model, global_var(:pva, i)) for i in activities)
+    xd_vars = Dict(i => ensure_var!(ctx, model, global_var(:xd, i)) for i in activities)
+    constraint = model isa JuMP.Model ? @NLconstraint(model,
+        y == sum(pva_vars[i] * xd_vars[i] for i in activities) - deprecia
+    ) : nothing
+    JCGEKernel.register_equation!(ctx; tag=:gdp, block=block.name,
+        payload=(indices=(), info="y = sum(pva*xd) - deprecia", constraint=constraint))
+    return nothing
+end
+
+function JCGECore.build!(block::SavingsInvestmentBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+
+    deprecia = ensure_var!(ctx, model, global_var(:deprecia))
+    savings = ensure_var!(ctx, model, global_var(:savings))
+    hhsav = ensure_var!(ctx, model, global_var(:hhsav))
+    govsav = ensure_var!(ctx, model, global_var(:govsav))
+    fsav = ensure_var!(ctx, model, global_var(:fsav))
+    er = ensure_var!(ctx, model, global_var(:er))
+    depr_vals = Dict(i => JCGECore.getparam(block.params, :depr, i) for i in activities)
+    pk_vars = Dict(i => ensure_var!(ctx, model, global_var(:pk, i)) for i in activities)
+    k_vars = Dict(i => ensure_var!(ctx, model, global_var(:k, i)) for i in activities)
+    dk_vars = Dict(i => ensure_var!(ctx, model, global_var(:dk, i)) for i in activities)
+    dst_vars = Dict(j => ensure_var!(ctx, model, global_var(:dst, j)) for j in commodities)
+    p_vars = Dict(j => ensure_var!(ctx, model, global_var(:p, j)) for j in commodities)
+
+    constraint = model isa JuMP.Model ? @NLconstraint(model,
+        deprecia == sum(depr_vals[i] * pk_vars[i] * k_vars[i] for i in activities)
+    ) : nothing
+    JCGEKernel.register_equation!(ctx; tag=:depreq, block=block.name,
+        payload=(indices=(), info="deprecia = sum(depr*pk*k)", constraint=constraint))
+
+    constraint = model isa JuMP.Model ? @NLconstraint(model, savings == hhsav + govsav + deprecia + fsav * er) : nothing
+    JCGEKernel.register_equation!(ctx; tag=:totsav, block=block.name,
+        payload=(indices=(), info="savings = hhsav + govsav + deprecia + fsav*er", constraint=constraint))
+
+    for i in activities
+        kio_i = JCGECore.getparam(block.params, :kio, i)
+        constraint = model isa JuMP.Model ? @NLconstraint(
+            model,
+            pk_vars[i] * dk_vars[i] == kio_i * savings - kio_i * sum(dst_vars[j] * p_vars[j] for j in commodities)
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:prodinv, block=block.name,
+            payload=(indices=(i,), info="pk*dk = kio*savings - kio*sum(dst*p)", constraint=constraint))
+    end
+
+    for i in activities
+        id = ensure_var!(ctx, model, global_var(:id, i))
+        constraint = model isa JuMP.Model ? @constraint(
+            model,
+            id == sum(JCGECore.getparam(block.params, :imat, i, j) * dk_vars[j] for j in activities)
+        ) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:ieq, block=block.name,
+            payload=(indices=(i,), info="id[i] = sum(imat[i,j]*dk[j])", constraint=constraint))
+    end
+
+    return nothing
+end
+
+function JCGECore.build!(block::FinalDemandClearingBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+    for i in commodities
+        x = ensure_var!(ctx, model, global_var(:x, i))
+        int = ensure_var!(ctx, model, global_var(:int, i))
+        cd = ensure_var!(ctx, model, global_var(:cd, i))
+        gd = ensure_var!(ctx, model, global_var(:gd, i))
+        id = ensure_var!(ctx, model, global_var(:id, i))
+        dst = ensure_var!(ctx, model, global_var(:dst, i))
+        constraint = model isa JuMP.Model ? @constraint(model, x == int + cd + gd + id + dst) : nothing
+        JCGEKernel.register_equation!(ctx; tag=:equil, block=block.name,
+            payload=(indices=(i,), info="x = int + cd + gd + id + dst", constraint=constraint))
+    end
+    return nothing
+end
+
+function JCGECore.build!(block::ConsumptionObjectiveBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+    omega = ensure_var!(ctx, model, global_var(:omega))
+    cd = Dict(i => ensure_var!(ctx, model, global_var(:cd, i)) for i in commodities)
+    if model isa JuMP.Model
+        alpha_vals = Dict(i => JCGECore.getparam(block.params, :alpha, i) for i in commodities)
+        active = [i for i in commodities if alpha_vals[i] > 0.0]
+        @NLconstraint(model, omega == prod(cd[i] ^ alpha_vals[i] for i in active))
+        @NLobjective(model, Max, omega)
+    end
+    JCGEKernel.register_equation!(ctx; tag=:objective, block=block.name,
+        payload=(indices=(), info="omega = prod(cd^alpha)", constraint=nothing))
     return nothing
 end
 

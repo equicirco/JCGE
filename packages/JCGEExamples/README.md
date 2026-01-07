@@ -35,6 +35,7 @@ Typical usage should look like:
 - `QuotaCGE`: Chapter 10.5 (QUOCGE, SEQ=280)
 - `ScaleEconomyCGE`: Chapter 10.6 (IRSCGE, SEQ=281)
 - `DynCGE`: Recursive-dynamic model (DYNCGE, SEQ=410, Japanese edition)
+- `CamCGE`: Cameroon CGE model (CAMCGE, SEQ=81)
 
 ## Optional solve tests (CI)
 Solver-based tests are gated behind `JCGE_SOLVE_TESTS=1` and are run via a manual GitHub Actions workflow:

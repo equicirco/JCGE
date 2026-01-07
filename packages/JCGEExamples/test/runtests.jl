@@ -8,7 +8,9 @@ using JCGEExamples.MonopolyCGE
 using JCGEExamples.QuotaCGE
 using JCGEExamples.ScaleEconomyCGE
 using JCGEExamples.DynCGE
+using JCGEExamples.CamCGE
 using JCGEKernel
+using JCGEBlocks
 using JuMP
 using Ipopt
 import MathOptInterface as MOI
@@ -39,10 +41,38 @@ import MathOptInterface as MOI
 
     dyn_spec = DynCGE.model()
     @test dyn_spec.name == "DynCGE"
+
+    cam_spec = CamCGE.model()
+    @test cam_spec.name == "CamCGE"
 end
 
 if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
     @testset "JCGEExamples.Solve" begin
+        function max_constraint_residual(result)
+            max_abs = 0.0
+            for eq in result.context.equations
+                payload = eq.payload
+                if payload isa NamedTuple && haskey(payload, :constraint) && payload.constraint !== nothing
+                    obj = JuMP.constraint_object(payload.constraint)
+                    val = try
+                        JuMP.value(obj.func)
+                    catch
+                        continue
+                    end
+                    r = val
+                    if obj.set isa MOI.EqualTo
+                        r = val - obj.set.value
+                    elseif obj.set isa MOI.GreaterThan
+                        r = min(0.0, val - obj.set.lower)
+                    elseif obj.set isa MOI.LessThan
+                        r = max(0.0, val - obj.set.upper)
+                    end
+                    max_abs = max(max_abs, abs(r))
+                end
+            end
+            return max_abs
+        end
+
         sam_path = joinpath(StandardCGE.datadir(), "sam_2_2.csv")
         result = StandardCGE.solve(sam_path=sam_path; optimizer=Ipopt.Optimizer)
         status = MOI.get(result.context.model, MOI.TerminationStatus())
@@ -80,6 +110,55 @@ if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
         result_dyn = result_dyn[1]
         status_dyn = MOI.get(result_dyn.context.model, MOI.TerminationStatus())
         @test status_dyn in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
+
+        result_cam = CamCGE.solve(; optimizer=Ipopt.Optimizer)
+        status_cam = MOI.get(result_cam.context.model, MOI.TerminationStatus())
+        if status_cam in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
+            @test true
+        else
+            @test max_constraint_residual(result_cam) <= 1e-5
+        end
+
+        cam_spec = CamCGE.model()
+        sectors = cam_spec.model.sets.commodities
+        labor = cam_spec.model.sets.factors
+
+        function cam_val(sym::Symbol)
+            return JuMP.value(result_cam.context.variables[sym])
+        end
+
+        for i in sectors
+            x = cam_val(JCGEBlocks.global_var(:x, i))
+            int = cam_val(JCGEBlocks.global_var(:int, i))
+            cd = cam_val(JCGEBlocks.global_var(:cd, i))
+            gd = cam_val(JCGEBlocks.global_var(:gd, i))
+            id = cam_val(JCGEBlocks.global_var(:id, i))
+            dst = cam_val(JCGEBlocks.global_var(:dst, i))
+            @test isapprox(x, int + cd + gd + id + dst; atol=1e-5, rtol=1e-6)
+        end
+
+        gr = cam_val(:gr)
+        tariff = cam_val(:tariff)
+        duty = cam_val(:duty)
+        indtax = cam_val(:indtax)
+        @test isapprox(gr, tariff + duty + indtax; atol=1e-5, rtol=1e-6)
+
+        govsav = cam_val(:govsav)
+        total_gd = sum(cam_val(JCGEBlocks.global_var(:p, i)) * cam_val(JCGEBlocks.global_var(:gd, i)) for i in sectors)
+        @test isapprox(gr, total_gd + govsav; atol=1e-5, rtol=1e-6)
+
+        savings = cam_val(:savings)
+        hhsav = cam_val(:hhsav)
+        deprecia = cam_val(:deprecia)
+        fsav = cam_val(:fsav)
+        er = cam_val(:er)
+        @test isapprox(savings, hhsav + govsav + deprecia + fsav * er; atol=1e-5, rtol=1e-6)
+
+        for lc in labor
+            lsum = sum(cam_val(JCGEBlocks.global_var(:l, i, lc)) for i in sectors)
+            ls = cam_val(JCGEBlocks.global_var(:ls, lc))
+            @test isapprox(lsum, ls; atol=1e-5, rtol=1e-6)
+        end
     end
 end
 
