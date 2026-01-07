@@ -217,6 +217,19 @@ end
     @test !isempty(ctx.equations)
 end
 
+@testset "JCGEBlocks.ImportQuotaBlock" begin
+    sets = JCGECore.Sets([:g1], [:a1], [:lab], [:hh1])
+    mappings = JCGECore.Mappings(Dict(:a1 => :g1))
+    params = (Mquota = Dict(:g1 => 10.0),)
+    block = JCGEBlocks.import_quota(:quota, [:g1], params)
+    ms = JCGECore.ModelSpec(Any[block], sets, mappings)
+    spec = JCGECore.RunSpec("BlocksTest", ms, JCGECore.ClosureSpec(:W), JCGECore.ScenarioSpec(:baseline, Dict{Symbol,Any}()))
+    ctx = JCGEKernel.KernelContext()
+    JCGECore.build!(block, ctx, spec)
+    @test !isempty(ctx.variables)
+    @test !isempty(ctx.equations)
+end
+
 @testset "JCGEBlocks.PriceLinkBlock" begin
     sets = JCGECore.Sets([:g1, :g2], [:a1], [:lab], [:hh1])
     mappings = JCGECore.Mappings(Dict(:a1 => :g1))

@@ -26,6 +26,14 @@ Typical usage should look like:
   - `models/<ModelName>/data/`: optional small benchmark inputs
   - `models/<ModelName>/docs/`: optional model notes and documentation
 
+## Models
+- `StandardCGE`: Chapter 6 (STDCGE, SEQ=276)
+- `SimpleCGE`: Chapter 5 (SPLCGE, SEQ=275)
+- `LargeCountryCGE`: Chapter 10.2 (LRGCGE, SEQ=277)
+- `TwoCountryCGE`: Chapter 10.3 (TWOCGE, SEQ=278)
+- `MonopolyCGE`: Chapter 10.4 (MONCGE, SEQ=279)
+- `QuotaCGE`: Chapter 10.5 (QUOCGE, SEQ=280)
+
 ## Optional solve tests (CI)
 Solver-based tests are gated behind `JCGE_SOLVE_TESTS=1` and are run via a manual GitHub Actions workflow:
 - Workflow: `.github/workflows/solve-tests.yml`

@@ -5,6 +5,7 @@ using JCGEExamples.SimpleCGE
 using JCGEExamples.LargeCountryCGE
 using JCGEExamples.TwoCountryCGE
 using JCGEExamples.MonopolyCGE
+using JCGEExamples.QuotaCGE
 using JCGEKernel
 using JuMP
 using Ipopt
@@ -25,6 +26,10 @@ import MathOptInterface as MOI
     mon_sam = joinpath(MonopolyCGE.datadir(), "sam_2_2.csv")
     mon_spec = MonopolyCGE.model(sam_path=mon_sam)
     @test mon_spec.name == "MonopolyCGE"
+
+    quo_sam = joinpath(QuotaCGE.datadir(), "sam_2_2.csv")
+    quo_spec = QuotaCGE.model(sam_path=quo_sam)
+    @test quo_spec.name == "QuotaCGE"
 end
 
 if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
@@ -56,6 +61,12 @@ if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
         result_mon = JCGEKernel.run!(spec_mon; optimizer=Ipopt.Optimizer, dataset_id="monopoly_cge_test")
         status_mon = MOI.get(result_mon.context.model, MOI.TerminationStatus())
         @test status_mon in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
+
+        quo_sam = joinpath(QuotaCGE.datadir(), "sam_2_2.csv")
+        spec_quo = QuotaCGE.model(sam_path=quo_sam)
+        result_quo = JCGEKernel.run!(spec_quo; optimizer=Ipopt.Optimizer, dataset_id="quota_cge_test")
+        status_quo = MOI.get(result_quo.context.model, MOI.TerminationStatus())
+        @test status_quo in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
     end
 end
 
