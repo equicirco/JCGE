@@ -221,7 +221,7 @@ uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
 
 [[deps.JCGEBlocks]]
-deps = ["JCGECore", "JCGEKernel", "JuMP", "Test"]
+deps = ["JCGECore", "JCGEKernel", "JuMP", "MathOptInterface", "Test"]
 path = "../JCGEBlocks"
 uuid = "e7e2410e-b632-4869-8943-8241db0dfb31"
 version = "0.0.0"

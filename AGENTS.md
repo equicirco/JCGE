@@ -127,3 +127,7 @@ JCGEKernel provides:
 # Project Objective (Non-negotiable)
 - All models must be built from reusable blocks. No ad-hoc or standalone model implementations are allowed outside the block system.
 - The tool’s purpose is a block-based CGE framework; every model must use blocks, and the library/examples are only block compositions.
+
+## Model data and calibration (Non-negotiable)
+- All model inputs must come from CSV files and the calibration package; do not embed raw data in model source files.
+- Models may include small CSVs under their own `models/<ModelName>/data/` directory, loaded via JCGECalibrate.

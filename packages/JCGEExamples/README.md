@@ -37,6 +37,7 @@ Typical usage should look like:
 - `DynCGE`: Recursive-dynamic model (DYNCGE, SEQ=410, Japanese edition)
 - `CamCGE`: Cameroon CGE model (CAMCGE, SEQ=81)
 - `CamMCP`: Cameroon CGE model as MCP (CAMMCP, SEQ=129)
+- `KorCGE`: Korea CGE model (KORCGE, SEQ=100, Chapter 11 in Chenery et al., 1986)
 
 ## Optional solve tests (CI)
 Solver-based tests are gated behind `JCGE_SOLVE_TESTS=1` and are run via a manual GitHub Actions workflow:

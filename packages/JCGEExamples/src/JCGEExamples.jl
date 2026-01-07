@@ -10,6 +10,7 @@ export ScaleEconomyCGE
 export DynCGE
 export CamCGE
 export CamMCP
+export KorCGE
 
 include("../models/StandardCGE/StandardCGE.jl")
 include("../models/SimpleCGE/SimpleCGE.jl")
@@ -21,5 +22,6 @@ include("../models/ScaleEconomyCGE/ScaleEconomyCGE.jl")
 include("../models/DynCGE/DynCGE.jl")
 include("../models/CamCGE/CamCGE.jl")
 include("../models/CamMCP/CamMCP.jl")
+include("../models/KorCGE/KorCGE.jl")
 
 end # module

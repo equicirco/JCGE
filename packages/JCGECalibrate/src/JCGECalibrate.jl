@@ -8,6 +8,7 @@ export calibrate_ces_share_scale
 export LabeledVector, LabeledMatrix
 export SAMTable, StartingValues, ModelParameters
 export load_sam_table, compute_starting_values, compute_calibration_params
+export load_labeled_matrix, load_labeled_vector
 
 "Convert CES elasticity sigma to rho (rho = (sigma - 1)/sigma)."
 rho_from_sigma(sigma::Real) = (sigma - 1) / sigma
@@ -48,6 +49,31 @@ LabeledMatrix(data::Matrix{T}, row_labels::Vector{Symbol}, col_labels::Vector{Sy
         Dict(l => i for (i, l) in pairs(row_labels)),
         Dict(l => i for (i, l) in pairs(col_labels)),
     )
+
+"""
+    load_labeled_matrix(path::AbstractString; label_col::String="label") -> LabeledMatrix
+
+Load a CSV with a row label column and return a `LabeledMatrix`.
+"""
+function load_labeled_matrix(path::AbstractString; label_col::String="label")
+    df = DataFrame(CSV.File(path))
+    row_labels = Symbol.(df[:, label_col])
+    col_labels = Symbol.(names(df)[names(df) .!= label_col])
+    data = Matrix{Float64}(df[:, names(df) .!= label_col])
+    return LabeledMatrix(data, row_labels, col_labels)
+end
+
+"""
+    load_labeled_vector(path::AbstractString; label_col::String="label", value_col::String="value") -> LabeledVector
+
+Load a CSV with a label and value column and return a `LabeledVector`.
+"""
+function load_labeled_vector(path::AbstractString; label_col::String="label", value_col::String="value")
+    df = DataFrame(CSV.File(path))
+    labels = Symbol.(df[:, label_col])
+    values = Vector{Float64}(df[:, value_col])
+    return LabeledVector(values, labels)
+end
 
 Base.sum(v::LabeledVector) = sum(v.data)
 

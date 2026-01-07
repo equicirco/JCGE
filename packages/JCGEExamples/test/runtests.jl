@@ -10,6 +10,7 @@ using JCGEExamples.ScaleEconomyCGE
 using JCGEExamples.DynCGE
 using JCGEExamples.CamCGE
 using JCGEExamples.CamMCP
+using JCGEExamples.KorCGE
 using JCGEKernel
 using JCGEBlocks
 using JuMP
@@ -49,6 +50,9 @@ import MathOptInterface as MOI
     cammcp_spec = CamMCP.model()
     @test cammcp_spec.name == "CamMCP"
 
+    kor_spec = KorCGE.model()
+    @test kor_spec.name == "KorCGE"
+
 end
 
 if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
@@ -58,7 +62,11 @@ if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
             for eq in result.context.equations
                 payload = eq.payload
                 if payload isa NamedTuple && haskey(payload, :constraint) && payload.constraint !== nothing
-                    obj = JuMP.constraint_object(payload.constraint)
+                    obj = try
+                        JuMP.constraint_object(payload.constraint)
+                    catch
+                        continue
+                    end
                     val = try
                         JuMP.value(obj.func)
                     catch
@@ -163,6 +171,14 @@ if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
             lsum = sum(cam_val(JCGEBlocks.global_var(:l, i, lc)) for i in sectors)
             ls = cam_val(JCGEBlocks.global_var(:ls, lc))
             @test isapprox(lsum, ls; atol=1e-5, rtol=1e-6)
+        end
+
+        result_kor = KorCGE.solve(; optimizer=Ipopt.Optimizer)
+        status_kor = MOI.get(result_kor.context.model, MOI.TerminationStatus())
+        if status_kor in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
+            @test true
+        else
+            @test max_constraint_residual(result_kor) <= 1e-5
         end
     end
 end

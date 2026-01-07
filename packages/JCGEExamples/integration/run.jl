@@ -9,6 +9,7 @@ specs = JCGECore.RunSpec[
     JCGEExamples.MonopolyCGE.model(),
     JCGEExamples.QuotaCGE.model(),
     JCGEExamples.ScaleEconomyCGE.model(),
+    JCGEExamples.KorCGE.model(),
 ]
 
 for spec in specs
