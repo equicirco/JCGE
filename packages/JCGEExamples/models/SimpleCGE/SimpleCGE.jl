@@ -1,7 +1,7 @@
 module SimpleCGE
 
 using JCGECore
-using JCGEKernel
+using JCGERuntime
 using Ipopt
 using JCGEBlocks
 using JCGECalibrate
@@ -105,7 +105,7 @@ end
 baseline() = model()
 
 function solve(; optimizer=Ipopt.Optimizer, kwargs...)
-    return JCGEKernel.run!(model(; kwargs...); optimizer=optimizer)
+    return JCGERuntime.run!(model(; kwargs...); optimizer=optimizer)
 end
 
 function scenario(name::Symbol)

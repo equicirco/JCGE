@@ -2,7 +2,7 @@
 
 julia_version = "1.12.3"
 manifest_format = "2.0"
-project_hash = "f8f6102caf5223b2f08842254361d2cd61407fd0"
+project_hash = "73c896e83295ae7fd7495f1282e257aa4f8cada3"
 
 [[deps.ASL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -221,7 +221,7 @@ uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
 
 [[deps.JCGEBlocks]]
-deps = ["JCGECore", "JCGEKernel", "JuMP", "MathOptInterface", "Test"]
+deps = ["JCGECore", "JCGERuntime", "JuMP", "MathOptInterface", "Test"]
 path = "../JCGEBlocks"
 uuid = "e7e2410e-b632-4869-8943-8241db0dfb31"
 version = "0.0.0"
@@ -239,14 +239,14 @@ uuid = "9fb9d605-0ed3-4980-82c1-f0874844db5d"
 version = "0.0.0"
 
 [[deps.JCGEExamples]]
-deps = ["Ipopt", "JCGEBlocks", "JCGECalibrate", "JCGECore", "JCGEKernel", "JuMP", "MathOptInterface", "PATHSolver", "Pkg", "Test"]
+deps = ["Ipopt", "JCGEBlocks", "JCGECalibrate", "JCGECore", "JCGERuntime", "JuMP", "MathOptInterface", "PATHSolver", "Pkg", "Test"]
 path = "."
 uuid = "0291785c-4d3c-45ec-ba8e-d8f5428f97c2"
 version = "0.0.0"
 
-[[deps.JCGEKernel]]
+[[deps.JCGERuntime]]
 deps = ["DualSignals", "JCGECore", "JuMP", "Test"]
-path = "../JCGEKernel"
+path = "../JCGERuntime"
 uuid = "cc244198-1562-43f7-ad75-589e1d675269"
 version = "0.0.0"
 

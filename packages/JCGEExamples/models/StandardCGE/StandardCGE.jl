@@ -3,7 +3,7 @@ module StandardCGE
 using JCGEBlocks
 using JCGECalibrate
 using JCGECore
-using JCGEKernel
+using JCGERuntime
 using Ipopt
 
 export model, baseline, scenario, datadir, solve
@@ -183,7 +183,7 @@ end
 baseline() = model()
 
 function solve(; optimizer=Ipopt.Optimizer, kwargs...)
-    return JCGEKernel.run!(model(; kwargs...); optimizer=optimizer)
+    return JCGERuntime.run!(model(; kwargs...); optimizer=optimizer)
 end
 
 function scenario(name::Symbol)

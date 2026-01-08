@@ -2,7 +2,7 @@
 
 julia_version = "1.12.3"
 manifest_format = "2.0"
-project_hash = "feac04e65a2d24c493129bd30d73ef7ae0d86ec0"
+project_hash = "03366816625d8e2ebcf803a19cf267763cdc6fd0"
 
 [[deps.Artifacts]]
 uuid = "56f22d72-fd6d-98f1-02f0-08ddc0907c33"
@@ -157,10 +157,10 @@ git-tree-sha1 = "a3f24677c21f5bbe9d2a714f95dcd58337fb2856"
 uuid = "82899510-4779-5014-852e-03e436cf321d"
 version = "1.0.0"
 
-[[deps.JCGEBlocks]]
-deps = ["JCGECore", "JCGERuntime", "JuMP", "MathOptInterface", "Test"]
+[[deps.JCGEAgentInterface]]
+deps = ["JCGECore", "JCGERuntime", "Test"]
 path = "."
-uuid = "e7e2410e-b632-4869-8943-8241db0dfb31"
+uuid = "0ceb7b1e-19fc-43b9-b3d5-2f4cf3d18128"
 version = "0.0.0"
 
 [[deps.JCGECore]]
@@ -397,9 +397,9 @@ version = "1.11.0"
 
 [[deps.StructUtils]]
 deps = ["Dates", "UUIDs"]
-git-tree-sha1 = "79529b493a44927dd5b13dde1c7ce957c2d049e4"
+git-tree-sha1 = "b0290a55d9e047841d7f5c472edbdc39c72cd0ce"
 uuid = "ec057cc2-7a8d-4b58-b3b3-92acb9f63b42"
-version = "2.6.0"
+version = "2.6.1"
 
     [deps.StructUtils.extensions]
     StructUtilsMeasurementsExt = ["Measurements"]

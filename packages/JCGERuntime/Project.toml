@@ -1,15 +1,13 @@
-name = "JCGEBlocks"
-uuid = "e7e2410e-b632-4869-8943-8241db0dfb31"
+name = "JCGERuntime"
+uuid = "cc244198-1562-43f7-ad75-589e1d675269"
 authors = ["Riccardo Boero <ribo@nilu.no>"]
 version = "0.0.0"
 
 [deps]
+DualSignals = "e4247b8d-50b5-41ef-b53d-f6e21a6bdac0"
 JCGECore = "9fb9d605-0ed3-4980-82c1-f0874844db5d"
-JCGERuntime = "cc244198-1562-43f7-ad75-589e1d675269"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
-MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [sources]
 JCGECore = { path = "../JCGECore" }
-JCGERuntime = { path = "../JCGERuntime" }

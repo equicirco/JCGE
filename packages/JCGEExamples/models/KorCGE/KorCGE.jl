@@ -2,7 +2,7 @@ module KorCGE
 
 using JCGEBlocks
 using JCGECore
-using JCGEKernel
+using JCGERuntime
 using JCGECalibrate
 using Ipopt
 
@@ -280,7 +280,7 @@ end
 baseline() = model()
 
 function solve(; optimizer = Ipopt.Optimizer)
-    return JCGEKernel.run!(model(); optimizer = optimizer)
+    return JCGERuntime.run!(model(); optimizer = optimizer)
 end
 
 function scenario(name::Symbol)

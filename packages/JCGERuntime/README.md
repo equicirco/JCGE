@@ -1,6 +1,6 @@
-# JCGEKernel
+# JCGERuntime
 
-JuMP-facing kernel for building and solving models.
+JuMP-facing runtime for building and solving models.
 
 ## Responsibilities
 - Variable and constraint registries, naming, equation tagging
@@ -15,12 +15,12 @@ To emulate GAMS-style “solve, tweak, solve”, capture the solved state and re
 as starting values (optionally carrying over bounds and fixed vars).
 
 ```julia
-result = JCGEKernel.run!(spec; optimizer=Ipopt.Optimizer)
-state = JCGEKernel.snapshot_state(result)
+result = JCGERuntime.run!(spec; optimizer=Ipopt.Optimizer)
+state = JCGERuntime.snapshot_state(result)
 
 spec2 = JCGEBlocks.apply_start(spec2, state.start;
     lower=state.lower, upper=state.upper, fixed=state.fixed)
-result2 = JCGEKernel.run!(spec2; optimizer=Ipopt.Optimizer)
+result2 = JCGERuntime.run!(spec2; optimizer=Ipopt.Optimizer)
 ```
 
 You can also use the shortcut:

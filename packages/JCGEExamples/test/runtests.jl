@@ -12,7 +12,7 @@ using JCGEExamples.CamCGE
 using JCGEExamples.CamMCP
 using JCGEExamples.KorCGE
 using JCGEExamples.KorMCP
-using JCGEKernel
+using JCGERuntime
 using JCGEBlocks
 using JuMP
 using Ipopt
@@ -209,7 +209,7 @@ if get(ENV, "JCGE_COMPARE_STANDARD", "0") == "1"
         std_Xp = JuMP.value.(std_model[:Xp])
 
         spec = StandardCGE.model(sam_path=sam_path)
-        result = JCGEKernel.run!(spec; optimizer=Ipopt.Optimizer, dataset_id="standard_cge_compare")
+        result = JCGERuntime.run!(spec; optimizer=Ipopt.Optimizer, dataset_id="standard_cge_compare")
         ours_model = result.context.model
         ours_obj = JuMP.objective_value(ours_model)
         goods = spec.model.sets.commodities

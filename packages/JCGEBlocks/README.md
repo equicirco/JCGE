@@ -9,7 +9,7 @@ Standard CGE blocks built on the JCGE interfaces.
 - Market clearing blocks
 
 ## Dependencies
-- Depends on JCGECore, JCGEKernel
+- Depends on JCGECore, JCGERuntime
 
 ## Naming and functional forms
 Block names are composed as `Domain + Role + FunctionalForm` when relevant.

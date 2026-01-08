@@ -10,9 +10,11 @@ JCGE.jl is a monorepo containing multiple Julia packages for building CGE models
 ## Monorepo layout
 - packages/JCGECore
 - packages/JCGECalibrate
-- packages/JCGEKernel
+- packages/JCGERuntime
 - packages/JCGEBlocks
-- packages/JCGECircular
+- packages/JCGEAgentInterface
+- packages/JCGEImportMPSGE
+- packages/JCGEOutput
 - packages/JCGEExamples
 - docs/ (optional documentation sources)
 - scripts/ (developer utilities)
@@ -21,9 +23,11 @@ JCGE.jl is a monorepo containing multiple Julia packages for building CGE models
 ## Dependency direction (must not be violated)
 JCGECore
   -> JCGECalibrate
-    -> JCGEKernel
+    -> JCGERuntime
       -> JCGEBlocks
-        -> JCGECircular
+        -> JCGEOutput
+        -> JCGEAgentInterface
+        -> JCGEImportMPSGE
           -> JCGEExamples
 
 Rules:
@@ -49,11 +53,11 @@ JCGECore defines the canonical specs:
 ### Block interface
 Every block type must implement (or explicitly declare as not applicable):
 - calibrate!(block, data, benchmark, params) -> updated params/benchmark
-- build!(block, ctx, spec) -> modifies kernel context (variables/equations)
+- build!(block, ctx, spec) -> modifies runtime context (variables/equations)
 - report(block, solution) -> structured outputs
 
-### Kernel responsibilities
-JCGEKernel provides:
+### Runtime responsibilities
+JCGERuntime provides:
 - variable registry (symbolic name -> internal handle)
 - equation registry with tags (block, market, agent)
 - closure application hooks

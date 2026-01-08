@@ -1,4 +1,4 @@
-module JCGEKernel
+module JCGERuntime
 
 using DualSignals
 using JuMP

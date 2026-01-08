@@ -10,10 +10,12 @@ JCGE.jl is a modular, block-based framework for building and running computable 
 - `packages/`: independently testable Julia packages
   - `JCGECore`: canonical data model and interfaces (no JuMP)
   - `JCGECalibrate`: calibration utilities for standard functional forms (no JuMP)
-- `JCGEKernel`: JuMP-facing kernel (model building, closure, diagnostics)
-- `JCGEBlocks`: standard CGE blocks built on the interfaces
-- `JCGECircular`: circular-economy extension blocks
-- `JCGEExamples`: runnable reference models and scenarios
+  - `JCGERuntime`: JuMP-facing runtime (model building, closure, diagnostics)
+  - `JCGEBlocks`: standard CGE blocks built on the interfaces
+  - `JCGEOutput`: equation rendering and results/IO reporting utilities
+  - `JCGEAgentInterface`: MCP passthrough for AI agent usage
+  - `JCGEImportMPSGE`: converter from MPSGE.jl model objects into blocks
+  - `JCGEExamples`: runnable reference models and scenarios
 - `docs/`: documentation sources (optional)
 - `scripts/`: developer utilities (optional)
 - `data/`: tiny toy datasets only (no large/proprietary files)

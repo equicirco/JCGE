@@ -3,7 +3,7 @@ module DynCGE
 using JCGEBlocks
 using JCGECalibrate
 using JCGECore
-using JCGEKernel
+using JCGERuntime
 using JuMP
 using Ipopt
 
@@ -383,13 +383,13 @@ function run_recursive(; periods::Int=30, optimizer=Ipopt.Optimizer,
     sf_path = [Sf00 * (1 + pop) ^ t for t in 0:periods]
 
     results = Vector{Any}(undef, periods + 1)
-    results[1] = JCGEKernel.run!(spec; optimizer=optimizer, dataset_id="dyncge_t0")
+    results[1] = JCGERuntime.run!(spec; optimizer=optimizer, dataset_id="dyncge_t0")
 
     mobile_sym = Symbol.(mobile_factors)
     activities = commodities
     for t in 1:periods
         prev = results[t]
-        state = JCGEKernel.snapshot_state(prev)
+        state = JCGERuntime.snapshot_state(prev)
         fixed = Dict{Symbol,Float64}()
         fixed[:PRICE] = 1.0
         fixed[:Sf] = sf_path[t + 1]
@@ -410,7 +410,7 @@ function run_recursive(; periods::Int=30, optimizer=Ipopt.Optimizer,
         end
 
         spec = JCGEBlocks.apply_start(spec, state.start; lower=state.lower, upper=state.upper, fixed=fixed)
-        results[t + 1] = JCGEKernel.run!(spec; optimizer=optimizer, dataset_id="dyncge_t$(t)")
+        results[t + 1] = JCGERuntime.run!(spec; optimizer=optimizer, dataset_id="dyncge_t$(t)")
     end
 
     return results

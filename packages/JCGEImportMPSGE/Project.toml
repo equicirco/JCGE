@@ -1,13 +1,13 @@
-name = "JCGEKernel"
-uuid = "cc244198-1562-43f7-ad75-589e1d675269"
+name = "JCGEImportMPSGE"
+uuid = "f07e4517-cb44-4ce3-be1e-24c689785741"
 authors = ["Riccardo Boero <ribo@nilu.no>"]
 version = "0.0.0"
 
 [deps]
-DualSignals = "e4247b8d-50b5-41ef-b53d-f6e21a6bdac0"
+JCGEBlocks = "e7e2410e-b632-4869-8943-8241db0dfb31"
 JCGECore = "9fb9d605-0ed3-4980-82c1-f0874844db5d"
-JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [sources]
+JCGEBlocks = { path = "../JCGEBlocks" }
 JCGECore = { path = "../JCGECore" }

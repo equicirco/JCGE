@@ -1,7 +1,7 @@
 module JCGEBlocks
 
 using JCGECore
-using JCGEKernel
+using JCGERuntime
 using JuMP
 import MathOptInterface as MOI
 
@@ -166,9 +166,9 @@ struct DummyBlock <: JCGECore.AbstractBlock
     name::Symbol
 end
 
-function JCGECore.build!(block::DummyBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
-    JCGEKernel.register_variable!(ctx, Symbol(block.name, :_x), 1.0)
-    JCGEKernel.register_equation!(ctx; tag=:dummy_eq, block=block.name, payload="x==1 (placeholder)")
+function JCGECore.build!(block::DummyBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
+    JCGERuntime.register_variable!(ctx, Symbol(block.name, :_x), 1.0)
+    JCGERuntime.register_equation!(ctx; tag=:dummy_eq, block=block.name, payload="x==1 (placeholder)")
     return nothing
 end
 
@@ -897,8 +897,8 @@ function var_name(block::FactorSupplyBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::FactorSupplyBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::FactorSupplyBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -906,23 +906,23 @@ function var_name(block::HouseholdDemandCDHHBlock, base::Symbol, idxs::Symbol...
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::HouseholdDemandCDHHBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDHHBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::HouseholdDemandCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::HouseholdDemandCDXpBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDXpBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::HouseholdDemandCDXpRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDXpRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -930,8 +930,8 @@ function var_name(block::HouseholdDemandIncomeBlock, base::Symbol, idxs::Symbol.
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::HouseholdDemandIncomeBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandIncomeBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -939,23 +939,23 @@ function var_name(block::MarketClearingBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::MarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::MarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::GoodsMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::GoodsMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::FactorMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::FactorMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::CompositeMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::CompositeMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -963,23 +963,23 @@ function var_name(block::PriceLinkBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::PriceLinkBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceLinkBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ExchangeRateLinkBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExchangeRateLinkBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ExchangeRateLinkRegionBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExchangeRateLinkRegionBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::PriceEqualityBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceEqualityBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -987,8 +987,8 @@ function var_name(block::NumeraireBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::NumeraireBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::NumeraireBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -996,13 +996,13 @@ function var_name(block::GovernmentBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::GovernmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::GovernmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::GovernmentRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::GovernmentRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1010,18 +1010,18 @@ function var_name(block::GovernmentBudgetBalanceBlock, base::Symbol, idxs::Symbo
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::GovernmentBudgetBalanceBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::GovernmentBudgetBalanceBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::PrivateSavingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PrivateSavingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::PrivateSavingRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PrivateSavingRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1029,8 +1029,8 @@ function var_name(block::PrivateSavingIncomeBlock, base::Symbol, idxs::Symbol...
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::PrivateSavingIncomeBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PrivateSavingIncomeBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1038,13 +1038,13 @@ function var_name(block::InvestmentBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::InvestmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InvestmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::InvestmentRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InvestmentRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1052,8 +1052,8 @@ function var_name(block::ArmingtonCESBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ArmingtonCESBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ArmingtonCESBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1061,8 +1061,8 @@ function var_name(block::TransformationCETBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::TransformationCETBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::TransformationCETBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1070,8 +1070,8 @@ function var_name(block::MonopolyRentBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::MonopolyRentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::MonopolyRentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1079,8 +1079,8 @@ function var_name(block::ImportQuotaBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ImportQuotaBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ImportQuotaBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1088,8 +1088,8 @@ function var_name(block::MobileFactorMarketBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::MobileFactorMarketBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::MobileFactorMarketBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1097,8 +1097,8 @@ function var_name(block::CapitalStockReturnBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::CapitalStockReturnBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::CapitalStockReturnBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1106,8 +1106,8 @@ function var_name(block::CompositeInvestmentBlock, base::Symbol, idxs::Symbol...
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::CompositeInvestmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::CompositeInvestmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1115,8 +1115,8 @@ function var_name(block::InvestmentAllocationBlock, base::Symbol, idxs::Symbol..
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::InvestmentAllocationBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InvestmentAllocationBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1124,8 +1124,8 @@ function var_name(block::CompositeConsumptionBlock, base::Symbol, idxs::Symbol..
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::CompositeConsumptionBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::CompositeConsumptionBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1133,8 +1133,8 @@ function var_name(block::PriceLevelBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::PriceLevelBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceLevelBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1142,8 +1142,8 @@ function var_name(block::PriceIndexBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::PriceIndexBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceIndexBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1151,8 +1151,8 @@ function var_name(block::ClosureBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ClosureBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ClosureBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1160,28 +1160,28 @@ function var_name(block::UtilityBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::UtilityBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::UtilityCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::UtilityCDXpBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDXpBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::UtilityCDHHBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDHHBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::UtilityCDRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1189,8 +1189,8 @@ function var_name(block::ExternalBalanceRemitBlock, base::Symbol, idxs::Symbol..
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ExternalBalanceRemitBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExternalBalanceRemitBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1198,18 +1198,18 @@ function var_name(block::ExternalBalanceBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ExternalBalanceBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExternalBalanceBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ExternalBalanceVarPriceBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExternalBalanceVarPriceBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ForeignTradeBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ForeignTradeBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1217,18 +1217,18 @@ function var_name(block::PriceAggregationBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::PriceAggregationBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceAggregationBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::InternationalMarketBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InternationalMarketBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::InitialValuesBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InitialValuesBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1236,7 +1236,7 @@ function var_name(block::ProductionCDLeontiefBlock, base::Symbol, idxs::Symbol..
     return global_var(base, idxs...)
 end
 
-function ensure_var!(ctx::JCGEKernel.KernelContext, model, name::Symbol; lower=0.00001, start=nothing)
+function ensure_var!(ctx::JCGERuntime.KernelContext, model, name::Symbol; lower=0.00001, start=nothing)
     if haskey(ctx.variables, name)
         return ctx.variables[name]
     end
@@ -1249,12 +1249,12 @@ function ensure_var!(ctx::JCGEKernel.KernelContext, model, name::Symbol; lower=0
     else
         v = (name=name)
     end
-    JCGEKernel.register_variable!(ctx, name, v)
+    JCGERuntime.register_variable!(ctx, name, v)
     return v
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ProductionCDLeontiefBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ProductionCDLeontiefBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
@@ -1262,17 +1262,17 @@ function var_name(block::ProductionCDLeontiefSectorPFBlock, base::Symbol, idxs::
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ProductionCDLeontiefSectorPFBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ProductionCDLeontiefSectorPFBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function register_eq!(ctx::JCGEKernel.KernelContext, block::ProductionCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGEKernel.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ProductionCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
     return nothing
 end
 
-function JCGECore.build!(block::ProductionCDLeontiefBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ProductionCDLeontiefBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
@@ -1343,7 +1343,7 @@ function JCGECore.build!(block::ProductionCDLeontiefBlock, ctx::JCGEKernel.Kerne
     return nothing
 end
 
-function JCGECore.build!(block::ProductionCDLeontiefSectorPFBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ProductionCDLeontiefSectorPFBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
@@ -1407,7 +1407,7 @@ function JCGECore.build!(block::ProductionCDLeontiefSectorPFBlock, ctx::JCGEKern
     return nothing
 end
 
-function JCGECore.build!(block::ProductionCDBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ProductionCDBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
@@ -1443,7 +1443,7 @@ function JCGECore.build!(block::ProductionCDBlock, ctx::JCGEKernel.KernelContext
     return nothing
 end
 
-function JCGECore.build!(block::ProductionBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ProductionBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     form_map = block.form isa Symbol ? Dict(a => block.form for a in activities) : block.form
     if !(form_map isa Dict{Symbol,Symbol})
@@ -1465,7 +1465,7 @@ function JCGECore.build!(block::ProductionBlock, ctx::JCGEKernel.KernelContext, 
     return nothing
 end
 
-function JCGECore.build!(block::FactorSupplyBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::FactorSupplyBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
 
@@ -1479,7 +1479,7 @@ function JCGECore.build!(block::FactorSupplyBlock, ctx::JCGEKernel.KernelContext
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdDemandCDHHBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdDemandCDHHBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     households = isempty(block.households) ? spec.model.sets.institutions : block.households
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
@@ -1534,7 +1534,7 @@ function JCGECore.build!(block::HouseholdDemandCDHHBlock, ctx::JCGEKernel.Kernel
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdDemandCDBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdDemandCDBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
@@ -1561,7 +1561,7 @@ function JCGECore.build!(block::HouseholdDemandCDBlock, ctx::JCGEKernel.KernelCo
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdDemandCDXpBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdDemandCDXpBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
@@ -1602,7 +1602,7 @@ function JCGECore.build!(block::HouseholdDemandCDXpBlock, ctx::JCGEKernel.Kernel
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdDemandCDXpRegionalBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdDemandCDXpRegionalBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
@@ -1634,7 +1634,7 @@ function JCGECore.build!(block::HouseholdDemandCDXpRegionalBlock, ctx::JCGEKerne
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdDemandIncomeBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdDemandIncomeBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
@@ -1669,7 +1669,7 @@ function JCGECore.build!(block::HouseholdDemandIncomeBlock, ctx::JCGEKernel.Kern
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdDemandBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdDemandBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     if block.form != :cd
         error("Unsupported household demand form: $(block.form)")
     end
@@ -1688,7 +1688,7 @@ function JCGECore.build!(block::HouseholdDemandBlock, ctx::JCGEKernel.KernelCont
     end
 end
 
-function JCGECore.build!(block::MarketClearingBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::MarketClearingBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
@@ -1736,7 +1736,7 @@ function JCGECore.build!(block::MarketClearingBlock, ctx::JCGEKernel.KernelConte
     return nothing
 end
 
-function JCGECore.build!(block::GoodsMarketClearingBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::GoodsMarketClearingBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -1750,7 +1750,7 @@ function JCGECore.build!(block::GoodsMarketClearingBlock, ctx::JCGEKernel.Kernel
     return nothing
 end
 
-function JCGECore.build!(block::FactorMarketClearingBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::FactorMarketClearingBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
@@ -1769,7 +1769,7 @@ function JCGECore.build!(block::FactorMarketClearingBlock, ctx::JCGEKernel.Kerne
     return nothing
 end
 
-function JCGECore.build!(block::CompositeMarketClearingBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::CompositeMarketClearingBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     model = ctx.model
@@ -1802,7 +1802,7 @@ function JCGECore.build!(block::CompositeMarketClearingBlock, ctx::JCGEKernel.Ke
     return nothing
 end
 
-function JCGECore.build!(block::PriceLinkBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::PriceLinkBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -1828,7 +1828,7 @@ function JCGECore.build!(block::PriceLinkBlock, ctx::JCGEKernel.KernelContext, s
     return nothing
 end
 
-function JCGECore.build!(block::ExchangeRateLinkBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ExchangeRateLinkBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -1855,7 +1855,7 @@ function JCGECore.build!(block::ExchangeRateLinkBlock, ctx::JCGEKernel.KernelCon
     return nothing
 end
 
-function JCGECore.build!(block::ExchangeRateLinkRegionBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ExchangeRateLinkRegionBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -1881,7 +1881,7 @@ function JCGECore.build!(block::ExchangeRateLinkRegionBlock, ctx::JCGEKernel.Ker
 
     return nothing
 end
-function JCGECore.build!(block::PriceEqualityBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::PriceEqualityBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -1895,7 +1895,7 @@ function JCGECore.build!(block::PriceEqualityBlock, ctx::JCGEKernel.KernelContex
     return nothing
 end
 
-function JCGECore.build!(block::NumeraireBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::NumeraireBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     model = ctx.model
     if model isa JuMP.Model
         if block.kind == :factor
@@ -1915,7 +1915,7 @@ function JCGECore.build!(block::NumeraireBlock, ctx::JCGEKernel.KernelContext, s
     return nothing
 end
 
-function JCGECore.build!(block::GovernmentBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::GovernmentBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
@@ -1996,7 +1996,7 @@ function JCGECore.build!(block::GovernmentBlock, ctx::JCGEKernel.KernelContext, 
     return nothing
 end
 
-function JCGECore.build!(block::GovernmentRegionalBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::GovernmentRegionalBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
@@ -2055,7 +2055,7 @@ function JCGECore.build!(block::GovernmentRegionalBlock, ctx::JCGEKernel.KernelC
     return nothing
 end
 
-function JCGECore.build!(block::GovernmentBudgetBalanceBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::GovernmentBudgetBalanceBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2099,7 +2099,7 @@ function JCGECore.build!(block::GovernmentBudgetBalanceBlock, ctx::JCGEKernel.Ke
     return nothing
 end
 
-function JCGECore.build!(block::PrivateSavingBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::PrivateSavingBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
 
@@ -2130,7 +2130,7 @@ function JCGECore.build!(block::PrivateSavingBlock, ctx::JCGEKernel.KernelContex
     return nothing
 end
 
-function JCGECore.build!(block::PrivateSavingRegionalBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::PrivateSavingRegionalBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     model = ctx.model
 
@@ -2148,7 +2148,7 @@ function JCGECore.build!(block::PrivateSavingRegionalBlock, ctx::JCGEKernel.Kern
     return nothing
 end
 
-function JCGECore.build!(block::PrivateSavingIncomeBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::PrivateSavingIncomeBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     model = ctx.model
@@ -2171,7 +2171,7 @@ function JCGECore.build!(block::PrivateSavingIncomeBlock, ctx::JCGEKernel.Kernel
     return nothing
 end
 
-function JCGECore.build!(block::InvestmentBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::InvestmentBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2196,7 +2196,7 @@ function JCGECore.build!(block::InvestmentBlock, ctx::JCGEKernel.KernelContext, 
     return nothing
 end
 
-function JCGECore.build!(block::InvestmentRegionalBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::InvestmentRegionalBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2221,7 +2221,7 @@ function JCGECore.build!(block::InvestmentRegionalBlock, ctx::JCGEKernel.KernelC
     return nothing
 end
 
-function JCGECore.build!(block::ArmingtonCESBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ArmingtonCESBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2267,7 +2267,7 @@ function JCGECore.build!(block::ArmingtonCESBlock, ctx::JCGEKernel.KernelContext
     return nothing
 end
 
-function JCGECore.build!(block::TransformationCETBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::TransformationCETBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2310,7 +2310,7 @@ function JCGECore.build!(block::TransformationCETBlock, ctx::JCGEKernel.KernelCo
     return nothing
 end
 
-function JCGECore.build!(block::MonopolyRentBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::MonopolyRentBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2333,7 +2333,7 @@ function JCGECore.build!(block::MonopolyRentBlock, ctx::JCGEKernel.KernelContext
     return nothing
 end
 
-function JCGECore.build!(block::ImportQuotaBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ImportQuotaBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2364,7 +2364,7 @@ function JCGECore.build!(block::ImportQuotaBlock, ctx::JCGEKernel.KernelContext,
     return nothing
 end
 
-function JCGECore.build!(block::MobileFactorMarketBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::MobileFactorMarketBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     factors = isempty(block.factors) ? spec.model.sets.factors : block.factors
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     model = ctx.model
@@ -2397,7 +2397,7 @@ function JCGECore.build!(block::MobileFactorMarketBlock, ctx::JCGEKernel.KernelC
     return nothing
 end
 
-function JCGECore.build!(block::CapitalStockReturnBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::CapitalStockReturnBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     model = ctx.model
 
@@ -2417,7 +2417,7 @@ function JCGECore.build!(block::CapitalStockReturnBlock, ctx::JCGEKernel.KernelC
     return nothing
 end
 
-function JCGECore.build!(block::CompositeInvestmentBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::CompositeInvestmentBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     model = ctx.model
@@ -2458,7 +2458,7 @@ function JCGECore.build!(block::CompositeInvestmentBlock, ctx::JCGEKernel.Kernel
     return nothing
 end
 
-function JCGECore.build!(block::InvestmentAllocationBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::InvestmentAllocationBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     model = ctx.model
 
@@ -2489,7 +2489,7 @@ function JCGECore.build!(block::InvestmentAllocationBlock, ctx::JCGEKernel.Kerne
     return nothing
 end
 
-function JCGECore.build!(block::CompositeConsumptionBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::CompositeConsumptionBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2510,7 +2510,7 @@ function JCGECore.build!(block::CompositeConsumptionBlock, ctx::JCGEKernel.Kerne
     return nothing
 end
 
-function JCGECore.build!(block::PriceLevelBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::PriceLevelBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2526,7 +2526,7 @@ function JCGECore.build!(block::PriceLevelBlock, ctx::JCGEKernel.KernelContext, 
     return nothing
 end
 
-function JCGECore.build!(block::PriceIndexBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::PriceIndexBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -2551,7 +2551,7 @@ function JCGECore.build!(block::PriceIndexBlock, ctx::JCGEKernel.KernelContext, 
     return nothing
 end
 
-function JCGECore.build!(block::ClosureBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ClosureBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     model = ctx.model
 
     if hasproperty(block.params, :fixed)
@@ -2578,7 +2578,7 @@ function JCGECore.build!(block::ClosureBlock, ctx::JCGEKernel.KernelContext, spe
     return nothing
 end
 
-function JCGECore.build!(block::UtilityCDHHBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::UtilityCDHHBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     households = isempty(block.households) ? spec.model.sets.institutions : block.households
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
@@ -2601,7 +2601,7 @@ function JCGECore.build!(block::UtilityCDHHBlock, ctx::JCGEKernel.KernelContext,
     return nothing
 end
 
-function JCGECore.build!(block::UtilityCDRegionalBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::UtilityCDRegionalBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     model = ctx.model
     goods_by_region = block.goods_by_region
     regions = collect(keys(goods_by_region))
@@ -2628,7 +2628,7 @@ function JCGECore.build!(block::UtilityCDRegionalBlock, ctx::JCGEKernel.KernelCo
     return nothing
 end
 
-function JCGECore.build!(block::UtilityCDBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::UtilityCDBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2645,7 +2645,7 @@ function JCGECore.build!(block::UtilityCDBlock, ctx::JCGEKernel.KernelContext, s
     return nothing
 end
 
-function JCGECore.build!(block::UtilityCDXpBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::UtilityCDXpBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2662,7 +2662,7 @@ function JCGECore.build!(block::UtilityCDXpBlock, ctx::JCGEKernel.KernelContext,
     return nothing
 end
 
-function JCGECore.build!(block::UtilityBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::UtilityBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     if block.form != :cd
         error("Unsupported utility form: $(block.form)")
     end
@@ -2681,7 +2681,7 @@ function JCGECore.build!(block::UtilityBlock, ctx::JCGEKernel.KernelContext, spe
     end
 end
 
-function JCGECore.build!(block::ExternalBalanceBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ExternalBalanceBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2704,7 +2704,7 @@ function JCGECore.build!(block::ExternalBalanceBlock, ctx::JCGEKernel.KernelCont
     return nothing
 end
 
-function JCGECore.build!(block::ExternalBalanceVarPriceBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ExternalBalanceVarPriceBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -2741,7 +2741,7 @@ function JCGECore.build!(block::ExternalBalanceVarPriceBlock, ctx::JCGEKernel.Ke
     return nothing
 end
 
-function JCGECore.build!(block::ExternalBalanceRemitBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ExternalBalanceRemitBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
     model = ctx.model
@@ -2779,7 +2779,7 @@ function JCGECore.build!(block::ExternalBalanceRemitBlock, ctx::JCGEKernel.Kerne
     return nothing
 end
 
-function JCGECore.build!(block::ForeignTradeBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ForeignTradeBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
 
@@ -2810,7 +2810,7 @@ function JCGECore.build!(block::ForeignTradeBlock, ctx::JCGEKernel.KernelContext
     return nothing
 end
 
-function JCGECore.build!(block::PriceAggregationBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::PriceAggregationBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     model = ctx.model
@@ -2836,7 +2836,7 @@ function JCGECore.build!(block::PriceAggregationBlock, ctx::JCGEKernel.KernelCon
     return nothing
 end
 
-function JCGECore.build!(block::InternationalMarketBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::InternationalMarketBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     model = ctx.model
     goods = block.goods
     regions = block.regions
@@ -2865,7 +2865,7 @@ function JCGECore.build!(block::InternationalMarketBlock, ctx::JCGEKernel.Kernel
     return nothing
 end
 
-function JCGECore.build!(block::ProductionMultilaborCDBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ProductionMultilaborCDBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     labor = isempty(block.labor) ? spec.model.sets.factors : block.labor
     model = ctx.model
@@ -2915,7 +2915,7 @@ function JCGECore.build!(block::ProductionMultilaborCDBlock, ctx::JCGEKernel.Ker
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:activity, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:activity, block=block.name,
             payload=(indices=(i,), info="xd[i] = ad[i]*prod(l^alphl)*k^(1-sum(alphl))", constraint=constraint))
 
         for lc in active_labor
@@ -2933,7 +2933,7 @@ function JCGECore.build!(block::ProductionMultilaborCDBlock, ctx::JCGEKernel.Ker
                     )
                 end
             end
-            JCGEKernel.register_equation!(ctx; tag=:profitmax, block=block.name,
+            JCGERuntime.register_equation!(ctx; tag=:profitmax, block=block.name,
                 payload=(indices=(i, lc), info="wa*wdist*l = xd*pva*alphl", constraint=constraint))
         end
     end
@@ -2941,7 +2941,7 @@ function JCGECore.build!(block::ProductionMultilaborCDBlock, ctx::JCGEKernel.Ker
     return nothing
 end
 
-function JCGECore.build!(block::LaborMarketClearingBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::LaborMarketClearingBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     labor = isempty(block.labor) ? spec.model.sets.factors : block.labor
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     model = ctx.model
@@ -2960,13 +2960,13 @@ function JCGECore.build!(block::LaborMarketClearingBlock, ctx::JCGEKernel.Kernel
                 constraint = @constraint(model, sum(l[i] for i in activities) == ls)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:lmequil, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:lmequil, block=block.name,
             payload=(indices=(lc,), info="sum_i l[i,lc] = ls[lc]", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::ActivityPriceIOBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ActivityPriceIOBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
@@ -2993,7 +2993,7 @@ function JCGECore.build!(block::ActivityPriceIOBlock, ctx::JCGEKernel.KernelCont
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:actp, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:actp, block=block.name,
             payload=(indices=(i,), info="px*(1-itax) = pva + sum(io*p)", constraint=constraint))
 
         constraint = nothing
@@ -3011,13 +3011,13 @@ function JCGECore.build!(block::ActivityPriceIOBlock, ctx::JCGEKernel.KernelCont
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:inteq, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:inteq, block=block.name,
             payload=(indices=(i,), info="int[i] = sum(io[i,j]*xd[j])", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::CapitalPriceCompositionBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::CapitalPriceCompositionBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
@@ -3039,13 +3039,13 @@ function JCGECore.build!(block::CapitalPriceCompositionBlock, ctx::JCGEKernel.Ke
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:pkdef, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:pkdef, block=block.name,
             payload=(indices=(i,), info="pk[i] = sum(p[j]*imat[j,i])", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::TradePriceLinkBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::TradePriceLinkBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
     model = ctx.model
@@ -3068,7 +3068,7 @@ function JCGECore.build!(block::TradePriceLinkBlock, ctx::JCGEKernel.KernelConte
                 constraint = @NLconstraint(model, pm == pwm_val * er * (1.0 + tm + pr))
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:pmdef, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:pmdef, block=block.name,
             payload=(indices=(i,), info="pm = pwm*er*(1+tm+pr)", constraint=constraint))
 
         pe = ensure_var!(ctx, model, global_var(:pe, i))
@@ -3087,13 +3087,13 @@ function JCGECore.build!(block::TradePriceLinkBlock, ctx::JCGEKernel.KernelConte
                     @NLconstraint(model, pe * (1.0 + te_i) == pwe_val * er)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:pedef, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:pedef, block=block.name,
             payload=(indices=(i,), info="pe definition (mode=$(pedef_mode))", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::AbsorptionSalesBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::AbsorptionSalesBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
     model = ctx.model
@@ -3117,7 +3117,7 @@ function JCGECore.build!(block::AbsorptionSalesBlock, ctx::JCGEKernel.KernelCont
                 constraint = @NLconstraint(model, p * x == pd * xxd + term_m)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:absorption, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:absorption, block=block.name,
             payload=(indices=(i,), info="p*x = pd*xxd + pm*m", constraint=constraint))
 
         px = ensure_var!(ctx, model, global_var(:px, i))
@@ -3134,13 +3134,13 @@ function JCGECore.build!(block::AbsorptionSalesBlock, ctx::JCGEKernel.KernelCont
                 constraint = @NLconstraint(model, px * xd == pd * xxd + term_e)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:sales, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:sales, block=block.name,
             payload=(indices=(i,), info="px*xd = pd*xxd + pe*e", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::ArmingtonMXxdBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ArmingtonMXxdBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
     model = ctx.model
@@ -3171,7 +3171,7 @@ function JCGECore.build!(block::ArmingtonMXxdBlock, ctx::JCGEKernel.KernelContex
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:armington, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:armington, block=block.name,
             payload=(indices=(i,), info="x = ac*(delta*m^-rhoc + (1-delta)*xxd^-rhoc)^(-1/rhoc)", constraint=constraint))
 
         constraint = nothing
@@ -3189,13 +3189,13 @@ function JCGECore.build!(block::ArmingtonMXxdBlock, ctx::JCGEKernel.KernelContex
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:costmin, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:costmin, block=block.name,
             payload=(indices=(i,), info="m/xxd = (pd/pm*delta/(1-delta))^(1/(1+rhoc))", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::CETXXDEBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::CETXXDEBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
     model = ctx.model
@@ -3227,7 +3227,7 @@ function JCGECore.build!(block::CETXXDEBlock, ctx::JCGEKernel.KernelContext, spe
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:cet, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:cet, block=block.name,
             payload=(indices=(i,), info="xd = at*(gamma*e^rhot + (1-gamma)*xxd^rhot)^(1/rhot)", constraint=constraint))
 
         constraint = nothing
@@ -3245,13 +3245,13 @@ function JCGECore.build!(block::CETXXDEBlock, ctx::JCGEKernel.KernelContext, spe
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:esupply, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:esupply, block=block.name,
             payload=(indices=(i,), info="e/xxd = (pe/pd*(1-gamma)/gamma)^(1/(rhot-1))", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::ExportDemandBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ExportDemandBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
     model = ctx.model
@@ -3272,13 +3272,13 @@ function JCGECore.build!(block::ExportDemandBlock, ctx::JCGEKernel.KernelContext
                 constraint = @NLconstraint(model, e / e0_i == (pwe0_i / pwe) ^ eta_i)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:edemand, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:edemand, block=block.name,
             payload=(indices=(i,), info="e/e0 = (pwe0/pwe)^eta", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::NontradedSupplyBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::NontradedSupplyBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     nontraded = hasproperty(block.params, :nontraded) ? block.params.nontraded : Symbol[]
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -3298,7 +3298,7 @@ function JCGECore.build!(block::NontradedSupplyBlock, ctx::JCGEKernel.KernelCont
                 constraint = @constraint(model, xxd == xd)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:xxdsn, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:xxdsn, block=block.name,
             payload=(indices=(i,), info="xxd = xd (nontraded)", constraint=constraint))
         constraint = nothing
         if model isa JuMP.Model
@@ -3309,13 +3309,13 @@ function JCGECore.build!(block::NontradedSupplyBlock, ctx::JCGEKernel.KernelCont
                 constraint = @constraint(model, x == xxd)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:xsn, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:xsn, block=block.name,
             payload=(indices=(i,), info="x = xxd (nontraded)", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdShareDemandBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdShareDemandBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -3335,7 +3335,7 @@ function JCGECore.build!(block::HouseholdShareDemandBlock, ctx::JCGEKernel.Kerne
                 constraint = @NLconstraint(model, p * cd == cles_i * (1.0 - mps) * y)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:cdeq, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:cdeq, block=block.name,
             payload=(indices=(i,), info="p*cd = cles*(1-mps)*y", constraint=constraint))
     end
 
@@ -3349,12 +3349,12 @@ function JCGECore.build!(block::HouseholdShareDemandBlock, ctx::JCGEKernel.Kerne
             constraint = @NLconstraint(model, hhsav == mps * y)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:hhsaveq, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:hhsaveq, block=block.name,
         payload=(indices=(), info="hhsav = mps*y", constraint=constraint))
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdShareDemandHHBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdShareDemandHHBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     households = isempty(block.households) ? spec.model.sets.institutions : block.households
     model = ctx.model
@@ -3380,7 +3380,7 @@ function JCGECore.build!(block::HouseholdShareDemandHHBlock, ctx::JCGEKernel.Ker
                 constraint = @NLconstraint(model, expr == 0)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:cdeq, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:cdeq, block=block.name,
             payload=(indices=(i,), info="p*cd = sum(cles*(1-mps)*yh*(1-htax))", constraint=constraint))
     end
 
@@ -3397,12 +3397,12 @@ function JCGECore.build!(block::HouseholdShareDemandHHBlock, ctx::JCGEKernel.Ker
             constraint = @NLconstraint(model, expr == 0)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:hhsaveq, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:hhsaveq, block=block.name,
         payload=(indices=(), info="hhsav = sum(mps*yh*(1-htax))", constraint=constraint))
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdIncomeLaborCapitalBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdIncomeLaborCapitalBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     labor = isempty(block.labor) ? spec.model.sets.factors : block.labor
     households = isempty(block.households) ? spec.model.sets.institutions : block.households
@@ -3433,7 +3433,7 @@ function JCGECore.build!(block::HouseholdIncomeLaborCapitalBlock, ctx::JCGEKerne
             constraint = @NLconstraint(model, expr == 0)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:labory, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:labory, block=block.name,
         payload=(indices=(labor_hh,), info="yh[labor] = sum(wa*ls) + remit*er", constraint=constraint))
 
     constraint = nothing
@@ -3449,12 +3449,12 @@ function JCGECore.build!(block::HouseholdIncomeLaborCapitalBlock, ctx::JCGEKerne
             constraint = @NLconstraint(model, expr == 0)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:capitaly, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:capitaly, block=block.name,
         payload=(indices=(capital_hh,), info="yh[capital] = sum(pva*xd)-depr-sum(wa*ls)+fbor*er+ypr", constraint=constraint))
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdTaxRevenueBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdTaxRevenueBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     households = isempty(block.households) ? spec.model.sets.institutions : block.households
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -3472,12 +3472,12 @@ function JCGECore.build!(block::HouseholdTaxRevenueBlock, ctx::JCGEKernel.Kernel
             constraint = @constraint(model, expr == 0)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:hhtaxdef, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:hhtaxdef, block=block.name,
         payload=(indices=(), info="tothhtax = sum(htax*yh)", constraint=constraint))
     return nothing
 end
 
-function JCGECore.build!(block::HouseholdIncomeSumBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::HouseholdIncomeSumBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     households = isempty(block.households) ? spec.model.sets.institutions : block.households
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -3493,12 +3493,12 @@ function JCGECore.build!(block::HouseholdIncomeSumBlock, ctx::JCGEKernel.KernelC
             constraint = @constraint(model, expr == 0)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:gdp, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:gdp, block=block.name,
         payload=(indices=(), info="y = sum(yh)", constraint=constraint))
     return nothing
 end
 
-function JCGECore.build!(block::GovernmentShareDemandBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::GovernmentShareDemandBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -3515,13 +3515,13 @@ function JCGECore.build!(block::GovernmentShareDemandBlock, ctx::JCGEKernel.Kern
                 constraint = @constraint(model, gd == gles_i * gdtot)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:gdeq, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:gdeq, block=block.name,
             payload=(indices=(i,), info="gd = gles*gdtot", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::InventoryDemandBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::InventoryDemandBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -3538,13 +3538,13 @@ function JCGECore.build!(block::InventoryDemandBlock, ctx::JCGEKernel.KernelCont
                 constraint = @constraint(model, dst == dstr_i * xd)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:dsteq, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:dsteq, block=block.name,
             payload=(indices=(i,), info="dst = dstr*xd", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::GovernmentFinanceBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::GovernmentFinanceBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
     model = ctx.model
@@ -3582,7 +3582,7 @@ function JCGECore.build!(block::GovernmentFinanceBlock, ctx::JCGEKernel.KernelCo
             )
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:tariffdef, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:tariffdef, block=block.name,
         payload=(indices=(), info="tariff = sum(tm*m*pwm)*er", constraint=constraint))
 
     constraint = nothing
@@ -3594,7 +3594,7 @@ function JCGECore.build!(block::GovernmentFinanceBlock, ctx::JCGEKernel.KernelCo
             constraint = @NLconstraint(model, indtax == sum(itax_vals[i] * px_vars[i] * xd_vars[i] for i in commodities))
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:indtaxdef, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:indtaxdef, block=block.name,
         payload=(indices=(), info="indtax = sum(itax*px*xd)", constraint=constraint))
 
     constraint = nothing
@@ -3606,7 +3606,7 @@ function JCGECore.build!(block::GovernmentFinanceBlock, ctx::JCGEKernel.KernelCo
             constraint = @NLconstraint(model, duty == sum(te_vals[i] * e_vars[i] * pe_vars[i] for i in traded))
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:dutydef, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:dutydef, block=block.name,
         payload=(indices=(), info="duty = sum(te*e*pe)", constraint=constraint))
 
     constraint = nothing
@@ -3618,7 +3618,7 @@ function JCGECore.build!(block::GovernmentFinanceBlock, ctx::JCGEKernel.KernelCo
             constraint = @constraint(model, gr == tariff + duty + indtax)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:greq, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:greq, block=block.name,
         payload=(indices=(), info="gr = tariff + duty + indtax", constraint=constraint))
 
     constraint = nothing
@@ -3630,13 +3630,13 @@ function JCGECore.build!(block::GovernmentFinanceBlock, ctx::JCGEKernel.KernelCo
             constraint = @NLconstraint(model, gr == sum(p_vars[i] * gd_vars[i] for i in commodities) + govsav)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:gruse, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:gruse, block=block.name,
         payload=(indices=(), info="gr = sum(p*gd) + govsav", constraint=constraint))
 
     return nothing
 end
 
-function JCGECore.build!(block::GovernmentRevenueBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::GovernmentRevenueBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
     model = ctx.model
@@ -3676,7 +3676,7 @@ function JCGECore.build!(block::GovernmentRevenueBlock, ctx::JCGEKernel.KernelCo
             )
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:tariffdef, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:tariffdef, block=block.name,
         payload=(indices=(), info="tariff = sum(tm*m*pwm)*er", constraint=constraint))
 
     constraint = nothing
@@ -3688,7 +3688,7 @@ function JCGECore.build!(block::GovernmentRevenueBlock, ctx::JCGEKernel.KernelCo
             constraint = @NLconstraint(model, indtax == sum(itax_vals[i] * px_vars[i] * xd_vars[i] for i in commodities))
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:indtaxdef, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:indtaxdef, block=block.name,
         payload=(indices=(), info="indtax = sum(itax*px*xd)", constraint=constraint))
 
     constraint = nothing
@@ -3700,7 +3700,7 @@ function JCGECore.build!(block::GovernmentRevenueBlock, ctx::JCGEKernel.KernelCo
             constraint = @NLconstraint(model, netsub == sum(te_vals[i] * e_vars[i] * pwe_vars[i] for i in traded) * er)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:netsubdef, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:netsubdef, block=block.name,
         payload=(indices=(), info="netsub = sum(te*e*pwe)*er", constraint=constraint))
 
     constraint = nothing
@@ -3712,7 +3712,7 @@ function JCGECore.build!(block::GovernmentRevenueBlock, ctx::JCGEKernel.KernelCo
             constraint = @constraint(model, gr == tariff - netsub + indtax + tothhtax)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:greq, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:greq, block=block.name,
         payload=(indices=(), info="gr = tariff - netsub + indtax + tothhtax", constraint=constraint))
 
     constraint = nothing
@@ -3724,13 +3724,13 @@ function JCGECore.build!(block::GovernmentRevenueBlock, ctx::JCGEKernel.KernelCo
             constraint = @NLconstraint(model, gr == sum(p_vars[i] * gd_vars[i] for i in commodities) + govsav)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:gruse, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:gruse, block=block.name,
         payload=(indices=(), info="gr = sum(p*gd) + govsav", constraint=constraint))
 
     return nothing
 end
 
-function JCGECore.build!(block::ImportPremiumIncomeBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ImportPremiumIncomeBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     traded = hasproperty(block.params, :traded) ? block.params.traded : commodities
     model = ctx.model
@@ -3751,12 +3751,12 @@ function JCGECore.build!(block::ImportPremiumIncomeBlock, ctx::JCGEKernel.Kernel
             constraint = @NLconstraint(model, expr == 0)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:premium, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:premium, block=block.name,
         payload=(indices=(), info="ypr = sum(pwm*m)*er*pr", constraint=constraint))
     return nothing
 end
 
-function JCGECore.build!(block::GDPIncomeBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::GDPIncomeBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -3775,12 +3775,12 @@ function JCGECore.build!(block::GDPIncomeBlock, ctx::JCGEKernel.KernelContext, s
             )
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:gdp, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:gdp, block=block.name,
         payload=(indices=(), info="y = sum(pva*xd) - deprecia", constraint=constraint))
     return nothing
 end
 
-function JCGECore.build!(block::SavingsInvestmentBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::SavingsInvestmentBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
@@ -3812,7 +3812,7 @@ function JCGECore.build!(block::SavingsInvestmentBlock, ctx::JCGEKernel.KernelCo
             )
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:depreq, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:depreq, block=block.name,
         payload=(indices=(), info="deprecia = sum(depr*pk*k)", constraint=constraint))
 
     constraint = nothing
@@ -3824,7 +3824,7 @@ function JCGECore.build!(block::SavingsInvestmentBlock, ctx::JCGEKernel.KernelCo
             constraint = @NLconstraint(model, savings == hhsav + govsav + deprecia + fsav * er)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:totsav, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:totsav, block=block.name,
         payload=(indices=(), info="savings = hhsav + govsav + deprecia + fsav*er", constraint=constraint))
 
     for i in activities
@@ -3844,7 +3844,7 @@ function JCGECore.build!(block::SavingsInvestmentBlock, ctx::JCGEKernel.KernelCo
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:prodinv, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:prodinv, block=block.name,
             payload=(indices=(i,), info="pk*dk = kio*invest - kio*sum(dst*p)", constraint=constraint))
     end
 
@@ -3865,14 +3865,14 @@ function JCGECore.build!(block::SavingsInvestmentBlock, ctx::JCGEKernel.KernelCo
                 )
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:ieq, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:ieq, block=block.name,
             payload=(indices=(i,), info="id[i] = sum(imat[i,j]*dk[j])", constraint=constraint))
     end
 
     return nothing
 end
 
-function JCGECore.build!(block::FinalDemandClearingBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::FinalDemandClearingBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -3892,13 +3892,13 @@ function JCGECore.build!(block::FinalDemandClearingBlock, ctx::JCGEKernel.Kernel
                 constraint = @constraint(model, x == int + cd + gd + id + dst)
             end
         end
-        JCGEKernel.register_equation!(ctx; tag=:equil, block=block.name,
+        JCGERuntime.register_equation!(ctx; tag=:equil, block=block.name,
             payload=(indices=(i,), info="x = int + cd + gd + id + dst", constraint=constraint))
     end
     return nothing
 end
 
-function JCGECore.build!(block::ConsumptionObjectiveBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::ConsumptionObjectiveBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
     model = ctx.model
     mcp = mcp_enabled(block.params)
@@ -3915,12 +3915,12 @@ function JCGECore.build!(block::ConsumptionObjectiveBlock, ctx::JCGEKernel.Kerne
             @NLobjective(model, Max, omega)
         end
     end
-    JCGEKernel.register_equation!(ctx; tag=:objective, block=block.name,
+    JCGERuntime.register_equation!(ctx; tag=:objective, block=block.name,
         payload=(indices=(), info="omega = prod(cd^alpha)", constraint=nothing))
     return nothing
 end
 
-function JCGECore.build!(block::InitialValuesBlock, ctx::JCGEKernel.KernelContext, spec::JCGECore.RunSpec)
+function JCGECore.build!(block::InitialValuesBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     model = ctx.model
     start = hasproperty(block.params, :start) ? block.params.start : Dict{Symbol,Float64}()
     lower = hasproperty(block.params, :lower) ? block.params.lower : Dict{Symbol,Float64}()
@@ -4007,9 +4007,9 @@ end
 
 function rerun!(spec::JCGECore.RunSpec; from, optimizer=nothing,
     dataset_id::String="jcge", tol::Real=1e-6, description::Union{String,Nothing}=nothing)
-    state = JCGEKernel.snapshot_state(from)
+    state = JCGERuntime.snapshot_state(from)
     spec2 = apply_start(spec, state.start; lower=state.lower, upper=state.upper, fixed=state.fixed)
-    return JCGEKernel.run!(spec2; optimizer=optimizer, dataset_id=dataset_id, tol=tol, description=description)
+    return JCGERuntime.run!(spec2; optimizer=optimizer, dataset_id=dataset_id, tol=tol, description=description)
 end
 
 end # module

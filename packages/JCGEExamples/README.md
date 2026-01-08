@@ -8,7 +8,7 @@ A package that bundles **model definitions** (as submodules) for the JCGE ecosys
 - Small toy datasets that are safe to ship in-repo (optional), under `models/<ModelName>/data/`.
 
 ## What does NOT belong here
-- Core framework code (data model, calibration, kernel, generic blocks): those stay in `JCGECore`, `JCGECalibrate`, `JCGEKernel`, `JCGEBlocks`, `JCGECircular`.
+- Core framework code (data model, calibration, runtime, generic blocks): those stay in `JCGECore`, `JCGECalibrate`, `JCGERuntime`, `JCGEBlocks`, `JCGEOutput`, `JCGEAgentInterface`, `JCGEImportMPSGE`.
 - Large, licensed, or country SAM datasets unless distribution rights are clear.
 - Solver-specific configuration that is not part of the model definition.
 

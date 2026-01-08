@@ -13,9 +13,11 @@ JCGE.jl is a modular, block-based framework for building and running computable 
 ## Near-term milestones
 1. Establish a minimal internal data model and validation (JCGECore).
 2. Implement calibration helpers for standard functional forms (JCGECalibrate).
-3. Implement a JuMP kernel with variable/constraint registries and diagnostics (JCGEKernel).
+3. Implement a JuMP runtime with variable/constraint registries and diagnostics (JCGERuntime).
 4. Implement a minimal set of standard blocks (JCGEBlocks).
-5. Add first circular-economy extension blocks (JCGECircular).
+5. Add MCP passthrough for AI agents (JCGEAgentInterface).
+6. Add MPSGE.jl model-object importer as a converter + conformance harness (JCGEImportMPSGE).
+7. Add backend-agnostic output/reporting utilities (JCGEOutput).
 6. Provide a tiny end-to-end example in `JCGEExamples` using a toy SAM.
 7. Port an existing JuMP CGE model into `JCGEExamples` as the first real model-driven development target.
 
