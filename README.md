@@ -15,6 +15,7 @@ JCGE.jl is a modular, block-based framework for building and running computable 
   - `JCGEOutput`: equation rendering and results/IO reporting utilities
   - `JCGEAgentInterface`: MCP passthrough for AI agent usage
   - `JCGEImportMPSGE`: converter from MPSGE.jl model objects into blocks
+  - `JCGEImportData`: ETL utilities to emit canonical JCGE CSV datasets
   - `JCGEExamples`: runnable reference models and scenarios
 - `docs/`: documentation sources (optional)
 - `scripts/`: developer utilities (optional)

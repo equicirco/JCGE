@@ -15,6 +15,7 @@ JCGE.jl is a monorepo containing multiple Julia packages for building CGE models
 - packages/JCGEAgentInterface
 - packages/JCGEImportMPSGE
 - packages/JCGEOutput
+- packages/JCGEImportData
 - packages/JCGEExamples
 - docs/ (optional documentation sources)
 - scripts/ (developer utilities)
@@ -28,6 +29,7 @@ JCGECore
         -> JCGEOutput
         -> JCGEAgentInterface
         -> JCGEImportMPSGE
+        -> JCGEImportData
           -> JCGEExamples
 
 Rules:

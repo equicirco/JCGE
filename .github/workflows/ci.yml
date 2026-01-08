@@ -13,9 +13,12 @@ jobs:
         pkg:
           - packages/JCGECore
           - packages/JCGECalibrate
-          - packages/JCGEKernel
+          - packages/JCGERuntime
           - packages/JCGEBlocks
-          - packages/JCGECircular
+          - packages/JCGEOutput
+          - packages/JCGEAgentInterface
+          - packages/JCGEImportMPSGE
+          - packages/JCGEImportData
           - packages/JCGEExamples
     steps:
       - uses: actions/checkout@v4

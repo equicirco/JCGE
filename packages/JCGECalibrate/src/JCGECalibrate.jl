@@ -8,6 +8,8 @@ export calibrate_ces_share_scale
 export LabeledVector, LabeledMatrix
 export SAMTable, StartingValues, ModelParameters
 export load_sam_table, compute_starting_values, compute_calibration_params
+export load_canonical_sets, load_canonical_labels, load_canonical_subsets
+export load_canonical_params, load_canonical_sam
 export load_labeled_matrix, load_labeled_vector
 
 "Convert CES elasticity sigma to rho (rho = (sigma - 1)/sigma)."
@@ -172,14 +174,17 @@ function load_sam_table(file_path::AbstractString; goods::Vector{String} = ["BRD
     households_label::String = "HOH",
     government_label::String = "GOV",
     investment_label::String = "INV",
-    restOfTheWorld_label::String = "EXT")
+    restOfTheWorld_label::String = "EXT",
+    label_col::String = "label")
     df = DataFrame(CSV.File(file_path))
     for col in eachcol(df)
         replace!(col, missing => 0)
     end
-    row_labels = Symbol.(df[:, "Column1"])
-    col_labels = Symbol.(names(df)[2:end])
-    sam = LabeledMatrix(Matrix{Float64}(df[:, 2:end]), row_labels, col_labels)
+    label_name = label_col in names(df) ? label_col : ("Column1" in names(df) ? "Column1" : names(df)[1])
+    row_labels = Symbol.(df[:, label_name])
+    data_cols = names(df)[names(df) .!= label_name]
+    col_labels = Symbol.(data_cols)
+    sam = LabeledMatrix(Matrix{Float64}(df[:, data_cols]), row_labels, col_labels)
     return SAMTable(
         to_symbols(goods),
         to_symbols(factors),
@@ -207,14 +212,17 @@ function load_sam_table(io::IO; goods::Vector{String} = ["BRD", "MLK"],
     households_label::String = "HOH",
     government_label::String = "GOV",
     investment_label::String = "INV",
-    restOfTheWorld_label::String = "EXT")
+    restOfTheWorld_label::String = "EXT",
+    label_col::String = "label")
     df = DataFrame(CSV.File(io))
     for col in eachcol(df)
         replace!(col, missing => 0)
     end
-    row_labels = Symbol.(df[:, "Column1"])
-    col_labels = Symbol.(names(df)[2:end])
-    sam = LabeledMatrix(Matrix{Float64}(df[:, 2:end]), row_labels, col_labels)
+    label_name = label_col in names(df) ? label_col : ("Column1" in names(df) ? "Column1" : names(df)[1])
+    row_labels = Symbol.(df[:, label_name])
+    data_cols = names(df)[names(df) .!= label_name]
+    col_labels = Symbol.(data_cols)
+    sam = LabeledMatrix(Matrix{Float64}(df[:, data_cols]), row_labels, col_labels)
     return SAMTable(
         to_symbols(goods),
         to_symbols(factors),
@@ -227,6 +235,78 @@ function load_sam_table(io::IO; goods::Vector{String} = ["BRD", "MLK"],
         Symbol(restOfTheWorld_label),
         sam,
     )
+end
+
+"""
+    load_canonical_sets(dir::AbstractString) -> Dict{Symbol,Vector{Symbol}}
+
+Load canonical sets from `sets.csv` (columns: set,item).
+"""
+function load_canonical_sets(dir::AbstractString)
+    path = joinpath(dir, "sets.csv")
+    df = DataFrame(CSV.File(path))
+    sets = Dict{Symbol,Vector{Symbol}}()
+    for row in eachrow(df)
+        name = Symbol(row.set)
+        push!(get!(sets, name, Symbol[]), Symbol(row.item))
+    end
+    return sets
+end
+
+"""
+    load_canonical_labels(dir::AbstractString) -> Dict{Tuple{Symbol,Symbol},String}
+
+Load canonical labels from `labels.csv` (columns: set,item,label).
+"""
+function load_canonical_labels(dir::AbstractString)
+    path = joinpath(dir, "labels.csv")
+    if !isfile(path)
+        return Dict{Tuple{Symbol,Symbol},String}()
+    end
+    df = DataFrame(CSV.File(path))
+    labels = Dict{Tuple{Symbol,Symbol},String}()
+    for row in eachrow(df)
+        labels[(Symbol(row.set), Symbol(row.item))] = String(row.label)
+    end
+    return labels
+end
+
+"""
+    load_canonical_subsets(dir::AbstractString) -> Dict{Symbol,Vector{Symbol}}
+
+Load canonical subsets from `subsets.csv` (columns: subset,parent_set,item).
+"""
+function load_canonical_subsets(dir::AbstractString)
+    path = joinpath(dir, "subsets.csv")
+    if !isfile(path)
+        return Dict{Symbol,Vector{Symbol}}()
+    end
+    df = DataFrame(CSV.File(path))
+    subsets = Dict{Symbol,Vector{Symbol}}()
+    for row in eachrow(df)
+        name = Symbol(row.subset)
+        push!(get!(subsets, name, Symbol[]), Symbol(row.item))
+    end
+    return subsets
+end
+
+"""
+    load_canonical_params(dir::AbstractString) -> DataFrame
+
+Load canonical parameters from `params.csv` (columns: name,set1,index1,set2,index2,set3,index3,value,section).
+"""
+function load_canonical_params(dir::AbstractString)
+    path = joinpath(dir, "params.csv")
+    return DataFrame(CSV.File(path))
+end
+
+"""
+    load_canonical_sam(dir::AbstractString; kwargs...) -> SAMTable
+
+Load canonical SAM from `sam.csv` (label column: `label`).
+"""
+function load_canonical_sam(dir::AbstractString; kwargs...)
+    return load_sam_table(joinpath(dir, "sam.csv"); kwargs..., label_col="label")
 end
 
 """
