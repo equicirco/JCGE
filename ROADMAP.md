@@ -18,6 +18,8 @@ JCGE.jl is a modular, block-based framework for building and running computable 
 5. Add MCP passthrough for AI agents (JCGEAgentInterface).
 6. Add MPSGE.jl model-object importer as a converter + conformance harness (JCGEImportMPSGE).
 7. Add backend-agnostic output/reporting utilities (JCGEOutput).
+   - Step 3: SAM/IO reporting with valuation modes `:model` (numeraire units) and `:baseline` (rescaled to base SAM using calibration prices).
+   - Requires a calibration link (e.g., `StartingValues`/baseline prices) for real-value reconstruction.
 8. Add data import utilities that emit canonical JCGE CSV datasets (JCGEImportData).
 6. Provide a tiny end-to-end example in `JCGEExamples` using a toy SAM.
 7. Port an existing JuMP CGE model into `JCGEExamples` as the first real model-driven development target.

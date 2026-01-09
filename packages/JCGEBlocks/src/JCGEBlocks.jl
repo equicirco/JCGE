@@ -1,6 +1,7 @@
 module JCGEBlocks
 
 using JCGECore
+using JCGECore: EAdd, EConst, EDiv, EEq, EIndex, EMul, ENeg, EParam, EProd, EPow, ESum, EVar, ERaw
 using JCGERuntime
 using JuMP
 import MathOptInterface as MOI
@@ -168,7 +169,8 @@ end
 
 function JCGECore.build!(block::DummyBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
     JCGERuntime.register_variable!(ctx, Symbol(block.name, :_x), 1.0)
-    JCGERuntime.register_equation!(ctx; tag=:dummy_eq, block=block.name, payload="x==1 (placeholder)")
+    JCGERuntime.register_equation!(ctx; tag=:dummy_eq, block=block.name,
+        payload=(indices=(), params=_payload_params(block), info="x==1 (placeholder)", expr=ERaw("x==1 (placeholder)"), constraint=nothing))
     return nothing
 end
 
@@ -886,6 +888,38 @@ struct InitialValuesBlock <: JCGECore.AbstractBlock
     params::NamedTuple
 end
 
+function _expr_or_raw(info, expr)
+    if expr !== nothing
+        return expr
+    end
+    if info === nothing
+        return ERaw("(no info)")
+    end
+    return ERaw(string(info))
+end
+
+function _payload_params(block)
+    return hasproperty(block, :params) ? getproperty(block, :params) : nothing
+end
+
+function _build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense)
+    payload = (
+        indices=idxs,
+        index_names=index_names,
+        params=_payload_params(block),
+        info=info,
+        expr=_expr_or_raw(info, expr),
+        constraint=constraint,
+    )
+    if mcp_var !== nothing
+        payload = merge(payload, (mcp_var=mcp_var,))
+    end
+    if objective_expr !== nothing
+        payload = merge(payload, (objective_expr=objective_expr, objective_sense=objective_sense))
+    end
+    return payload
+end
+
 function global_var(base::Symbol, idxs::Symbol...)
     if isempty(idxs)
         return base
@@ -897,8 +931,8 @@ function var_name(block::FactorSupplyBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::FactorSupplyBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::FactorSupplyBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -906,23 +940,23 @@ function var_name(block::HouseholdDemandCDHHBlock, base::Symbol, idxs::Symbol...
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDHHBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDHHBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDXpBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDXpBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDXpRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandCDXpRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -930,8 +964,8 @@ function var_name(block::HouseholdDemandIncomeBlock, base::Symbol, idxs::Symbol.
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandIncomeBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::HouseholdDemandIncomeBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -939,23 +973,23 @@ function var_name(block::MarketClearingBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::MarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::MarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::GoodsMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::GoodsMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::FactorMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::FactorMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::CompositeMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::CompositeMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -963,23 +997,23 @@ function var_name(block::PriceLinkBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceLinkBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceLinkBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ExchangeRateLinkBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExchangeRateLinkBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ExchangeRateLinkRegionBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExchangeRateLinkRegionBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceEqualityBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceEqualityBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -987,8 +1021,8 @@ function var_name(block::NumeraireBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::NumeraireBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::NumeraireBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -996,13 +1030,13 @@ function var_name(block::GovernmentBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::GovernmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::GovernmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::GovernmentRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::GovernmentRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1010,18 +1044,18 @@ function var_name(block::GovernmentBudgetBalanceBlock, base::Symbol, idxs::Symbo
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::GovernmentBudgetBalanceBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::GovernmentBudgetBalanceBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::PrivateSavingBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PrivateSavingBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::PrivateSavingRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PrivateSavingRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1029,8 +1063,8 @@ function var_name(block::PrivateSavingIncomeBlock, base::Symbol, idxs::Symbol...
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::PrivateSavingIncomeBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PrivateSavingIncomeBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1038,13 +1072,13 @@ function var_name(block::InvestmentBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::InvestmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InvestmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::InvestmentRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InvestmentRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1052,8 +1086,8 @@ function var_name(block::ArmingtonCESBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ArmingtonCESBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ArmingtonCESBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1061,8 +1095,8 @@ function var_name(block::TransformationCETBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::TransformationCETBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::TransformationCETBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1070,8 +1104,8 @@ function var_name(block::MonopolyRentBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::MonopolyRentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::MonopolyRentBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1079,8 +1113,8 @@ function var_name(block::ImportQuotaBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ImportQuotaBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ImportQuotaBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1088,8 +1122,8 @@ function var_name(block::MobileFactorMarketBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::MobileFactorMarketBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::MobileFactorMarketBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1097,8 +1131,8 @@ function var_name(block::CapitalStockReturnBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::CapitalStockReturnBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::CapitalStockReturnBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1106,8 +1140,8 @@ function var_name(block::CompositeInvestmentBlock, base::Symbol, idxs::Symbol...
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::CompositeInvestmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::CompositeInvestmentBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1115,8 +1149,8 @@ function var_name(block::InvestmentAllocationBlock, base::Symbol, idxs::Symbol..
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::InvestmentAllocationBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InvestmentAllocationBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1124,8 +1158,8 @@ function var_name(block::CompositeConsumptionBlock, base::Symbol, idxs::Symbol..
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::CompositeConsumptionBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::CompositeConsumptionBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1133,8 +1167,8 @@ function var_name(block::PriceLevelBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceLevelBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceLevelBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1142,8 +1176,8 @@ function var_name(block::PriceIndexBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceIndexBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceIndexBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1151,8 +1185,8 @@ function var_name(block::ClosureBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ClosureBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ClosureBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1160,28 +1194,28 @@ function var_name(block::UtilityBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDXpBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDXpBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDHHBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDHHBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::UtilityCDRegionalBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1189,8 +1223,8 @@ function var_name(block::ExternalBalanceRemitBlock, base::Symbol, idxs::Symbol..
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ExternalBalanceRemitBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExternalBalanceRemitBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1198,18 +1232,18 @@ function var_name(block::ExternalBalanceBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ExternalBalanceBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExternalBalanceBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ExternalBalanceVarPriceBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ExternalBalanceVarPriceBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ForeignTradeBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ForeignTradeBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1217,18 +1251,18 @@ function var_name(block::PriceAggregationBlock, base::Symbol, idxs::Symbol...)
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceAggregationBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::PriceAggregationBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::InternationalMarketBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InternationalMarketBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::InitialValuesBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::InitialValuesBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1253,8 +1287,8 @@ function ensure_var!(ctx::JCGERuntime.KernelContext, model, name::Symbol; lower=
     return v
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ProductionCDLeontiefBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ProductionCDLeontiefBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1262,13 +1296,13 @@ function var_name(block::ProductionCDLeontiefSectorPFBlock, base::Symbol, idxs::
     return global_var(base, idxs...)
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ProductionCDLeontiefSectorPFBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ProductionCDLeontiefSectorPFBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
-function register_eq!(ctx::JCGERuntime.KernelContext, block::ProductionCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, constraint=nothing)
-    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=(indices=idxs, info=info, constraint=constraint))
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ProductionCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
 
@@ -1316,28 +1350,83 @@ function JCGECore.build!(block::ProductionCDLeontiefBlock, ctx::JCGERuntime.Kern
         ay_i = JCGECore.getparam(block.params, :ay, i)
         ax_vals = Dict(j => JCGECore.getparam(block.params, :ax, j, i) for j in commodities)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Y[i] == b_i * prod(F[(h, i)] ^ beta_vals[h] for h in factors)) : nothing
-        register_eq!(ctx, block, :eqpy, i; info="Y[i] == b[i] * prod(F[h,i]^beta[h,i])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Y, Any[EIndex(:i)]),
+            EMul([
+                EParam(:b, Any[EIndex(:i)]),
+                EProd(:h, factors,
+                    EPow(
+                        EVar(:F, Any[EIndex(:h), EIndex(:i)]),
+                        EParam(:beta, Any[EIndex(:h), EIndex(:i)]),
+                    ),
+                ),
+            ]),
+        )
+        register_eq!(ctx, block, :eqpy, i;
+            info="Y[i] == b[i] * prod(F[h,i]^beta[h,i])", expr=expr, index_names=(:i,), constraint=constraint)
 
         for h in factors
-            constraint = model isa JuMP.Model ? @NLconstraint(model, F[(h, i)] == beta_vals[h] * py[i] * Y[i] / pf[h]) : nothing
-            register_eq!(ctx, block, :eqF, h, i; info="F[h,i] == beta[h,i] * py[i] * Y[i] / pf[h]", constraint=constraint)
+            constraint = nothing
+            expr = EEq(
+                EVar(:F, Any[EIndex(:h), EIndex(:i)]),
+                EDiv(
+                    EMul([
+                        EParam(:beta, Any[EIndex(:h), EIndex(:i)]),
+                        EVar(:py, Any[EIndex(:i)]),
+                        EVar(:Y, Any[EIndex(:i)]),
+                    ]),
+                    EVar(:pf, Any[EIndex(:h)]),
+                ),
+            )
+            register_eq!(ctx, block, :eqF, h, i;
+                info="F[h,i] == beta[h,i] * py[i] * Y[i] / pf[h]",
+                expr=expr, index_names=(:h, :i), constraint=constraint)
         end
 
         for j in commodities
-            constraint = model isa JuMP.Model ? @constraint(model, X[(j, i)] == ax_vals[j] * Z[i]) : nothing
-            register_eq!(ctx, block, :eqX, j, i; info="X[j,i] == ax[j,i] * Z[i]", constraint=constraint)
+            constraint = nothing
+            expr = EEq(
+                EVar(:X, Any[EIndex(:j), EIndex(:i)]),
+                EMul([
+                    EParam(:ax, Any[EIndex(:j), EIndex(:i)]),
+                    EVar(:Z, Any[EIndex(:i)]),
+                ]),
+            )
+            register_eq!(ctx, block, :eqX, j, i;
+                info="X[j,i] == ax[j,i] * Z[i]", expr=expr, index_names=(:j, :i), constraint=constraint)
         end
 
-        constraint = model isa JuMP.Model ? @constraint(model, Y[i] == ay_i * Z[i]) : nothing
-        register_eq!(ctx, block, :eqY, i; info="Y[i] == ay[i] * Z[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Y, Any[EIndex(:i)]),
+            EMul([
+                EParam(:ay, Any[EIndex(:i)]),
+                EVar(:Z, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqY, i; info="Y[i] == ay[i] * Z[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
         fc_term = hasproperty(block.params, :FC) ? JCGECore.getparam(block.params, :FC, i) / Z[i] : 0.0
-        constraint = model isa JuMP.Model ? @NLconstraint(
-            model,
-            pz[i] == ay_i * py[i] + sum(ax_vals[j] * pq[j] for j in commodities) + fc_term
-        ) : nothing
-        register_eq!(ctx, block, :eqpzs, i; info="pz[i] == ay[i]*py[i] + sum(ax[j,i]*pq[j]) + FC[i]/Z[i]", constraint=constraint)
+        constraint = nothing
+        fc_expr = hasproperty(block.params, :FC) ? EDiv(EParam(:FC, Any[EIndex(:i)]), EVar(:Z, Any[EIndex(:i)])) : EConst(0.0)
+        expr = EEq(
+            EVar(:pz, Any[EIndex(:i)]),
+            EAdd([
+                EMul([
+                    EParam(:ay, Any[EIndex(:i)]),
+                    EVar(:py, Any[EIndex(:i)]),
+                ]),
+                ESum(:j, commodities, EMul([
+                    EParam(:ax, Any[EIndex(:j), EIndex(:i)]),
+                    EVar(:pq, Any[EIndex(:j)]),
+                ])),
+                fc_expr,
+            ]),
+        )
+        register_eq!(ctx, block, :eqpzs, i;
+            info="pz[i] == ay[i]*py[i] + sum(ax[j,i]*pq[j]) + FC[i]/Z[i]",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1384,24 +1473,80 @@ function JCGECore.build!(block::ProductionCDLeontiefSectorPFBlock, ctx::JCGERunt
         ay_i = JCGECore.getparam(block.params, :ay, i)
         ax_vals = Dict(j => JCGECore.getparam(block.params, :ax, j, i) for j in commodities)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Y[i] == b_i * prod(F[(h, i)] ^ beta_vals[h] for h in factors)) : nothing
-        register_eq!(ctx, block, :eqpy, i; info="Y[i] == b[i] * prod(F[h,i]^beta[h,i])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Y, Any[EIndex(:i)]),
+            EMul([
+                EParam(:b, Any[EIndex(:i)]),
+                EProd(:h, factors,
+                    EPow(
+                        EVar(:F, Any[EIndex(:h), EIndex(:i)]),
+                        EParam(:beta, Any[EIndex(:h), EIndex(:i)]),
+                    ),
+                ),
+            ]),
+        )
+        register_eq!(ctx, block, :eqpy, i;
+            info="Y[i] == b[i] * prod(F[h,i]^beta[h,i])", expr=expr, index_names=(:i,), constraint=constraint)
 
         for h in factors
-            constraint = model isa JuMP.Model ? @NLconstraint(model, F[(h, i)] == beta_vals[h] * py[i] * Y[i] / pf[(h, i)]) : nothing
-            register_eq!(ctx, block, :eqF, h, i; info="F[h,i] == beta[h,i] * py[i] * Y[i] / pf[h,i]", constraint=constraint)
+            constraint = nothing
+            expr = EEq(
+                EVar(:F, Any[EIndex(:h), EIndex(:i)]),
+                EDiv(
+                    EMul([
+                        EParam(:beta, Any[EIndex(:h), EIndex(:i)]),
+                        EVar(:py, Any[EIndex(:i)]),
+                        EVar(:Y, Any[EIndex(:i)]),
+                    ]),
+                    EVar(:pf, Any[EIndex(:h), EIndex(:i)]),
+                ),
+            )
+            register_eq!(ctx, block, :eqF, h, i;
+                info="F[h,i] == beta[h,i] * py[i] * Y[i] / pf[h,i]",
+                expr=expr, index_names=(:h, :i), constraint=constraint)
         end
 
         for j in commodities
-            constraint = model isa JuMP.Model ? @constraint(model, X[(j, i)] == ax_vals[j] * Z[i]) : nothing
-            register_eq!(ctx, block, :eqX, j, i; info="X[j,i] == ax[j,i] * Z[i]", constraint=constraint)
+            constraint = nothing
+            expr = EEq(
+                EVar(:X, Any[EIndex(:j), EIndex(:i)]),
+                EMul([
+                    EParam(:ax, Any[EIndex(:j), EIndex(:i)]),
+                    EVar(:Z, Any[EIndex(:i)]),
+                ]),
+            )
+            register_eq!(ctx, block, :eqX, j, i;
+                info="X[j,i] == ax[j,i] * Z[i]", expr=expr, index_names=(:j, :i), constraint=constraint)
         end
 
-        constraint = model isa JuMP.Model ? @constraint(model, Y[i] == ay_i * Z[i]) : nothing
-        register_eq!(ctx, block, :eqY, i; info="Y[i] == ay[i] * Z[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Y, Any[EIndex(:i)]),
+            EMul([
+                EParam(:ay, Any[EIndex(:i)]),
+                EVar(:Z, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqY, i; info="Y[i] == ay[i] * Z[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @constraint(model, pz[i] == ay_i * py[i] + sum(ax_vals[j] * pq[j] for j in commodities)) : nothing
-        register_eq!(ctx, block, :eqpzs, i; info="pz[i] == ay[i]*py[i] + sum(ax[j,i]*pq[j])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:pz, Any[EIndex(:i)]),
+            EAdd([
+                EMul([
+                    EParam(:ay, Any[EIndex(:i)]),
+                    EVar(:py, Any[EIndex(:i)]),
+                ]),
+                ESum(:j, commodities, EMul([
+                    EParam(:ax, Any[EIndex(:j), EIndex(:i)]),
+                    EVar(:pq, Any[EIndex(:j)]),
+                ])),
+            ]),
+        )
+        register_eq!(ctx, block, :eqpzs, i;
+            info="pz[i] == ay[i]*py[i] + sum(ax[j,i]*pq[j])",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1431,12 +1576,37 @@ function JCGECore.build!(block::ProductionCDBlock, ctx::JCGERuntime.KernelContex
     for j in activities
         b_j = JCGECore.getparam(block.params, :b, j)
         beta_vals = Dict(h => JCGECore.getparam(block.params, :beta, h, j) for h in factors)
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Z[j] == b_j * prod(F[(h, j)] ^ beta_vals[h] for h in factors)) : nothing
-        register_eq!(ctx, block, :eqZ, j; info="Z[j] == b[j] * prod(F[h,j]^beta[h,j])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Z, Any[EIndex(:j)]),
+            EMul([
+                EParam(:b, Any[EIndex(:j)]),
+                EProd(:h, factors,
+                    EPow(
+                        EVar(:F, Any[EIndex(:h), EIndex(:j)]),
+                        EParam(:beta, Any[EIndex(:h), EIndex(:j)]),
+                    ),
+                ),
+            ]),
+        )
+        register_eq!(ctx, block, :eqZ, j;
+            info="Z[j] == b[j] * prod(F[h,j]^beta[h,j])", expr=expr, index_names=(:j,), constraint=constraint)
 
         for h in factors
-            constraint = model isa JuMP.Model ? @NLconstraint(model, F[(h, j)] == beta_vals[h] * pz[j] * Z[j] / pf[h]) : nothing
-            register_eq!(ctx, block, :eqF, h, j; info="F[h,j] == beta[h,j] * pz[j] * Z[j] / pf[h]", constraint=constraint)
+            constraint = nothing
+            expr = EEq(
+                EVar(:F, Any[EIndex(:h), EIndex(:j)]),
+                EDiv(
+                    EMul([
+                        EParam(:beta, Any[EIndex(:h), EIndex(:j)]),
+                        EVar(:pz, Any[EIndex(:j)]),
+                        EVar(:Z, Any[EIndex(:j)]),
+                    ]),
+                    EVar(:pf, Any[EIndex(:h)]),
+                ),
+            )
+            register_eq!(ctx, block, :eqF, h, j;
+                info="F[h,j] == beta[h,j] * pz[j] * Z[j] / pf[h]", expr=expr, index_names=(:h, :j), constraint=constraint)
         end
     end
 
@@ -1471,9 +1641,11 @@ function JCGECore.build!(block::FactorSupplyBlock, ctx::JCGERuntime.KernelContex
 
     for h in factors
         var = ensure_var!(ctx, model, var_name(block, :FF, h))
-    ff_h = JCGECore.getparam(block.params, :FF, h)
-    constraint = model isa JuMP.Model ? @constraint(model, var == ff_h) : nothing
-        register_eq!(ctx, block, :eqFF, h; info="FF[h] == endowment[h]", constraint=constraint)
+        ff_h = JCGECore.getparam(block.params, :FF, h)
+        constraint = nothing
+        expr = EEq(EVar(:FF, Any[EIndex(:h)]), EParam(:FF, Any[EIndex(:h)]))
+        register_eq!(ctx, block, :eqFF, h;
+            info="FF[h] == endowment[h]", expr=expr, index_names=(:h,), constraint=constraint)
     end
 
     return nothing
@@ -1516,18 +1688,58 @@ function JCGECore.build!(block::HouseholdDemandCDHHBlock, ctx::JCGERuntime.Kerne
         tau_d_hh = JCGECore.getparam(block.params, :tau_d, hh)
         alpha_vals = Dict(i => JCGECore.getparam(block.params, :alpha, i, hh) for i in commodities)
 
-        constraint = model isa JuMP.Model ? @constraint(model, Y[hh] == sum(pf[h] * ff_vals[h] for h in factors)) : nothing
-        register_eq!(ctx, block, :eqY, hh; info="Y[hh] == sum(pf[h] * FF[h,hh])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Y, Any[EIndex(:hh)]),
+            ESum(:h, factors, EMul([
+                EVar(:pf, Any[EIndex(:h)]),
+                EParam(:FF, Any[EIndex(:h), EIndex(:hh)]),
+            ])),
+        )
+        register_eq!(ctx, block, :eqY, hh;
+            info="Y[hh] == sum(pf[h] * FF[h,hh])", expr=expr, index_names=(:hh,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @constraint(model, Sp[hh] == ssp_hh * Y[hh]) : nothing
-        register_eq!(ctx, block, :eqSp, hh; info="Sp[hh] == ssp[hh] * Y[hh]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Sp, Any[EIndex(:hh)]),
+            EMul([
+                EParam(:ssp, Any[EIndex(:hh)]),
+                EVar(:Y, Any[EIndex(:hh)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqSp, hh;
+            info="Sp[hh] == ssp[hh] * Y[hh]", expr=expr, index_names=(:hh,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @constraint(model, Td[hh] == tau_d_hh * Y[hh]) : nothing
-        register_eq!(ctx, block, :eqTd, hh; info="Td[hh] == tau_d[hh] * Y[hh]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Td, Any[EIndex(:hh)]),
+            EMul([
+                EParam(:tau_d, Any[EIndex(:hh)]),
+                EVar(:Y, Any[EIndex(:hh)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqTd, hh;
+            info="Td[hh] == tau_d[hh] * Y[hh]", expr=expr, index_names=(:hh,), constraint=constraint)
 
         for i in commodities
-            constraint = model isa JuMP.Model ? @NLconstraint(model, Xp[(i, hh)] == alpha_vals[i] * (Y[hh] - Sp[hh] - Td[hh]) / pq[i]) : nothing
-            register_eq!(ctx, block, :eqXp, i, hh; info="Xp[i,hh] == alpha[i,hh] * (Y - Sp - Td) / pq[i]", constraint=constraint)
+            constraint = nothing
+            expr = EEq(
+                EVar(:Xp, Any[EIndex(:i), EIndex(:hh)]),
+                EDiv(
+                    EMul([
+                        EParam(:alpha, Any[EIndex(:i), EIndex(:hh)]),
+                        EAdd([
+                            EVar(:Y, Any[EIndex(:hh)]),
+                            ENeg(EVar(:Sp, Any[EIndex(:hh)])),
+                            ENeg(EVar(:Td, Any[EIndex(:hh)])),
+                        ]),
+                    ]),
+                    EVar(:pq, Any[EIndex(:i)]),
+                ),
+            )
+            register_eq!(ctx, block, :eqXp, i, hh;
+                info="Xp[i,hh] == alpha[i,hh] * (Y - Sp - Td) / pq[i]",
+                expr=expr, index_names=(:i, :hh), constraint=constraint)
         end
     end
 
@@ -1554,8 +1766,23 @@ function JCGECore.build!(block::HouseholdDemandCDBlock, ctx::JCGERuntime.KernelC
     ff_vals = Dict(h => JCGECore.getparam(block.params, :FF, h) for h in factors)
     for i in commodities
         alpha_i = JCGECore.getparam(block.params, :alpha, i)
-        constraint = model isa JuMP.Model ? @NLconstraint(model, X[i] == alpha_i * sum(pf[h] * ff_vals[h] for h in factors) / px[i]) : nothing
-        register_eq!(ctx, block, :eqX, i; info="X[i] == alpha[i] * sum(pf[h]*FF[h]) / px[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:X, Any[EIndex(:i)]),
+            EDiv(
+                EMul([
+                    EParam(:alpha, Any[EIndex(:i)]),
+                    ESum(:h, factors, EMul([
+                        EVar(:pf, Any[EIndex(:h)]),
+                        EParam(:FF, Any[EIndex(:h)]),
+                    ])),
+                ]),
+                EVar(:px, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqX, i;
+            info="X[i] == alpha[i] * sum(pf[h]*FF[h]) / px[i]",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1592,11 +1819,31 @@ function JCGECore.build!(block::HouseholdDemandCDXpBlock, ctx::JCGERuntime.Kerne
         alpha_i = JCGECore.getparam(block.params, :alpha, i)
         rent_term = include_rent ? sum(RT[j] for j in commodities) : 0.0
         fc_term = include_fc ? sum(JCGECore.getparam(block.params, :FC, j) for j in commodities) : 0.0
-        constraint = model isa JuMP.Model ? @NLconstraint(
-            model,
-            Xp[i] == alpha_i * (sum(pf[h] * ff_vals[h] for h in factors) - Sp - Td + rent_term + fc_term) / pq[i]
-        ) : nothing
-        register_eq!(ctx, block, :eqXp, i; info="Xp[i] == alpha[i] * (sum(pf[h]*FF[h]) - Sp - Td + sum(RT) + sum(FC)) / pq[i]", constraint=constraint)
+        constraint = nothing
+        rent_expr = include_rent ? ESum(:j, commodities, EVar(:RT, Any[EIndex(:j)])) : EConst(0.0)
+        fc_expr = include_fc ? ESum(:j, commodities, EParam(:FC, Any[EIndex(:j)])) : EConst(0.0)
+        expr = EEq(
+            EVar(:Xp, Any[EIndex(:i)]),
+            EDiv(
+                EMul([
+                    EParam(:alpha, Any[EIndex(:i)]),
+                    EAdd([
+                        ESum(:h, factors, EMul([
+                            EVar(:pf, Any[EIndex(:h)]),
+                            EParam(:FF, Any[EIndex(:h)]),
+                        ])),
+                        ENeg(EVar(:Sp, Any[])),
+                        ENeg(EVar(:Td, Any[])),
+                        rent_expr,
+                        fc_expr,
+                    ]),
+                ]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqXp, i;
+            info="Xp[i] == alpha[i] * (sum(pf[h]*FF[h]) - Sp - Td + sum(RT) + sum(FC)) / pq[i]",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1624,11 +1871,27 @@ function JCGECore.build!(block::HouseholdDemandCDXpRegionalBlock, ctx::JCGERunti
     ff_vals = Dict(h => JCGECore.getparam(block.params, :FF, h) for h in factors)
     for i in commodities
         alpha_i = JCGECore.getparam(block.params, :alpha, i)
-        constraint = model isa JuMP.Model ? @NLconstraint(
-            model,
-            Xp[i] == alpha_i * (sum(pf[h] * ff_vals[h] for h in factors) - Sp - Td) / pq[i]
-        ) : nothing
-        register_eq!(ctx, block, :eqXp, i; info="Xp[i] == alpha[i] * (sum(pf[h]*FF[h]) - Sp - Td) / pq[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Xp, Any[EIndex(:i)]),
+            EDiv(
+                EMul([
+                    EParam(:alpha, Any[EIndex(:i)]),
+                    EAdd([
+                        ESum(:h, factors, EMul([
+                            EVar(:pf, Any[EIndex(:h)]),
+                            EParam(:FF, Any[EIndex(:h)]),
+                        ])),
+                        ENeg(EVar(:Sp, Any[EIndex(:r)])),
+                        ENeg(EVar(:Td, Any[EIndex(:r)])),
+                    ]),
+                ]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqXp, i, block.region;
+            info="Xp[i] == alpha[i] * (sum(pf[h]*FF[h]) - Sp - Td) / pq[i]",
+            expr=expr, index_names=(:i, :r), constraint=constraint)
     end
 
     return nothing
@@ -1659,11 +1922,27 @@ function JCGECore.build!(block::HouseholdDemandIncomeBlock, ctx::JCGERuntime.Ker
     income = sum(pf[(h, j)] * F[(h, j)] for h in factors for j in activities)
     for i in commodities
         alpha_i = JCGECore.getparam(block.params, :alpha, i)
-        constraint = model isa JuMP.Model ? @NLconstraint(
-            model,
-            Xp[i] == alpha_i * (income - Sp - Td) / pq[i]
-        ) : nothing
-        register_eq!(ctx, block, :eqXp, i; info="Xp[i] == alpha[i] * (income - Sp - Td) / pq[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Xp, Any[EIndex(:i)]),
+            EDiv(
+                EMul([
+                    EParam(:alpha, Any[EIndex(:i)]),
+                    EAdd([
+                        ESum(:h, factors, ESum(:j, activities, EMul([
+                            EVar(:pf, Any[EIndex(:h), EIndex(:j)]),
+                            EVar(:F, Any[EIndex(:h), EIndex(:j)]),
+                        ]))),
+                        ENeg(EVar(:Sp, Any[])),
+                        ENeg(EVar(:Td, Any[])),
+                    ]),
+                ]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqXp, i;
+            info="Xp[i] == alpha[i] * (income - Sp - Td) / pq[i]",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1724,13 +2003,29 @@ function JCGECore.build!(block::MarketClearingBlock, ctx::JCGERuntime.KernelCont
     end
 
     for i in commodities
-        constraint = model isa JuMP.Model ? @constraint(model, Q[i] == sum(Xp[(i, hh)] for hh in spec.model.sets.institutions) + Xg[i] + Xv[i] + sum(X[(i, j)] for j in spec.model.sets.activities)) : nothing
-        register_eq!(ctx, block, :eqQ, i; info="Q[i] == sum(Xp[i,hh]) + Xg[i] + Xv[i] + sum(X[i,j])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Q, Any[EIndex(:i)]),
+            EAdd([
+                ESum(:hh, spec.model.sets.institutions, EVar(:Xp, Any[EIndex(:i), EIndex(:hh)])),
+                EVar(:Xg, Any[EIndex(:i)]),
+                EVar(:Xv, Any[EIndex(:i)]),
+                ESum(:j, spec.model.sets.activities, EVar(:X, Any[EIndex(:i), EIndex(:j)])),
+            ]),
+        )
+        register_eq!(ctx, block, :eqQ, i;
+            info="Q[i] == sum(Xp[i,hh]) + Xg[i] + Xv[i] + sum(X[i,j])",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     for h in factors
-        constraint = model isa JuMP.Model ? @constraint(model, FF[h] == sum(F[(h, i)] for i in spec.model.sets.activities)) : nothing
-        register_eq!(ctx, block, :eqF, h; info="FF[h] == sum(F[h,i])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:FF, Any[EIndex(:h)]),
+            ESum(:i, spec.model.sets.activities, EVar(:F, Any[EIndex(:h), EIndex(:i)])),
+        )
+        register_eq!(ctx, block, :eqF, h;
+            info="FF[h] == sum(F[h,i])", expr=expr, index_names=(:h,), constraint=constraint)
     end
 
     return nothing
@@ -1743,8 +2038,12 @@ function JCGECore.build!(block::GoodsMarketClearingBlock, ctx::JCGERuntime.Kerne
     for i in commodities
         X = ensure_var!(ctx, model, global_var(:X, i))
         Z = ensure_var!(ctx, model, global_var(:Z, i))
-        constraint = model isa JuMP.Model ? @constraint(model, X == Z) : nothing
-        register_eq!(ctx, block, :eqX, i; info="X[i] == Z[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:X, Any[EIndex(:i)]),
+            EVar(:Z, Any[EIndex(:i)]),
+        )
+        register_eq!(ctx, block, :eqX, i; info="X[i] == Z[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1762,8 +2061,13 @@ function JCGECore.build!(block::FactorMarketClearingBlock, ctx::JCGERuntime.Kern
 
     for h in factors
         ff_h = JCGECore.getparam(block.params, :FF, h)
-        constraint = model isa JuMP.Model ? @constraint(model, sum(F[(h, j)] for j in activities) == ff_h) : nothing
-        register_eq!(ctx, block, :eqF, h; info="sum(F[h,j]) == FF[h]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            ESum(:j, activities, EVar(:F, Any[EIndex(:h), EIndex(:j)])),
+            EParam(:FF, Any[EIndex(:h)]),
+        )
+        register_eq!(ctx, block, :eqF, h;
+            info="sum(F[h,j]) == FF[h]", expr=expr, index_names=(:h,), constraint=constraint)
     end
 
     return nothing
@@ -1792,11 +2096,19 @@ function JCGECore.build!(block::CompositeMarketClearingBlock, ctx::JCGERuntime.K
     end
 
     for i in commodities
-        constraint = model isa JuMP.Model ? @constraint(
-            model,
-            Q[i] == Xp[i] + Xg[i] + Xv[i] + sum(X[(i, j)] for j in activities)
-        ) : nothing
-        register_eq!(ctx, block, :eqQ, i; info="Q[i] == Xp[i] + Xg[i] + Xv[i] + sum(X[i,j])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Q, Any[EIndex(:i)]),
+            EAdd([
+                EVar(:Xp, Any[EIndex(:i)]),
+                EVar(:Xg, Any[EIndex(:i)]),
+                EVar(:Xv, Any[EIndex(:i)]),
+                ESum(:j, activities, EVar(:X, Any[EIndex(:i), EIndex(:j)])),
+            ]),
+        )
+        register_eq!(ctx, block, :eqQ, i;
+            info="Q[i] == Xp[i] + Xg[i] + Xv[i] + sum(X[i,j])",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1818,11 +2130,25 @@ function JCGECore.build!(block::PriceLinkBlock, ctx::JCGERuntime.KernelContext, 
     for i in commodities
         pWe_i = JCGECore.getparam(block.params, :pWe, i)
         pWm_i = JCGECore.getparam(block.params, :pWm, i)
-        constraint = model isa JuMP.Model ? @constraint(model, pe[i] == epsilon * pWe_i) : nothing
-        register_eq!(ctx, block, :eqpe, i; info="pe[i] == epsilon * pWe[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:pe, Any[EIndex(:i)]),
+            EMul([
+                EVar(:epsilon, Any[]),
+                EParam(:pWe, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqpe, i; info="pe[i] == epsilon * pWe[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @constraint(model, pm[i] == epsilon * pWm_i) : nothing
-        register_eq!(ctx, block, :eqpm, i; info="pm[i] == epsilon * pWm[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:pm, Any[EIndex(:i)]),
+            EMul([
+                EVar(:epsilon, Any[]),
+                EParam(:pWm, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqpm, i; info="pm[i] == epsilon * pWm[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1846,10 +2172,24 @@ function JCGECore.build!(block::ExchangeRateLinkBlock, ctx::JCGERuntime.KernelCo
     end
 
     for i in commodities
-        constraint = model isa JuMP.Model ? @constraint(model, pe[i] == epsilon * pWe[i]) : nothing
-        register_eq!(ctx, block, :eqpe, i; info="pe[i] == epsilon * pWe[i]", constraint=constraint)
-        constraint = model isa JuMP.Model ? @constraint(model, pm[i] == epsilon * pWm[i]) : nothing
-        register_eq!(ctx, block, :eqpm, i; info="pm[i] == epsilon * pWm[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:pe, Any[EIndex(:i)]),
+            EMul([
+                EVar(:epsilon, Any[]),
+                EVar(:pWe, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqpe, i; info="pe[i] == epsilon * pWe[i]", expr=expr, index_names=(:i,), constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:pm, Any[EIndex(:i)]),
+            EMul([
+                EVar(:epsilon, Any[]),
+                EVar(:pWm, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqpm, i; info="pm[i] == epsilon * pWm[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1873,10 +2213,20 @@ function JCGECore.build!(block::ExchangeRateLinkRegionBlock, ctx::JCGERuntime.Ke
     end
 
     for i in commodities
-        constraint = model isa JuMP.Model ? @constraint(model, pe[i] == epsilon * pWe[i]) : nothing
-        register_eq!(ctx, block, :eqpe, i, block.region; info="pe[i] == epsilon[r] * pWe[i]", constraint=constraint)
-        constraint = model isa JuMP.Model ? @constraint(model, pm[i] == epsilon * pWm[i]) : nothing
-        register_eq!(ctx, block, :eqpm, i, block.region; info="pm[i] == epsilon[r] * pWm[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:pe, Any[EIndex(:i)]),
+            EMul([EVar(:epsilon, Any[EIndex(:r)]), EVar(:pWe, Any[EIndex(:i)])]),
+        )
+        register_eq!(ctx, block, :eqpe, i, block.region;
+            info="pe[i] == epsilon[r] * pWe[i]", expr=expr, index_names=(:i, :r), constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:pm, Any[EIndex(:i)]),
+            EMul([EVar(:epsilon, Any[EIndex(:r)]), EVar(:pWm, Any[EIndex(:i)])]),
+        )
+        register_eq!(ctx, block, :eqpm, i, block.region;
+            info="pm[i] == epsilon[r] * pWm[i]", expr=expr, index_names=(:i, :r), constraint=constraint)
     end
 
     return nothing
@@ -1888,8 +2238,9 @@ function JCGECore.build!(block::PriceEqualityBlock, ctx::JCGERuntime.KernelConte
     for i in commodities
         px = ensure_var!(ctx, model, global_var(:px, i))
         pz = ensure_var!(ctx, model, global_var(:pz, i))
-        constraint = model isa JuMP.Model ? @constraint(model, px == pz) : nothing
-        register_eq!(ctx, block, :eqP, i; info="px[i] == pz[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(EVar(:px, Any[EIndex(:i)]), EVar(:pz, Any[EIndex(:i)]))
+        register_eq!(ctx, block, :eqP, i; info="px[i] == pz[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -1969,29 +2320,85 @@ function JCGECore.build!(block::GovernmentBlock, ctx::JCGERuntime.KernelContext,
     tau_d = JCGECore.getparam(block.params, :tau_d)
     rent_term = include_rent ? sum(RT[i] for i in commodities) : 0.0
     fc_term = include_fc ? sum(JCGECore.getparam(block.params, :FC, i) for i in commodities) : 0.0
-    constraint = model isa JuMP.Model ? @constraint(
-        model,
-        Td == tau_d * (sum(pf[h] * ff_vals[h] for h in factors) + rent_term + fc_term)
-    ) : nothing
-    register_eq!(ctx, block, :eqTd; info="Td == tau_d * (sum(pf[h] * FF[h]) + sum(RT) + sum(FC))", constraint=constraint)
+    constraint = nothing
+    rent_expr = include_rent ? ESum(:i, commodities, EVar(:RT, Any[EIndex(:i)])) : EConst(0.0)
+    fc_expr = include_fc ? ESum(:i, commodities, EParam(:FC, Any[EIndex(:i)])) : EConst(0.0)
+    ff_expr = use_ff_params ? EParam(:FF, Any[EIndex(:h)]) : EVar(:FF, Any[EIndex(:h)])
+    expr = EEq(
+        EVar(:Td, Any[]),
+        EMul([
+            EParam(:tau_d, Any[]),
+            EAdd([
+                ESum(:h, factors, EMul([
+                    EVar(:pf, Any[EIndex(:h)]),
+                    ff_expr,
+                ])),
+                rent_expr,
+                fc_expr,
+            ]),
+        ]),
+    )
+    register_eq!(ctx, block, :eqTd; info="Td == tau_d * (sum(pf[h] * FF[h]) + sum(RT) + sum(FC))", expr=expr, constraint=constraint)
 
     for i in commodities
         tau_z_i = JCGECore.getparam(block.params, :tau_z, i)
         tau_m_i = JCGECore.getparam(block.params, :tau_m, i)
         mu_i = JCGECore.getparam(block.params, :mu, i)
-        constraint = model isa JuMP.Model ? @constraint(model, Tz[i] == tau_z_i * pz[i] * Z[i]) : nothing
-        register_eq!(ctx, block, :eqTz, i; info="Tz[i] == tau_z[i] * pz[i] * Z[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Tz, Any[EIndex(:i)]),
+            EMul([
+                EParam(:tau_z, Any[EIndex(:i)]),
+                EVar(:pz, Any[EIndex(:i)]),
+                EVar(:Z, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqTz, i; info="Tz[i] == tau_z[i] * pz[i] * Z[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @constraint(model, Tm[i] == tau_m_i * pm[i] * M[i]) : nothing
-        register_eq!(ctx, block, :eqTm, i; info="Tm[i] == tau_m[i] * pm[i] * M[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Tm, Any[EIndex(:i)]),
+            EMul([
+                EParam(:tau_m, Any[EIndex(:i)]),
+                EVar(:pm, Any[EIndex(:i)]),
+                EVar(:M, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqTm, i; info="Tm[i] == tau_m[i] * pm[i] * M[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Xg[i] == mu_i * (Td + sum(Tz[j] for j in commodities) + sum(Tm[j] for j in commodities) - Sg) / pq[i]) : nothing
-        register_eq!(ctx, block, :eqXg, i; info="Xg[i] == mu[i] * (Td + sum(Tz)+sum(Tm) - Sg) / pq[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Xg, Any[EIndex(:i)]),
+            EDiv(
+                EMul([
+                    EParam(:mu, Any[EIndex(:i)]),
+                    EAdd([
+                        EVar(:Td, Any[]),
+                        ESum(:j, commodities, EVar(:Tz, Any[EIndex(:j)])),
+                        ESum(:j, commodities, EVar(:Tm, Any[EIndex(:j)])),
+                        ENeg(EVar(:Sg, Any[])),
+                    ]),
+                ]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqXg, i; info="Xg[i] == mu[i] * (Td + sum(Tz)+sum(Tm) - Sg) / pq[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     ssg = JCGECore.getparam(block.params, :ssg)
-    constraint = model isa JuMP.Model ? @constraint(model, Sg == ssg * (Td + sum(Tz[i] for i in commodities) + sum(Tm[i] for i in commodities))) : nothing
-    register_eq!(ctx, block, :eqSg; info="Sg == ssg * (Td + sum(Tz) + sum(Tm))", constraint=constraint)
+    constraint = nothing
+    expr = EEq(
+        EVar(:Sg, Any[]),
+        EMul([
+            EParam(:ssg, Any[]),
+            EAdd([
+                EVar(:Td, Any[]),
+                ESum(:i, commodities, EVar(:Tz, Any[EIndex(:i)])),
+                ESum(:i, commodities, EVar(:Tm, Any[EIndex(:i)])),
+            ]),
+        ]),
+    )
+    register_eq!(ctx, block, :eqSg; info="Sg == ssg * (Td + sum(Tz) + sum(Tm))", expr=expr, constraint=constraint)
 
     return nothing
 end
@@ -2031,26 +2438,78 @@ function JCGECore.build!(block::GovernmentRegionalBlock, ctx::JCGERuntime.Kernel
     end
 
     tau_d = JCGECore.getparam(block.params, :tau_d)
-    constraint = model isa JuMP.Model ? @constraint(model, Td == tau_d * sum(pf[h] * ff_vals[h] for h in factors)) : nothing
-    register_eq!(ctx, block, :eqTd, block.region; info="Td[r] == tau_d[r] * sum(pf[h,r] * FF[h,r])", constraint=constraint)
+    constraint = nothing
+    expr = EEq(
+        EVar(:Td, Any[block.region]),
+        EMul([
+            EParam(:tau_d, Any[]),
+            ESum(:h, factors, EMul([
+                EVar(:pf, Any[EIndex(:h)]),
+                EParam(:FF, Any[EIndex(:h)]),
+            ])),
+        ]),
+    )
+    register_eq!(ctx, block, :eqTd, block.region; info="Td[r] == tau_d[r] * sum(pf[h,r] * FF[h,r])", expr=expr, constraint=constraint)
 
     for i in commodities
         tau_z_i = JCGECore.getparam(block.params, :tau_z, i)
         tau_m_i = JCGECore.getparam(block.params, :tau_m, i)
         mu_i = JCGECore.getparam(block.params, :mu, i)
-        constraint = model isa JuMP.Model ? @constraint(model, Tz[i] == tau_z_i * pz[i] * Z[i]) : nothing
-        register_eq!(ctx, block, :eqTz, i; info="Tz[i] == tau_z[i] * pz[i] * Z[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Tz, Any[EIndex(:i)]),
+            EMul([
+                EParam(:tau_z, Any[EIndex(:i)]),
+                EVar(:pz, Any[EIndex(:i)]),
+                EVar(:Z, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqTz, i; info="Tz[i] == tau_z[i] * pz[i] * Z[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @constraint(model, Tm[i] == tau_m_i * pm[i] * M[i]) : nothing
-        register_eq!(ctx, block, :eqTm, i; info="Tm[i] == tau_m[i] * pm[i] * M[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Tm, Any[EIndex(:i)]),
+            EMul([
+                EParam(:tau_m, Any[EIndex(:i)]),
+                EVar(:pm, Any[EIndex(:i)]),
+                EVar(:M, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqTm, i; info="Tm[i] == tau_m[i] * pm[i] * M[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Xg[i] == mu_i * (Td + sum(Tz[j] for j in commodities) + sum(Tm[j] for j in commodities) - Sg) / pq[i]) : nothing
-        register_eq!(ctx, block, :eqXg, i; info="Xg[i] == mu[i] * (Td + sum(Tz)+sum(Tm) - Sg) / pq[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Xg, Any[EIndex(:i)]),
+            EDiv(
+                EMul([
+                    EParam(:mu, Any[EIndex(:i)]),
+                    EAdd([
+                        EVar(:Td, Any[block.region]),
+                        ESum(:j, commodities, EVar(:Tz, Any[EIndex(:j)])),
+                        ESum(:j, commodities, EVar(:Tm, Any[EIndex(:j)])),
+                        ENeg(EVar(:Sg, Any[block.region])),
+                    ]),
+                ]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqXg, i; info="Xg[i] == mu[i] * (Td + sum(Tz)+sum(Tm) - Sg) / pq[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     ssg = JCGECore.getparam(block.params, :ssg)
-    constraint = model isa JuMP.Model ? @constraint(model, Sg == ssg * (Td + sum(Tz[i] for i in commodities) + sum(Tm[i] for i in commodities))) : nothing
-    register_eq!(ctx, block, :eqSg, block.region; info="Sg[r] == ssg[r] * (Td + sum(Tz) + sum(Tm))", constraint=constraint)
+    constraint = nothing
+    expr = EEq(
+        EVar(:Sg, Any[block.region]),
+        EMul([
+            EParam(:ssg, Any[]),
+            EAdd([
+                EVar(:Td, Any[block.region]),
+                ESum(:i, commodities, EVar(:Tz, Any[EIndex(:i)])),
+                ESum(:i, commodities, EVar(:Tm, Any[EIndex(:i)])),
+            ]),
+        ]),
+    )
+    register_eq!(ctx, block, :eqSg, block.region; info="Sg[r] == ssg[r] * (Td + sum(Tz) + sum(Tm))", expr=expr, constraint=constraint)
 
     return nothing
 end
@@ -2083,18 +2542,42 @@ function JCGECore.build!(block::GovernmentBudgetBalanceBlock, ctx::JCGERuntime.K
     for i in commodities
         tau_z_i = JCGECore.getparam(block.params, :tauz, i)
         tau_m_i = JCGECore.getparam(block.params, :taum, i)
-        constraint = model isa JuMP.Model ? @constraint(model, Tz[i] == tau_z_i * pz[i] * Z[i]) : nothing
-        register_eq!(ctx, block, :eqTz, i; info="Tz[i] == tauz[i] * pz[i] * Z[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Tz, Any[EIndex(:i)]),
+            EMul([
+                EParam(:tauz, Any[EIndex(:i)]),
+                EVar(:pz, Any[EIndex(:i)]),
+                EVar(:Z, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqTz, i; info="Tz[i] == tauz[i] * pz[i] * Z[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @constraint(model, Tm[i] == tau_m_i * pm[i] * M[i]) : nothing
-        register_eq!(ctx, block, :eqTm, i; info="Tm[i] == taum[i] * pm[i] * M[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Tm, Any[EIndex(:i)]),
+            EMul([
+                EParam(:taum, Any[EIndex(:i)]),
+                EVar(:pm, Any[EIndex(:i)]),
+                EVar(:M, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqTm, i; info="Tm[i] == taum[i] * pm[i] * M[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
-    constraint = model isa JuMP.Model ? @constraint(
-        model,
-        Td == sum(pq[i] * Xg[i] for i in commodities) - sum(Tz[i] + Tm[i] for i in commodities)
-    ) : nothing
-    register_eq!(ctx, block, :eqTd; info="Td == sum(pq[i]*Xg[i]) - sum(Tz[i] + Tm[i])", constraint=constraint)
+    constraint = nothing
+    expr = EEq(
+        EVar(:Td, Any[]),
+        EAdd([
+            ESum(:i, commodities, EMul([
+                EVar(:pq, Any[EIndex(:i)]),
+                EVar(:Xg, Any[EIndex(:i)]),
+            ])),
+            ENeg(ESum(:i, commodities, EVar(:Tz, Any[EIndex(:i)]))),
+            ENeg(ESum(:i, commodities, EVar(:Tm, Any[EIndex(:i)]))),
+        ]),
+    )
+    register_eq!(ctx, block, :eqTd; info="Td == sum(pq[i]*Xg[i]) - sum(Tz[i] + Tm[i])", expr=expr, constraint=constraint)
 
     return nothing
 end
@@ -2121,11 +2604,24 @@ function JCGECore.build!(block::PrivateSavingBlock, ctx::JCGERuntime.KernelConte
     end
     rent_term = include_rent ? sum(RT[i] for i in spec.model.sets.commodities) : 0.0
     fc_term = include_fc ? sum(JCGECore.getparam(block.params, :FC, i) for i in spec.model.sets.commodities) : 0.0
-    constraint = model isa JuMP.Model ? @constraint(
-        model,
-        Sp == ssp * (sum(pf[h] * ff_vals[h] for h in factors) + rent_term + fc_term)
-    ) : nothing
-    register_eq!(ctx, block, :eqSp; info="Sp == ssp * (sum(pf[h] * FF[h]) + sum(RT) + sum(FC))", constraint=constraint)
+    constraint = nothing
+    rent_expr = include_rent ? ESum(:i, spec.model.sets.commodities, EVar(:RT, Any[EIndex(:i)])) : EConst(0.0)
+    fc_expr = include_fc ? ESum(:i, spec.model.sets.commodities, EParam(:FC, Any[EIndex(:i)])) : EConst(0.0)
+    expr = EEq(
+        EVar(:Sp, Any[]),
+        EMul([
+            EParam(:ssp, Any[]),
+            EAdd([
+                ESum(:h, factors, EMul([
+                    EVar(:pf, Any[EIndex(:h)]),
+                    EParam(:FF, Any[EIndex(:h)]),
+                ])),
+                rent_expr,
+                fc_expr,
+            ]),
+        ]),
+    )
+    register_eq!(ctx, block, :eqSp; info="Sp == ssp * (sum(pf[h] * FF[h]) + sum(RT) + sum(FC))", expr=expr, constraint=constraint)
 
     return nothing
 end
@@ -2142,8 +2638,18 @@ function JCGECore.build!(block::PrivateSavingRegionalBlock, ctx::JCGERuntime.Ker
 
     ssp = JCGECore.getparam(block.params, :ssp)
     ff_vals = Dict(h => JCGECore.getparam(block.params, :FF, h) for h in factors)
-    constraint = model isa JuMP.Model ? @constraint(model, Sp == ssp * sum(pf[h] * ff_vals[h] for h in factors)) : nothing
-    register_eq!(ctx, block, :eqSp, block.region; info="Sp[r] == ssp[r] * sum(pf[h,r] * FF[h,r])", constraint=constraint)
+    constraint = nothing
+    expr = EEq(
+        EVar(:Sp, Any[block.region]),
+        EMul([
+            EParam(:ssp, Any[]),
+            ESum(:h, factors, EMul([
+                EVar(:pf, Any[EIndex(:h)]),
+                EParam(:FF, Any[EIndex(:h)]),
+            ])),
+        ]),
+    )
+    register_eq!(ctx, block, :eqSp, block.region; info="Sp[r] == ssp[r] * sum(pf[h,r] * FF[h,r])", expr=expr, constraint=constraint)
 
     return nothing
 end
@@ -2165,8 +2671,21 @@ function JCGECore.build!(block::PrivateSavingIncomeBlock, ctx::JCGERuntime.Kerne
 
     ssp = JCGECore.getparam(block.params, :ssp)
     income = sum(pf[(h, j)] * F[(h, j)] for h in factors for j in activities)
-    constraint = model isa JuMP.Model ? @constraint(model, Sp == ssp * (income - Td)) : nothing
-    register_eq!(ctx, block, :eqSp; info="Sp == ssp * (sum(pf[h,j]*F[h,j]) - Td)", constraint=constraint)
+    constraint = nothing
+    expr = EEq(
+        EVar(:Sp, Any[]),
+        EMul([
+            EParam(:ssp, Any[]),
+            EAdd([
+                ESum(:h, factors, ESum(:j, activities, EMul([
+                    EVar(:pf, Any[EIndex(:h), EIndex(:j)]),
+                    EVar(:F, Any[EIndex(:h), EIndex(:j)]),
+                ]))),
+                ENeg(EVar(:Td, Any[])),
+            ]),
+        ]),
+    )
+    register_eq!(ctx, block, :eqSp; info="Sp == ssp * (sum(pf[h,j]*F[h,j]) - Td)", expr=expr, constraint=constraint)
 
     return nothing
 end
@@ -2189,8 +2708,25 @@ function JCGECore.build!(block::InvestmentBlock, ctx::JCGERuntime.KernelContext,
     Sf = JCGECore.getparam(block.params, :Sf)
     for i in commodities
         lambda_i = JCGECore.getparam(block.params, :lambda, i)
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Xv[i] == lambda_i * (Sp + Sg + epsilon * Sf) / pq[i]) : nothing
-        register_eq!(ctx, block, :eqXv, i; info="Xv[i] == lambda[i] * (Sp + Sg + epsilon*Sf) / pq[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Xv, Any[EIndex(:i)]),
+            EDiv(
+                EMul([
+                    EParam(:lambda, Any[EIndex(:i)]),
+                    EAdd([
+                        EVar(:Sp, Any[]),
+                        EVar(:Sg, Any[]),
+                        EMul([
+                            EVar(:epsilon, Any[]),
+                            EParam(:Sf, Any[]),
+                        ]),
+                    ]),
+                ]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqXv, i; info="Xv[i] == lambda[i] * (Sp + Sg + epsilon*Sf) / pq[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -2214,8 +2750,25 @@ function JCGECore.build!(block::InvestmentRegionalBlock, ctx::JCGERuntime.Kernel
     Sf = JCGECore.getparam(block.params, :Sf)
     for i in commodities
         lambda_i = JCGECore.getparam(block.params, :lambda, i)
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Xv[i] == lambda_i * (Sp + Sg + epsilon * Sf) / pq[i]) : nothing
-        register_eq!(ctx, block, :eqXv, i; info="Xv[i] == lambda[i] * (Sp + Sg + epsilon*Sf) / pq[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Xv, Any[EIndex(:i)]),
+            EDiv(
+                EMul([
+                    EParam(:lambda, Any[EIndex(:i)]),
+                    EAdd([
+                        EVar(:Sp, Any[block.region]),
+                        EVar(:Sg, Any[block.region]),
+                        EMul([
+                            EVar(:epsilon, Any[block.region]),
+                            EParam(:Sf, Any[]),
+                        ]),
+                    ]),
+                ]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqXv, i; info="Xv[i] == lambda[i] * (Sp + Sg + epsilon*Sf) / pq[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -2251,17 +2804,83 @@ function JCGECore.build!(block::ArmingtonCESBlock, ctx::JCGERuntime.KernelContex
         include_chi = hasproperty(block.params, :include_chi) && getproperty(block.params, :include_chi)
         chi_i = include_chi ? ensure_var!(ctx, model, global_var(:chi, i)) : 0.0
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Q[i] == gamma_i *
-            (delta_m_i * M[i] ^ eta_i + delta_d_i * D[i] ^ eta_i) ^ (1 / eta_i)) : nothing
-        register_eq!(ctx, block, :eqQ, i; info="Q[i] == gamma[i]*(delta_m*M^eta + delta_d*D^eta)^(1/eta)", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Q, Any[EIndex(:i)]),
+            EMul([
+                EParam(:gamma, Any[EIndex(:i)]),
+                EPow(
+                    EAdd([
+                        EMul([
+                            EParam(:delta_m, Any[EIndex(:i)]),
+                            EPow(EVar(:M, Any[EIndex(:i)]), EParam(:eta, Any[EIndex(:i)])),
+                        ]),
+                        EMul([
+                            EParam(:delta_d, Any[EIndex(:i)]),
+                            EPow(EVar(:D, Any[EIndex(:i)]), EParam(:eta, Any[EIndex(:i)])),
+                        ]),
+                    ]),
+                    EDiv(EConst(1.0), EParam(:eta, Any[EIndex(:i)])),
+                ),
+            ]),
+        )
+        register_eq!(ctx, block, :eqQ, i;
+            info="Q[i] == gamma[i]*(delta_m*M^eta + delta_d*D^eta)^(1/eta)",
+            expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, M[i] ==
-            (gamma_i ^ eta_i * delta_m_i * pq[i] / ((1 + chi_i + tau_m_i) * pm[i])) ^ (1 / (1 - eta_i)) * Q[i]) : nothing
-        register_eq!(ctx, block, :eqM, i; info="M[i] == (...) * Q[i]", constraint=constraint)
+        constraint = nothing
+        chi_expr = include_chi ? EVar(:chi, Any[EIndex(:i)]) : EConst(0.0)
+        ratio_m = EDiv(
+            EMul([
+                EPow(EParam(:gamma, Any[EIndex(:i)]), EParam(:eta, Any[EIndex(:i)])),
+                EParam(:delta_m, Any[EIndex(:i)]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ]),
+            EMul([
+                EAdd([
+                    EConst(1.0),
+                    chi_expr,
+                    EParam(:tau_m, Any[EIndex(:i)]),
+                ]),
+                EVar(:pm, Any[EIndex(:i)]),
+            ]),
+        )
+        expr = EEq(
+            EVar(:M, Any[EIndex(:i)]),
+            EMul([
+                EPow(
+                    ratio_m,
+                    EDiv(EConst(1.0), EAdd([EConst(1.0), ENeg(EParam(:eta, Any[EIndex(:i)]))])),
+                ),
+                EVar(:Q, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqM, i; info="M[i] == (...) * Q[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, D[i] ==
-            (gamma_i ^ eta_i * delta_d_i * pq[i] / (pd_scale_i * pd[i])) ^ (1 / (1 - eta_i)) * Q[i]) : nothing
-        register_eq!(ctx, block, :eqD, i; info="D[i] == (...) * Q[i]", constraint=constraint)
+        constraint = nothing
+        pd_scale_expr = hasproperty(block.params, :pd_scale) ? EParam(:pd_scale, Any[EIndex(:i)]) : EConst(1.0)
+        ratio_d = EDiv(
+            EMul([
+                EPow(EParam(:gamma, Any[EIndex(:i)]), EParam(:eta, Any[EIndex(:i)])),
+                EParam(:delta_d, Any[EIndex(:i)]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ]),
+            EMul([
+                pd_scale_expr,
+                EVar(:pd, Any[EIndex(:i)]),
+            ]),
+        )
+        expr = EEq(
+            EVar(:D, Any[EIndex(:i)]),
+            EMul([
+                EPow(
+                    ratio_d,
+                    EDiv(EConst(1.0), EAdd([EConst(1.0), ENeg(EParam(:eta, Any[EIndex(:i)]))])),
+                ),
+                EVar(:Q, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqD, i; info="D[i] == (...) * Q[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -2294,17 +2913,73 @@ function JCGECore.build!(block::TransformationCETBlock, ctx::JCGERuntime.KernelC
         phi_i = JCGECore.getparam(block.params, :phi, i)
         tau_z_i = JCGECore.getparam(block.params, :tau_z, i)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Z[i] == theta_i *
-            (xie_i * E[i] ^ phi_i + xid_i * D[i] ^ phi_i) ^ (1 / phi_i)) : nothing
-        register_eq!(ctx, block, :eqZ, i; info="Z[i] == theta[i]*(xie*E^phi + xid*D^phi)^(1/phi)", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Z, Any[EIndex(:i)]),
+            EMul([
+                EParam(:theta, Any[EIndex(:i)]),
+                EPow(
+                    EAdd([
+                        EMul([
+                            EParam(:xie, Any[EIndex(:i)]),
+                            EPow(EVar(:E, Any[EIndex(:i)]), EParam(:phi, Any[EIndex(:i)])),
+                        ]),
+                        EMul([
+                            EParam(:xid, Any[EIndex(:i)]),
+                            EPow(EVar(:D, Any[EIndex(:i)]), EParam(:phi, Any[EIndex(:i)])),
+                        ]),
+                    ]),
+                    EDiv(EConst(1.0), EParam(:phi, Any[EIndex(:i)])),
+                ),
+            ]),
+        )
+        register_eq!(ctx, block, :eqZ, i;
+            info="Z[i] == theta[i]*(xie*E^phi + xid*D^phi)^(1/phi)",
+            expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, E[i] ==
-            (theta_i ^ phi_i * xie_i * (1 + tau_z_i) * pz[i] / pe[i]) ^ (1 / (1 - phi_i)) * Z[i]) : nothing
-        register_eq!(ctx, block, :eqE, i; info="E[i] == (...) * Z[i]", constraint=constraint)
+        constraint = nothing
+        ratio_e = EDiv(
+            EMul([
+                EPow(EParam(:theta, Any[EIndex(:i)]), EParam(:phi, Any[EIndex(:i)])),
+                EParam(:xie, Any[EIndex(:i)]),
+                EAdd([EConst(1.0), EParam(:tau_z, Any[EIndex(:i)])]),
+                EVar(:pz, Any[EIndex(:i)]),
+            ]),
+            EVar(:pe, Any[EIndex(:i)]),
+        )
+        expr = EEq(
+            EVar(:E, Any[EIndex(:i)]),
+            EMul([
+                EPow(
+                    ratio_e,
+                    EDiv(EConst(1.0), EAdd([EConst(1.0), ENeg(EParam(:phi, Any[EIndex(:i)]))])),
+                ),
+                EVar(:Z, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqE, i; info="E[i] == (...) * Z[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, D[i] ==
-            (theta_i ^ phi_i * xid_i * (1 + tau_z_i) * pz[i] / pd[i]) ^ (1 / (1 - phi_i)) * Z[i]) : nothing
-        register_eq!(ctx, block, :eqDs, i; info="D[i] == (...) * Z[i]", constraint=constraint)
+        constraint = nothing
+        ratio_d = EDiv(
+            EMul([
+                EPow(EParam(:theta, Any[EIndex(:i)]), EParam(:phi, Any[EIndex(:i)])),
+                EParam(:xid, Any[EIndex(:i)]),
+                EAdd([EConst(1.0), EParam(:tau_z, Any[EIndex(:i)])]),
+                EVar(:pz, Any[EIndex(:i)]),
+            ]),
+            EVar(:pd, Any[EIndex(:i)]),
+        )
+        expr = EEq(
+            EVar(:D, Any[EIndex(:i)]),
+            EMul([
+                EPow(
+                    ratio_d,
+                    EDiv(EConst(1.0), EAdd([EConst(1.0), ENeg(EParam(:phi, Any[EIndex(:i)]))])),
+                ),
+                EVar(:Z, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqDs, i; info="D[i] == (...) * Z[i]", expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -2326,8 +3001,21 @@ function JCGECore.build!(block::MonopolyRentBlock, ctx::JCGERuntime.KernelContex
 
     for i in commodities
         eta_i = JCGECore.getparam(block.params, :eta, i)
-        constraint = model isa JuMP.Model ? @NLconstraint(model, RT[i] == ((1 - eta_i) / eta_i) * pd[i] * D[i]) : nothing
-        register_eq!(ctx, block, :eqRT, i; info="RT[i] == (1-eta[i])/eta[i] * pd[i] * D[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:RT, Any[EIndex(:i)]),
+            EMul([
+                EDiv(
+                    EAdd([EConst(1.0), ENeg(EParam(:eta, Any[EIndex(:i)]))]),
+                    EParam(:eta, Any[EIndex(:i)]),
+                ),
+                EVar(:pd, Any[EIndex(:i)]),
+                EVar(:D, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqRT, i;
+            info="RT[i] == (1-eta[i])/eta[i] * pd[i] * D[i]",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -2351,13 +3039,31 @@ function JCGECore.build!(block::ImportQuotaBlock, ctx::JCGERuntime.KernelContext
 
     for i in commodities
         Mquota_i = JCGECore.getparam(block.params, :Mquota, i)
-        constraint = model isa JuMP.Model ? @NLconstraint(model, RT[i] == chi[i] * pm[i] * M[i]) : nothing
-        register_eq!(ctx, block, :eqRT, i; info="RT[i] == chi[i] * pm[i] * M[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:RT, Any[EIndex(:i)]),
+            EMul([
+                EVar(:chi, Any[EIndex(:i)]),
+                EVar(:pm, Any[EIndex(:i)]),
+                EVar(:M, Any[EIndex(:i)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqRT, i; info="RT[i] == chi[i] * pm[i] * M[i]", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @NLconstraint(model, chi[i] * (Mquota_i - M[i]) == 0) : nothing
-        register_eq!(ctx, block, :eqchi1, i; info="chi[i] * (Mquota[i] - M[i]) == 0", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EMul([
+                EVar(:chi, Any[EIndex(:i)]),
+                EAdd([
+                    EParam(:Mquota, Any[EIndex(:i)]),
+                    ENeg(EVar(:M, Any[EIndex(:i)])),
+                ]),
+            ]),
+            EConst(0.0),
+        )
+        register_eq!(ctx, block, :eqchi1, i; info="chi[i] * (Mquota[i] - M[i]) == 0", expr=expr, index_names=(:i,), constraint=constraint)
 
-        constraint = model isa JuMP.Model ? @constraint(model, Mquota_i - M[i] >= 0) : nothing
+        constraint = nothing
         register_eq!(ctx, block, :eqchi2, i; info="Mquota[i] - M[i] >= 0", constraint=constraint)
     end
 
@@ -2382,14 +3088,24 @@ function JCGECore.build!(block::MobileFactorMarketBlock, ctx::JCGERuntime.Kernel
     end
 
     for h in factors
-        constraint = model isa JuMP.Model ? @constraint(model, sum(F[(h, j)] for j in activities) == FF[h]) : nothing
-        register_eq!(ctx, block, :eqpf1, h; info="sum(F[h,j]) == FF[h]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            ESum(:j, activities, EVar(:F, Any[EIndex(:h), EIndex(:j)])),
+            EVar(:FF, Any[EIndex(:h)]),
+        )
+        register_eq!(ctx, block, :eqpf1, h;
+            info="sum(F[h,j]) == FF[h]", expr=expr, index_names=(:h,), constraint=constraint)
 
         if length(activities) > 1
             ref = activities[1]
             for j in activities[2:end]
-                constraint = model isa JuMP.Model ? @constraint(model, pf[(h, j)] == pf[(h, ref)]) : nothing
-                register_eq!(ctx, block, :eqpf2, h, j; info="pf[h,j] == pf[h,ref]", constraint=constraint)
+                constraint = nothing
+                expr = EEq(
+                    EVar(:pf, Any[EIndex(:h), EIndex(:j)]),
+                    EVar(:pf, Any[EIndex(:h), ref]),
+                )
+                register_eq!(ctx, block, :eqpf2, h, j;
+                    info="pf[h,j] == pf[h,ref]", expr=expr, index_names=(:h, :j), constraint=constraint)
             end
         end
     end
@@ -2410,8 +3126,16 @@ function JCGECore.build!(block::CapitalStockReturnBlock, ctx::JCGERuntime.Kernel
 
     ror = JCGECore.getparam(block.params, :ror)
     for j in activities
-        constraint = model isa JuMP.Model ? @constraint(model, F[(block.factor, j)] == ror * KK[j]) : nothing
-        register_eq!(ctx, block, :eqpf3, j; info="F[factor,j] == ror * KK[j]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:F, Any[block.factor, EIndex(:j)]),
+            EMul([
+                EParam(:ror, Any[]),
+                EVar(:KK, Any[EIndex(:j)]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqpf3, j;
+            info="F[factor,j] == ror * KK[j]", expr=expr, index_names=(:j,), constraint=constraint)
     end
 
     return nothing
@@ -2439,21 +3163,42 @@ function JCGECore.build!(block::CompositeInvestmentBlock, ctx::JCGERuntime.Kerne
     sum_ii = sum(II[j] for j in activities)
     for i in commodities
         lambda_i = JCGECore.getparam(block.params, :lambda, i)
-        constraint = model isa JuMP.Model ? @NLconstraint(model, Xv[i] == lambda_i * pk * sum_ii / pq[i]) : nothing
-        register_eq!(ctx, block, :eqXv, i; info="Xv[i] == lambda[i] * pk * sum(II) / pq[i]", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:Xv, Any[EIndex(:i)]),
+            EDiv(
+                EMul([
+                    EParam(:lambda, Any[EIndex(:i)]),
+                    EVar(:pk, Any[]),
+                    ESum(:j, activities, EVar(:II, Any[EIndex(:j)])),
+                ]),
+                EVar(:pq, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqXv, i;
+            info="Xv[i] == lambda[i] * pk * sum(II) / pq[i]",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     iota = JCGECore.getparam(block.params, :iota)
-    if model isa JuMP.Model
-        lambda_vals = Dict(i => JCGECore.getparam(block.params, :lambda, i) for i in commodities)
-        constraint = @NLconstraint(model, III == iota * prod(Xv[i] ^ lambda_vals[i] for i in commodities))
-        register_eq!(ctx, block, :eqIII; info="III == iota * prod(Xv[i]^lambda[i])", constraint=constraint)
-    else
-        register_eq!(ctx, block, :eqIII; info="III == iota * prod(Xv[i]^lambda[i])", constraint=nothing)
-    end
+        expr = EEq(
+            EVar(:III, Any[]),
+            EMul([
+                EParam(:iota, Any[]),
+                EProd(:i, commodities, EPow(
+                    EVar(:Xv, Any[EIndex(:i)]),
+                    EParam(:lambda, Any[EIndex(:i)]),
+                )),
+            ]),
+        )
+        register_eq!(ctx, block, :eqIII; info="III == iota * prod(Xv[i]^lambda[i])", expr=expr, constraint=nothing)
 
-    constraint = model isa JuMP.Model ? @constraint(model, sum_ii == III) : nothing
-    register_eq!(ctx, block, :eqpk; info="sum(II) == III", constraint=constraint)
+    constraint = nothing
+    expr = EEq(
+        ESum(:j, activities, EVar(:II, Any[EIndex(:j)])),
+        EVar(:III, Any[]),
+    )
+    register_eq!(ctx, block, :eqpk; info="sum(II) == III", expr=expr, constraint=constraint)
 
     return nothing
 end
@@ -2479,11 +3224,36 @@ function JCGECore.build!(block::InvestmentAllocationBlock, ctx::JCGERuntime.Kern
     zeta = JCGECore.getparam(block.params, :zeta)
     denom = sum(pf[(block.factor, j)] ^ zeta * F[(block.factor, j)] for j in activities)
     for j in activities
-        constraint = model isa JuMP.Model ? @NLconstraint(
-            model,
-            pk * II[j] == pf[(block.factor, j)] ^ zeta * F[(block.factor, j)] / denom * (Sp + epsilon * Sf)
-        ) : nothing
-        register_eq!(ctx, block, :eqII, j; info="pk*II[j] == pf^zeta*F/denom*(Sp+epsilon*Sf)", constraint=constraint)
+        constraint = nothing
+        denom_expr = ESum(:k, activities, EMul([
+            EPow(EVar(:pf, Any[block.factor, EIndex(:k)]), EParam(:zeta, Any[])),
+            EVar(:F, Any[block.factor, EIndex(:k)]),
+        ]))
+        expr = EEq(
+            EMul([
+                EVar(:pk, Any[]),
+                EVar(:II, Any[EIndex(:j)]),
+            ]),
+            EMul([
+                EDiv(
+                    EMul([
+                        EPow(EVar(:pf, Any[block.factor, EIndex(:j)]), EParam(:zeta, Any[])),
+                        EVar(:F, Any[block.factor, EIndex(:j)]),
+                    ]),
+                    denom_expr,
+                ),
+                EAdd([
+                    EVar(:Sp, Any[]),
+                    EMul([
+                        EVar(:epsilon, Any[]),
+                        EVar(:Sf, Any[]),
+                    ]),
+                ]),
+            ]),
+        )
+        register_eq!(ctx, block, :eqII, j;
+            info="pk*II[j] == pf^zeta*F/denom*(Sp+epsilon*Sf)",
+            expr=expr, index_names=(:j,), constraint=constraint)
     end
 
     return nothing
@@ -2499,14 +3269,19 @@ function JCGECore.build!(block::CompositeConsumptionBlock, ctx::JCGERuntime.Kern
         Xp[i] = ensure_var!(ctx, model, global_var(:Xp, i))
     end
 
-    if model isa JuMP.Model
-        alpha_vals = Dict(i => JCGECore.getparam(block.params, :alpha, i) for i in commodities)
-        scale = JCGECore.getparam(block.params, :a)
-        @NLconstraint(model, CC == scale * prod(Xp[i] ^ alpha_vals[i] for i in commodities))
-        @NLobjective(model, Max, CC)
-    end
-    register_eq!(ctx, block, :eqCC; info="CC == a * prod(Xp[i]^alpha[i])", constraint=nothing)
-    register_eq!(ctx, block, :objective; info="maximize CC", constraint=nothing)
+    expr = EEq(
+        EVar(:CC, Any[]),
+        EMul([
+            EParam(:a, Any[]),
+            EProd(:i, commodities, EPow(
+                EVar(:Xp, Any[EIndex(:i)]),
+                EParam(:alpha, Any[EIndex(:i)]),
+            )),
+        ]),
+    )
+    register_eq!(ctx, block, :eqCC; info="CC == a * prod(Xp[i]^alpha[i])", expr=expr, constraint=nothing)
+    register_eq!(ctx, block, :objective; info="maximize CC",
+        objective_expr=EVar(:CC, Any[]), objective_sense=:Max, constraint=nothing)
     return nothing
 end
 
@@ -2521,8 +3296,15 @@ function JCGECore.build!(block::PriceLevelBlock, ctx::JCGERuntime.KernelContext,
     end
 
     weights = Dict(i => JCGECore.getparam(block.params, :w, i) for i in commodities)
-    constraint = model isa JuMP.Model ? @constraint(model, PRICE == sum(pq[i] * weights[i] for i in commodities)) : nothing
-    register_eq!(ctx, block, :eqPRICE; info="PRICE == sum(pq[i]*w[i])", constraint=constraint)
+    constraint = nothing
+    expr = EEq(
+        EVar(:PRICE, Any[]),
+        ESum(:i, commodities, EMul([
+            EVar(:pq, Any[EIndex(:i)]),
+            EParam(:w, Any[EIndex(:i)]),
+        ])),
+    )
+    register_eq!(ctx, block, :eqPRICE; info="PRICE == sum(pq[i]*w[i])", expr=expr, constraint=constraint)
     return nothing
 end
 
@@ -2539,15 +3321,16 @@ function JCGECore.build!(block::PriceIndexBlock, ctx::JCGERuntime.KernelContext,
 
     weights = Dict(i => JCGECore.getparam(block.params, :pwts, i) for i in commodities)
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, pindex - sum(p[i] * weights[i] for i in commodities))
-            constraint = mcp_constraint(model, expr, pindex)
-        else
-            constraint = @constraint(model, pindex == sum(p[i] * weights[i] for i in commodities))
-        end
-    end
-    register_eq!(ctx, block, :pindexdef; info="pindex == sum(p[i]*pwts[i])", constraint=constraint)
+    mcp_var = mcp ? EVar(:pindex, Any[]) : nothing
+    eq_expr = EEq(
+        EVar(:pindex, Any[]),
+        ESum(:i, commodities, EMul([
+            EVar(:p, Any[EIndex(:i)]),
+            EParam(:pwts, Any[EIndex(:i)]),
+        ])),
+    )
+    register_eq!(ctx, block, :pindexdef; info="pindex == sum(p[i]*pwts[i])",
+        expr=eq_expr, mcp_var=mcp_var, constraint=constraint)
     return nothing
 end
 
@@ -2561,7 +3344,8 @@ function JCGECore.build!(block::ClosureBlock, ctx::JCGERuntime.KernelContext, sp
             if model isa JuMP.Model
                 JuMP.fix(var, value; force=true)
             end
-            register_eq!(ctx, block, :fix, name; info="fix $(name) == $(value)", constraint=nothing)
+            expr = EEq(EVar(Symbol(name), Any[]), EConst(value))
+            register_eq!(ctx, block, :fix, name; info="fix $(name) == $(value)", expr=expr, constraint=nothing)
         end
     end
 
@@ -2570,8 +3354,9 @@ function JCGECore.build!(block::ClosureBlock, ctx::JCGERuntime.KernelContext, sp
         for (lhs, rhs) in eqs
             var_lhs = ensure_var!(ctx, model, global_var(Symbol(lhs)))
             var_rhs = ensure_var!(ctx, model, global_var(Symbol(rhs)))
-            constraint = model isa JuMP.Model ? @constraint(model, var_lhs == var_rhs) : nothing
-            register_eq!(ctx, block, :eq, lhs, rhs; info="fix $(lhs) == $(rhs)", constraint=constraint)
+            constraint = nothing
+            expr = EEq(EVar(Symbol(lhs), Any[]), EVar(Symbol(rhs), Any[]))
+            register_eq!(ctx, block, :eq, lhs, rhs; info="fix $(lhs) == $(rhs)", expr=expr, constraint=constraint)
         end
     end
 
@@ -2588,16 +3373,12 @@ function JCGECore.build!(block::UtilityCDHHBlock, ctx::JCGERuntime.KernelContext
         Xp[(i, hh)] = ensure_var!(ctx, model, global_var(:Xp, i, hh))
     end
 
-    if model isa JuMP.Model
-        alpha_vals = Dict(hh => Dict(i => JCGECore.getparam(block.params, :alpha, i, hh) for i in commodities) for hh in households)
-        if length(households) == 1
-            hh = only(households)
-            @NLobjective(model, Max, prod(Xp[(i, hh)] ^ alpha_vals[hh][i] for i in commodities))
-        else
-            @NLobjective(model, Max, sum(prod(Xp[(i, hh)] ^ alpha_vals[hh][i] for i in commodities) for hh in households))
-        end
-    end
-    register_eq!(ctx, block, :objective; info="maximize household utility", constraint=nothing)
+    objective_expr = ESum(:hh, households, EProd(:i, commodities, EPow(
+        EVar(:Xp, Any[EIndex(:i), EIndex(:hh)]),
+        EParam(:alpha, Any[EIndex(:i), EIndex(:hh)]),
+    )))
+    register_eq!(ctx, block, :objective; info="maximize household utility",
+        objective_expr=objective_expr, objective_sense=:Max, constraint=nothing)
     return nothing
 end
 
@@ -2614,17 +3395,20 @@ function JCGECore.build!(block::UtilityCDRegionalBlock, ctx::JCGERuntime.KernelC
         for i in goods
             Xp[i] = ensure_var!(ctx, model, global_var(:Xp, i))
         end
-        if model isa JuMP.Model
-            alpha_vals = Dict(i => JCGECore.getparam(block.params, :alpha, i) for i in goods)
-            @NLconstraint(model, UU[r] == prod(Xp[i] ^ alpha_vals[i] for i in goods))
-        end
-        register_eq!(ctx, block, :eqUU, r; info="UU[r] == prod(Xp[i]^alpha[i])", constraint=nothing)
+        expr = EEq(
+            EVar(:UU, Any[EIndex(:r)]),
+            EProd(:i, goods, EPow(
+                EVar(:Xp, Any[EIndex(:i)]),
+                EParam(:alpha, Any[EIndex(:i)]),
+            )),
+        )
+        register_eq!(ctx, block, :eqUU, r;
+            info="UU[r] == prod(Xp[i]^alpha[i])", expr=expr, index_names=(:r,), constraint=nothing)
     end
 
-    if model isa JuMP.Model
-        @NLobjective(model, Max, sum(UU[r] for r in regions))
-    end
-    register_eq!(ctx, block, :objective; info="maximize social welfare", constraint=nothing)
+    objective_expr = ESum(:r, regions, EVar(:UU, Any[EIndex(:r)]))
+    register_eq!(ctx, block, :objective; info="maximize social welfare",
+        objective_expr=objective_expr, objective_sense=:Max, constraint=nothing)
     return nothing
 end
 
@@ -2637,11 +3421,12 @@ function JCGECore.build!(block::UtilityCDBlock, ctx::JCGERuntime.KernelContext, 
         X[i] = ensure_var!(ctx, model, global_var(:X, i))
     end
 
-    if model isa JuMP.Model
-        alpha_vals = Dict(i => JCGECore.getparam(block.params, :alpha, i) for i in commodities)
-        @NLobjective(model, Max, prod(X[i] ^ alpha_vals[i] for i in commodities))
-    end
-    register_eq!(ctx, block, :objective; info="maximize Cobb-Douglas utility", constraint=nothing)
+    objective_expr = EProd(:i, commodities, EPow(
+        EVar(:X, Any[EIndex(:i)]),
+        EParam(:alpha, Any[EIndex(:i)]),
+    ))
+    register_eq!(ctx, block, :objective; info="maximize Cobb-Douglas utility",
+        objective_expr=objective_expr, objective_sense=:Max, constraint=nothing)
     return nothing
 end
 
@@ -2654,11 +3439,12 @@ function JCGECore.build!(block::UtilityCDXpBlock, ctx::JCGERuntime.KernelContext
         Xp[i] = ensure_var!(ctx, model, global_var(:Xp, i))
     end
 
-    if model isa JuMP.Model
-        alpha_vals = Dict(i => JCGECore.getparam(block.params, :alpha, i) for i in commodities)
-        @NLobjective(model, Max, prod(Xp[i] ^ alpha_vals[i] for i in commodities))
-    end
-    register_eq!(ctx, block, :objective; info="maximize Cobb-Douglas utility over Xp", constraint=nothing)
+    objective_expr = EProd(:i, commodities, EPow(
+        EVar(:Xp, Any[EIndex(:i)]),
+        EParam(:alpha, Any[EIndex(:i)]),
+    ))
+    register_eq!(ctx, block, :objective; info="maximize Cobb-Douglas utility over Xp",
+        objective_expr=objective_expr, objective_sense=:Max, constraint=nothing)
     return nothing
 end
 
@@ -2695,11 +3481,21 @@ function JCGECore.build!(block::ExternalBalanceBlock, ctx::JCGERuntime.KernelCon
     Sf = JCGECore.getparam(block.params, :Sf)
     pWe_vals = Dict(i => JCGECore.getparam(block.params, :pWe, i) for i in commodities)
     pWm_vals = Dict(i => JCGECore.getparam(block.params, :pWm, i) for i in commodities)
-    constraint = model isa JuMP.Model ? @constraint(model,
-        sum(pWe_vals[i] * E[i] for i in commodities) + Sf ==
-        sum(pWm_vals[i] * M[i] for i in commodities)
-    ) : nothing
-    register_eq!(ctx, block, :eqBOP; info="sum(pWe[i]*E[i]) + Sf == sum(pWm[i]*M[i])", constraint=constraint)
+    constraint = nothing
+    expr = EEq(
+        EAdd([
+            ESum(:i, commodities, EMul([
+                EParam(:pWe, Any[EIndex(:i)]),
+                EVar(:E, Any[EIndex(:i)]),
+            ])),
+            EParam(:Sf, Any[]),
+        ]),
+        ESum(:i, commodities, EMul([
+            EParam(:pWm, Any[EIndex(:i)]),
+            EVar(:M, Any[EIndex(:i)]),
+        ])),
+    )
+    register_eq!(ctx, block, :eqBOP; info="sum(pWe[i]*E[i]) + Sf == sum(pWm[i]*M[i])", expr=expr, constraint=constraint)
 
     return nothing
 end
@@ -2722,21 +3518,22 @@ function JCGECore.build!(block::ExternalBalanceVarPriceBlock, ctx::JCGERuntime.K
 
     Sf = JCGECore.getparam(block.params, :Sf)
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(
-                model,
-                sum(pWe[i] * E[i] for i in commodities) + Sf - sum(pWm[i] * M[i] for i in commodities)
-            )
-            constraint = mcp_constraint(model, expr, ensure_var!(ctx, model, global_var(:er)))
-        else
-            constraint = @constraint(model,
-                sum(pWe[i] * E[i] for i in commodities) + Sf ==
-                sum(pWm[i] * M[i] for i in commodities)
-            )
-        end
-    end
-    register_eq!(ctx, block, :eqBOP; info="sum(pWe[i]*E[i]) + Sf == sum(pWm[i]*M[i])", constraint=constraint)
+    mcp_var = mcp ? EVar(:er, Any[]) : nothing
+    eq_expr = EEq(
+        EAdd([
+            ESum(:i, commodities, EMul([
+                EVar(:pWe, Any[EIndex(:i)]),
+                EVar(:E, Any[EIndex(:i)]),
+            ])),
+            EParam(:Sf, Any[]),
+        ]),
+        ESum(:i, commodities, EMul([
+            EVar(:pWm, Any[EIndex(:i)]),
+            EVar(:M, Any[EIndex(:i)]),
+        ])),
+    )
+    register_eq!(ctx, block, :eqBOP; info="sum(pWe[i]*E[i]) + Sf == sum(pWm[i]*M[i])",
+        expr=eq_expr, mcp_var=mcp_var, constraint=constraint)
 
     return nothing
 end
@@ -2764,18 +3561,26 @@ function JCGECore.build!(block::ExternalBalanceRemitBlock, ctx::JCGERuntime.Kern
     remit = ensure_var!(ctx, model, global_var(:remit))
     fbor = ensure_var!(ctx, model, global_var(:fbor))
     constraint = nothing
-    if model isa JuMP.Model
-        expr = @expression(
-            model,
-            sum(pwm[i] * M[i] for i in traded) - sum(pwe[i] * E[i] for i in traded) - fsav - remit - fbor
-        )
-        if mcp
-            constraint = mcp_constraint(model, expr, ensure_var!(ctx, model, global_var(:er)))
-        else
-            constraint = @constraint(model, expr == 0)
-        end
-    end
-    register_eq!(ctx, block, :caeq; info="sum(pwm*m) = sum(pwe*e) + fsav + remit + fbor", constraint=constraint)
+    mcp_var = mcp ? EVar(:er, Any[]) : nothing
+    pwm_expr = hasproperty(block.params, :pwm) ? EParam(:pwm, Any[EIndex(:i)]) : EVar(:pwm, Any[EIndex(:i)])
+    pwe_expr = hasproperty(block.params, :pwe) ? EParam(:pwe, Any[EIndex(:i)]) : EVar(:pwe, Any[EIndex(:i)])
+    eq_expr = EEq(
+        ESum(:i, traded, EMul([
+            pwm_expr,
+            EVar(:M, Any[EIndex(:i)]),
+        ])),
+        EAdd([
+            ESum(:i, traded, EMul([
+                pwe_expr,
+                EVar(:E, Any[EIndex(:i)]),
+            ])),
+            EVar(:fsav, Any[]),
+            EVar(:remit, Any[]),
+            EVar(:fbor, Any[]),
+        ]),
+    )
+    register_eq!(ctx, block, :caeq; info="sum(pwm*m) = sum(pwe*e) + fsav + remit + fbor",
+        expr=eq_expr, mcp_var=mcp_var, constraint=constraint)
     return nothing
 end
 
@@ -2801,10 +3606,28 @@ function JCGECore.build!(block::ForeignTradeBlock, ctx::JCGERuntime.KernelContex
         pWm0_i = JCGECore.getparam(block.params, :pWm0, i)
         sigma_i = JCGECore.getparam(block.params, :sigma, i)
         psi_i = JCGECore.getparam(block.params, :psi, i)
-        constraint = model isa JuMP.Model ? @NLconstraint(model, E[i] / E0_i == (pWe[i] / pWe0_i) ^ (-sigma_i)) : nothing
-        register_eq!(ctx, block, :eqfe, i; info="E[i]/E0[i] == (pWe[i]/pWe0[i])^(-sigma[i])", constraint=constraint)
-        constraint = model isa JuMP.Model ? @NLconstraint(model, M[i] / M0_i == (pWm[i] / pWm0_i) ^ (psi_i)) : nothing
-        register_eq!(ctx, block, :eqfm, i; info="M[i]/M0[i] == (pWm[i]/pWm0[i])^(psi[i])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EDiv(EVar(:E, Any[EIndex(:i)]), EParam(:E0, Any[EIndex(:i)])),
+            EPow(
+                EDiv(EVar(:pWe, Any[EIndex(:i)]), EParam(:pWe0, Any[EIndex(:i)])),
+                ENeg(EParam(:sigma, Any[EIndex(:i)])),
+            ),
+        )
+        register_eq!(ctx, block, :eqfe, i;
+            info="E[i]/E0[i] == (pWe[i]/pWe0[i])^(-sigma[i])",
+            expr=expr, index_names=(:i,), constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EDiv(EVar(:M, Any[EIndex(:i)]), EParam(:M0, Any[EIndex(:i)])),
+            EPow(
+                EDiv(EVar(:pWm, Any[EIndex(:i)]), EParam(:pWm0, Any[EIndex(:i)])),
+                EParam(:psi, Any[EIndex(:i)]),
+            ),
+        )
+        register_eq!(ctx, block, :eqfm, i;
+            info="M[i]/M0[i] == (pWm[i]/pWm0[i])^(psi[i])",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -2829,8 +3652,23 @@ function JCGECore.build!(block::PriceAggregationBlock, ctx::JCGERuntime.KernelCo
     for i in activities
         ay_i = JCGECore.getparam(block.params, :ay, i)
         ax_vals = Dict(j => JCGECore.getparam(block.params, :ax, j, i) for j in commodities)
-        constraint = model isa JuMP.Model ? @constraint(model, pz[i] == ay_i * py[i] + sum(ax_vals[j] * pq[j] for j in commodities)) : nothing
-        register_eq!(ctx, block, :eqpzs, i; info="pz[i] == ay[i]*py[i] + sum(ax[j,i]*pq[j])", constraint=constraint)
+        constraint = nothing
+        expr = EEq(
+            EVar(:pz, Any[EIndex(:i)]),
+            EAdd([
+                EMul([
+                    EParam(:ay, Any[EIndex(:i)]),
+                    EVar(:py, Any[EIndex(:i)]),
+                ]),
+                ESum(:j, commodities, EMul([
+                    EParam(:ax, Any[EIndex(:j), EIndex(:i)]),
+                    EVar(:pq, Any[EIndex(:j)]),
+                ])),
+            ]),
+        )
+        register_eq!(ctx, block, :eqpzs, i;
+            info="pz[i] == ay[i]*py[i] + sum(ax[j,i]*pq[j])",
+            expr=expr, index_names=(:i,), constraint=constraint)
     end
 
     return nothing
@@ -2855,10 +3693,20 @@ function JCGECore.build!(block::InternationalMarketBlock, ctx::JCGERuntime.Kerne
             pWm = ensure_var!(ctx, model, global_var(:pWm, sym_rr))
             E = ensure_var!(ctx, model, global_var(:E, sym_r))
             M = ensure_var!(ctx, model, global_var(:M, sym_rr))
-            constraint = model isa JuMP.Model ? @constraint(model, pWe == pWm) : nothing
-            register_eq!(ctx, block, :eqpw, i, r, rr; info="pWe[i,r] == pWm[i,rr]", constraint=constraint)
-            constraint = model isa JuMP.Model ? @constraint(model, E == M) : nothing
-            register_eq!(ctx, block, :eqw, i, r, rr; info="E[i,r] == M[i,rr]", constraint=constraint)
+            constraint = nothing
+            expr = EEq(
+                EVar(:pWe, Any[sym_r]),
+                EVar(:pWm, Any[sym_rr]),
+            )
+            register_eq!(ctx, block, :eqpw, i, r, rr;
+                info="pWe[i,r] == pWm[i,rr]", expr=expr, index_names=(:i, :r, :rr), constraint=constraint)
+            constraint = nothing
+            expr = EEq(
+                EVar(:E, Any[sym_r]),
+                EVar(:M, Any[sym_rr]),
+            )
+            register_eq!(ctx, block, :eqw, i, r, rr;
+                info="E[i,r] == M[i,rr]", expr=expr, index_names=(:i, :r, :rr), constraint=constraint)
         end
     end
 
@@ -2899,42 +3747,46 @@ function JCGECore.build!(block::ProductionMultilaborCDBlock, ctx::JCGERuntime.Ke
         labor_share = sum(alphl_vals[lc] for lc in labor)
 
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(
-                    model,
-                    xd[i] - ad_i * prod(l[(i, lc)] ^ alphl_vals[lc] for lc in active_labor) *
-                              k[i] ^ (1.0 - labor_share)
-                )
-                constraint = mcp_constraint(model, expr, pva[i])
-            else
-                constraint = @NLconstraint(
-                    model,
-                    xd[i] == ad_i * prod(l[(i, lc)] ^ alphl_vals[lc] for lc in active_labor) *
-                             k[i] ^ (1.0 - labor_share)
-                )
-            end
-        end
+        k_exp = EAdd([
+            EConst(1.0),
+            ENeg(ESum(:lc, labor, EParam(:alphl, Any[EIndex(:lc), EIndex(:i)]))),
+        ])
+        expr = EEq(
+            EVar(:xd, Any[EIndex(:i)]),
+            EMul([
+                EParam(:ad, Any[EIndex(:i)]),
+                EProd(:lc, active_labor, EPow(
+                    EVar(:l, Any[EIndex(:i), EIndex(:lc)]),
+                    EParam(:alphl, Any[EIndex(:lc), EIndex(:i)]),
+                )),
+                EPow(EVar(:k, Any[EIndex(:i)]), k_exp),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:pva, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:activity, block=block.name,
-            payload=(indices=(i,), info="xd[i] = ad[i]*prod(l^alphl)*k^(1-sum(alphl))", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="xd[i] = ad[i]*prod(l^alphl)*k^(1-sum(alphl))", expr=expr, constraint=constraint, mcp_var=mcp_var))
 
         for lc in active_labor
             wdist_i = wdist_vals[lc]
             alpha_i = alphl_vals[lc]
             constraint = nothing
-            if model isa JuMP.Model
-                if mcp
-                    expr = @expression(model, wa[lc] * wdist_i * l[(i, lc)] - xd[i] * pva[i] * alpha_i)
-                    constraint = mcp_constraint(model, expr, l[(i, lc)])
-                else
-                    constraint = @NLconstraint(
-                        model,
-                        wa[lc] * wdist_i * l[(i, lc)] == xd[i] * pva[i] * alpha_i
-                    )
-                end
-            end
+            expr = EEq(
+                EMul([
+                    EVar(:wa, Any[EIndex(:lc)]),
+                    EParam(:wdist, Any[EIndex(:i), EIndex(:lc)]),
+                    EVar(:l, Any[EIndex(:i), EIndex(:lc)]),
+                ]),
+                EMul([
+                    EVar(:xd, Any[EIndex(:i)]),
+                    EVar(:pva, Any[EIndex(:i)]),
+                    EParam(:alphl, Any[EIndex(:lc), EIndex(:i)]),
+                ]),
+            )
+            mcp_var = mcp ? EVar(:l, Any[EIndex(:i), EIndex(:lc)]) : nothing
             JCGERuntime.register_equation!(ctx; tag=:profitmax, block=block.name,
-                payload=(indices=(i, lc), info="wa*wdist*l = xd*pva*alphl", constraint=constraint))
+                payload=(indices=(i, lc), params=_payload_params(block), index_names=(:i, :lc),
+                    info="wa*wdist*l = xd*pva*alphl", expr=expr, constraint=constraint, mcp_var=mcp_var))
         end
     end
 
@@ -2952,16 +3804,14 @@ function JCGECore.build!(block::LaborMarketClearingBlock, ctx::JCGERuntime.Kerne
         wa = ensure_var!(ctx, model, global_var(:wa, lc))
         l = Dict(i => ensure_var!(ctx, model, global_var(:l, i, lc)) for i in activities)
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, ls - sum(l[i] for i in activities))
-                constraint = mcp_constraint(model, expr, wa)
-            else
-                constraint = @constraint(model, sum(l[i] for i in activities) == ls)
-            end
-        end
+        expr = EEq(
+            ESum(:i, activities, EVar(:l, Any[EIndex(:i), EIndex(:lc)])),
+            EVar(:ls, Any[EIndex(:lc)]),
+        )
+        mcp_var = mcp ? EVar(:wa, Any[EIndex(:lc)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:lmequil, block=block.name,
-            payload=(indices=(lc,), info="sum_i l[i,lc] = ls[lc]", constraint=constraint))
+            payload=(indices=(lc,), params=_payload_params(block), index_names=(:lc,),
+                info="sum_i l[i,lc] = ls[lc]", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -2982,37 +3832,36 @@ function JCGECore.build!(block::ActivityPriceIOBlock, ctx::JCGERuntime.KernelCon
         io_vals = Dict(j => JCGECore.getparam(block.params, :io, j, i) for j in commodities)
 
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, px * (1.0 - itax_i) - pva - sum(io_vals[j] * p[j] for j in commodities))
-                constraint = mcp_constraint(model, expr, xd)
-            else
-                constraint = @constraint(
-                    model,
-                    px * (1.0 - itax_i) == pva + sum(io_vals[j] * p[j] for j in commodities)
-                )
-            end
-        end
+        expr = EEq(
+            EMul([
+                EVar(:px, Any[EIndex(:i)]),
+                EAdd([EConst(1.0), ENeg(EParam(:itax, Any[EIndex(:i)]))]),
+            ]),
+            EAdd([
+                EVar(:pva, Any[EIndex(:i)]),
+                ESum(:j, commodities, EMul([
+                    EParam(:io, Any[EIndex(:j), EIndex(:i)]),
+                    EVar(:p, Any[EIndex(:j)]),
+                ])),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:xd, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:actp, block=block.name,
-            payload=(indices=(i,), info="px*(1-itax) = pva + sum(io*p)", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="px*(1-itax) = pva + sum(io*p)", expr=expr, constraint=constraint, mcp_var=mcp_var))
 
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(
-                    model,
-                    int - sum(JCGECore.getparam(block.params, :io, i, j) * ensure_var!(ctx, model, global_var(:xd, j)) for j in activities)
-                )
-                constraint = mcp_constraint(model, expr, int)
-            else
-                constraint = @constraint(
-                    model,
-                    int == sum(JCGECore.getparam(block.params, :io, i, j) * ensure_var!(ctx, model, global_var(:xd, j)) for j in activities)
-                )
-            end
-        end
+        expr = EEq(
+            EVar(:int, Any[EIndex(:i)]),
+            ESum(:j, activities, EMul([
+                EParam(:io, Any[EIndex(:i), EIndex(:j)]),
+                EVar(:xd, Any[EIndex(:j)]),
+            ])),
+        )
+        mcp_var = mcp ? EVar(:int, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:inteq, block=block.name,
-            payload=(indices=(i,), info="int[i] = sum(io[i,j]*xd[j])", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="int[i] = sum(io[i,j]*xd[j])", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3028,19 +3877,17 @@ function JCGECore.build!(block::CapitalPriceCompositionBlock, ctx::JCGERuntime.K
         p = Dict(j => ensure_var!(ctx, model, global_var(:p, j)) for j in commodities)
         imat_vals = Dict(j => JCGECore.getparam(block.params, :imat, j, i) for j in commodities)
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, pk - sum(p[j] * imat_vals[j] for j in commodities))
-                constraint = mcp_constraint(model, expr, pk)
-            else
-                constraint = @constraint(
-                    model,
-                    pk == sum(p[j] * imat_vals[j] for j in commodities)
-                )
-            end
-        end
+        expr = EEq(
+            EVar(:pk, Any[EIndex(:i)]),
+            ESum(:j, commodities, EMul([
+                EVar(:p, Any[EIndex(:j)]),
+                EParam(:imat, Any[EIndex(:j), EIndex(:i)]),
+            ])),
+        )
+        mcp_var = mcp ? EVar(:pk, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:pkdef, block=block.name,
-            payload=(indices=(i,), info="pk[i] = sum(p[j]*imat[j,i])", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="pk[i] = sum(p[j]*imat[j,i])", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3060,35 +3907,49 @@ function JCGECore.build!(block::TradePriceLinkBlock, ctx::JCGERuntime.KernelCont
         tm = ensure_var!(ctx, model, global_var(:tm, i))
         pr = include_pr ? ensure_var!(ctx, model, global_var(:pr)) : 0.0
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, pm - pwm_val * er * (1.0 + tm + pr))
-                constraint = mcp_constraint(model, expr, pm)
-            else
-                constraint = @NLconstraint(model, pm == pwm_val * er * (1.0 + tm + pr))
-            end
-        end
+        pwm_expr = hasproperty(block.params, :pwm) ? EParam(:pwm, Any[EIndex(:i)]) : EVar(:pwm, Any[EIndex(:i)])
+        pr_expr = include_pr ? EVar(:pr, Any[]) : EConst(0.0)
+        expr = EEq(
+            EVar(:pm, Any[EIndex(:i)]),
+            EMul([
+                pwm_expr,
+                EVar(:er, Any[]),
+                EAdd([EConst(1.0), EVar(:tm, Any[EIndex(:i)]), pr_expr]),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:pm, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:pmdef, block=block.name,
-            payload=(indices=(i,), info="pm = pwm*er*(1+tm+pr)", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="pm = pwm*er*(1+tm+pr)", expr=expr, constraint=constraint, mcp_var=mcp_var))
 
         pe = ensure_var!(ctx, model, global_var(:pe, i))
         pwe_val = hasproperty(block.params, :pwe) ? block.params.pwe[i] : ensure_var!(ctx, model, global_var(:pwe, i))
         te_i = JCGECore.getparam(block.params, :te, i)
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = pedef_mode == :pwe ?
-                    @expression(model, pe - pwe_val * (1.0 + te_i) * er) :
-                    @expression(model, pe * (1.0 + te_i) - pwe_val * er)
-                constraint = mcp_constraint(model, expr, pe)
-            else
-                constraint = pedef_mode == :pwe ?
-                    @NLconstraint(model, pe == pwe_val * (1.0 + te_i) * er) :
-                    @NLconstraint(model, pe * (1.0 + te_i) == pwe_val * er)
-            end
-        end
+        pwe_expr = hasproperty(block.params, :pwe) ? EParam(:pwe, Any[EIndex(:i)]) : EVar(:pwe, Any[EIndex(:i)])
+        expr = pedef_mode == :pwe ?
+            EEq(
+                EVar(:pe, Any[EIndex(:i)]),
+                EMul([
+                    pwe_expr,
+                    EAdd([EConst(1.0), EParam(:te, Any[EIndex(:i)])]),
+                    EVar(:er, Any[]),
+                ]),
+            ) :
+            EEq(
+                EMul([
+                    EVar(:pe, Any[EIndex(:i)]),
+                    EAdd([EConst(1.0), EParam(:te, Any[EIndex(:i)])]),
+                ]),
+                EMul([
+                    pwe_expr,
+                    EVar(:er, Any[]),
+                ]),
+            )
+        mcp_var = mcp ? EVar(:pe, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:pedef, block=block.name,
-            payload=(indices=(i,), info="pe definition (mode=$(pedef_mode))", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="pe definition (mode=$(pedef_mode))", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3109,16 +3970,18 @@ function JCGECore.build!(block::AbsorptionSalesBlock, ctx::JCGERuntime.KernelCon
         m = ensure_var!(ctx, model, global_var(:m, i))
         term_m = i in traded ? pm * m : 0.0
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, p * x - pd * xxd - term_m)
-                constraint = mcp_constraint(model, expr, p)
-            else
-                constraint = @NLconstraint(model, p * x == pd * xxd + term_m)
-            end
-        end
+        term_m_expr = i in traded ? EMul([EVar(:pm, Any[EIndex(:i)]), EVar(:m, Any[EIndex(:i)])]) : EConst(0.0)
+        expr = EEq(
+            EMul([EVar(:p, Any[EIndex(:i)]), EVar(:x, Any[EIndex(:i)])]),
+            EAdd([
+                EMul([EVar(:pd, Any[EIndex(:i)]), EVar(:xxd, Any[EIndex(:i)])]),
+                term_m_expr,
+            ]),
+        )
+        mcp_var = mcp ? EVar(:p, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:absorption, block=block.name,
-            payload=(indices=(i,), info="p*x = pd*xxd + pm*m", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="p*x = pd*xxd + pm*m", expr=expr, constraint=constraint, mcp_var=mcp_var))
 
         px = ensure_var!(ctx, model, global_var(:px, i))
         xd = ensure_var!(ctx, model, global_var(:xd, i))
@@ -3126,16 +3989,18 @@ function JCGECore.build!(block::AbsorptionSalesBlock, ctx::JCGERuntime.KernelCon
         e = ensure_var!(ctx, model, global_var(:e, i))
         term_e = i in traded ? pe * e : 0.0
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, px * xd - pd * xxd - term_e)
-                constraint = mcp_constraint(model, expr, xxd)
-            else
-                constraint = @NLconstraint(model, px * xd == pd * xxd + term_e)
-            end
-        end
+        term_e_expr = i in traded ? EMul([EVar(:pe, Any[EIndex(:i)]), EVar(:e, Any[EIndex(:i)])]) : EConst(0.0)
+        expr = EEq(
+            EMul([EVar(:px, Any[EIndex(:i)]), EVar(:xd, Any[EIndex(:i)])]),
+            EAdd([
+                EMul([EVar(:pd, Any[EIndex(:i)]), EVar(:xxd, Any[EIndex(:i)])]),
+                term_e_expr,
+            ]),
+        )
+        mcp_var = mcp ? EVar(:xxd, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:sales, block=block.name,
-            payload=(indices=(i,), info="px*xd = pd*xxd + pe*e", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="px*xd = pd*xxd + pe*e", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3157,40 +4022,51 @@ function JCGECore.build!(block::ArmingtonMXxdBlock, ctx::JCGERuntime.KernelConte
         rhoc_i = JCGECore.getparam(block.params, :rhoc, i)
 
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(
-                    model,
-                    x - ac_i * (delta_i * m ^ (-rhoc_i) + (1.0 - delta_i) * xxd ^ (-rhoc_i)) ^ (-1.0 / rhoc_i)
-                )
-                constraint = mcp_constraint(model, expr, pd)
-            else
-                constraint = @NLconstraint(
-                    model,
-                    x == ac_i * (delta_i * m ^ (-rhoc_i) + (1.0 - delta_i) * xxd ^ (-rhoc_i)) ^ (-1.0 / rhoc_i)
-                )
-            end
-        end
+        expr = EEq(
+            EVar(:x, Any[EIndex(:i)]),
+            EMul([
+                EParam(:ac, Any[EIndex(:i)]),
+                EPow(
+                    EAdd([
+                        EMul([
+                            EParam(:delta, Any[EIndex(:i)]),
+                            EPow(EVar(:m, Any[EIndex(:i)]), ENeg(EParam(:rhoc, Any[EIndex(:i)]))),
+                        ]),
+                        EMul([
+                            EAdd([EConst(1.0), ENeg(EParam(:delta, Any[EIndex(:i)]))]),
+                            EPow(EVar(:xxd, Any[EIndex(:i)]), ENeg(EParam(:rhoc, Any[EIndex(:i)]))),
+                        ]),
+                    ]),
+                    EDiv(ENeg(EConst(1.0)), EParam(:rhoc, Any[EIndex(:i)])),
+                ),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:pd, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:armington, block=block.name,
-            payload=(indices=(i,), info="x = ac*(delta*m^-rhoc + (1-delta)*xxd^-rhoc)^(-1/rhoc)", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="x = ac*(delta*m^-rhoc + (1-delta)*xxd^-rhoc)^(-1/rhoc)", expr=expr, constraint=constraint, mcp_var=mcp_var))
 
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(
-                    model,
-                    m / xxd - (pd / pm * delta_i / (1.0 - delta_i)) ^ (1.0 / (1.0 + rhoc_i))
-                )
-                constraint = mcp_constraint(model, expr, m)
-            else
-                constraint = @NLconstraint(
-                    model,
-                    m / xxd == (pd / pm * delta_i / (1.0 - delta_i)) ^ (1.0 / (1.0 + rhoc_i))
-                )
-            end
-        end
+        expr = EEq(
+            EDiv(EVar(:m, Any[EIndex(:i)]), EVar(:xxd, Any[EIndex(:i)])),
+            EPow(
+                EDiv(
+                    EMul([
+                        EVar(:pd, Any[EIndex(:i)]),
+                        EParam(:delta, Any[EIndex(:i)]),
+                    ]),
+                    EMul([
+                        EVar(:pm, Any[EIndex(:i)]),
+                        EAdd([EConst(1.0), ENeg(EParam(:delta, Any[EIndex(:i)]))]),
+                    ]),
+                ),
+                EDiv(EConst(1.0), EAdd([EConst(1.0), EParam(:rhoc, Any[EIndex(:i)])])),
+            ),
+        )
+        mcp_var = mcp ? EVar(:m, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:costmin, block=block.name,
-            payload=(indices=(i,), info="m/xxd = (pd/pm*delta/(1-delta))^(1/(1+rhoc))", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="m/xxd = (pd/pm*delta/(1-delta))^(1/(1+rhoc))", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3213,40 +4089,51 @@ function JCGECore.build!(block::CETXXDEBlock, ctx::JCGERuntime.KernelContext, sp
         rhot_i = JCGECore.getparam(block.params, :rhot, i)
 
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(
-                    model,
-                    xd - at_i * (gamma_i * e ^ rhot_i + (1.0 - gamma_i) * xxd ^ rhot_i) ^ (1.0 / rhot_i)
-                )
-                constraint = mcp_constraint(model, expr, px)
-            else
-                constraint = @NLconstraint(
-                    model,
-                    xd == at_i * (gamma_i * e ^ rhot_i + (1.0 - gamma_i) * xxd ^ rhot_i) ^ (1.0 / rhot_i)
-                )
-            end
-        end
+        expr = EEq(
+            EVar(:xd, Any[EIndex(:i)]),
+            EMul([
+                EParam(:at, Any[EIndex(:i)]),
+                EPow(
+                    EAdd([
+                        EMul([
+                            EParam(:gamma, Any[EIndex(:i)]),
+                            EPow(EVar(:e, Any[EIndex(:i)]), EParam(:rhot, Any[EIndex(:i)])),
+                        ]),
+                        EMul([
+                            EAdd([EConst(1.0), ENeg(EParam(:gamma, Any[EIndex(:i)]))]),
+                            EPow(EVar(:xxd, Any[EIndex(:i)]), EParam(:rhot, Any[EIndex(:i)])),
+                        ]),
+                    ]),
+                    EDiv(EConst(1.0), EParam(:rhot, Any[EIndex(:i)])),
+                ),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:px, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:cet, block=block.name,
-            payload=(indices=(i,), info="xd = at*(gamma*e^rhot + (1-gamma)*xxd^rhot)^(1/rhot)", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="xd = at*(gamma*e^rhot + (1-gamma)*xxd^rhot)^(1/rhot)", expr=expr, constraint=constraint, mcp_var=mcp_var))
 
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(
-                    model,
-                    e / xxd - (pe / pd * (1.0 - gamma_i) / gamma_i) ^ (1.0 / (rhot_i - 1.0))
-                )
-                constraint = mcp_constraint(model, expr, e)
-            else
-                constraint = @NLconstraint(
-                    model,
-                    e / xxd == (pe / pd * (1.0 - gamma_i) / gamma_i) ^ (1.0 / (rhot_i - 1.0))
-                )
-            end
-        end
+        expr = EEq(
+            EDiv(EVar(:e, Any[EIndex(:i)]), EVar(:xxd, Any[EIndex(:i)])),
+            EPow(
+                EDiv(
+                    EMul([
+                        EVar(:pe, Any[EIndex(:i)]),
+                        EAdd([EConst(1.0), ENeg(EParam(:gamma, Any[EIndex(:i)]))]),
+                    ]),
+                    EMul([
+                        EVar(:pd, Any[EIndex(:i)]),
+                        EParam(:gamma, Any[EIndex(:i)]),
+                    ]),
+                ),
+                EDiv(EConst(1.0), EAdd([EParam(:rhot, Any[EIndex(:i)]), ENeg(EConst(1.0))])),
+            ),
+        )
+        mcp_var = mcp ? EVar(:e, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:esupply, block=block.name,
-            payload=(indices=(i,), info="e/xxd = (pe/pd*(1-gamma)/gamma)^(1/(rhot-1))", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="e/xxd = (pe/pd*(1-gamma)/gamma)^(1/(rhot-1))", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3264,16 +4151,17 @@ function JCGECore.build!(block::ExportDemandBlock, ctx::JCGERuntime.KernelContex
         pwe0_i = JCGECore.getparam(block.params, :pwe0, i)
         eta_i = JCGECore.getparam(block.params, :eta, i)
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, e / e0_i - (pwe0_i / pwe) ^ eta_i)
-                constraint = mcp_constraint(model, expr, pwe)
-            else
-                constraint = @NLconstraint(model, e / e0_i == (pwe0_i / pwe) ^ eta_i)
-            end
-        end
+        expr = EEq(
+            EDiv(EVar(:e, Any[EIndex(:i)]), EParam(:e0, Any[EIndex(:i)])),
+            EPow(
+                EDiv(EParam(:pwe0, Any[EIndex(:i)]), EVar(:pwe, Any[EIndex(:i)])),
+                EParam(:eta, Any[EIndex(:i)]),
+            ),
+        )
+        mcp_var = mcp ? EVar(:pwe, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:edemand, block=block.name,
-            payload=(indices=(i,), info="e/e0 = (pwe0/pwe)^eta", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="e/e0 = (pwe0/pwe)^eta", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3290,27 +4178,23 @@ function JCGECore.build!(block::NontradedSupplyBlock, ctx::JCGERuntime.KernelCon
         p = ensure_var!(ctx, model, global_var(:p, i))
         px = ensure_var!(ctx, model, global_var(:px, i))
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, xxd - xd)
-                constraint = mcp_constraint(model, expr, pd)
-            else
-                constraint = @constraint(model, xxd == xd)
-            end
-        end
+        expr = EEq(
+            EVar(:xxd, Any[EIndex(:i)]),
+            EVar(:xd, Any[EIndex(:i)]),
+        )
+        mcp_var = mcp ? EVar(:pd, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:xxdsn, block=block.name,
-            payload=(indices=(i,), info="xxd = xd (nontraded)", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="xxd = xd (nontraded)", expr=expr, constraint=constraint, mcp_var=mcp_var))
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, x - xxd)
-                constraint = mcp_constraint(model, expr, px)
-            else
-                constraint = @constraint(model, x == xxd)
-            end
-        end
+        expr = EEq(
+            EVar(:x, Any[EIndex(:i)]),
+            EVar(:xxd, Any[EIndex(:i)]),
+        )
+        mcp_var = mcp ? EVar(:px, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:xsn, block=block.name,
-            payload=(indices=(i,), info="x = xxd (nontraded)", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="x = xxd (nontraded)", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3327,30 +4211,29 @@ function JCGECore.build!(block::HouseholdShareDemandBlock, ctx::JCGERuntime.Kern
         cd = ensure_var!(ctx, model, global_var(:cd, i))
         cles_i = JCGECore.getparam(block.params, :cles, i)
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, p * cd - cles_i * (1.0 - mps) * y)
-                constraint = mcp_constraint(model, expr, cd)
-            else
-                constraint = @NLconstraint(model, p * cd == cles_i * (1.0 - mps) * y)
-            end
-        end
+        expr = EEq(
+            EMul([EVar(:p, Any[EIndex(:i)]), EVar(:cd, Any[EIndex(:i)])]),
+            EMul([
+                EParam(:cles, Any[EIndex(:i)]),
+                EAdd([EConst(1.0), ENeg(EVar(:mps, Any[]))]),
+                EVar(:y, Any[]),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:cd, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:cdeq, block=block.name,
-            payload=(indices=(i,), info="p*cd = cles*(1-mps)*y", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="p*cd = cles*(1-mps)*y", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
 
     hhsav = ensure_var!(ctx, model, global_var(:hhsav))
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, hhsav - mps * y)
-            constraint = mcp_constraint(model, expr, hhsav)
-        else
-            constraint = @NLconstraint(model, hhsav == mps * y)
-        end
-    end
+    expr = EEq(
+        EVar(:hhsav, Any[]),
+        EMul([EVar(:mps, Any[]), EVar(:y, Any[])]),
+    )
+    mcp_var = mcp ? EVar(:hhsav, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:hhsaveq, block=block.name,
-        payload=(indices=(), info="hhsav = mps*y", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="hhsav = mps*y", expr=expr, constraint=constraint, mcp_var=mcp_var))
     return nothing
 end
 
@@ -3369,36 +4252,34 @@ function JCGECore.build!(block::HouseholdShareDemandHHBlock, ctx::JCGERuntime.Ke
     for i in commodities
         cles_vals = Dict(hh => JCGECore.getparam(block.params, :cles, i, hh) for hh in households)
         constraint = nothing
-        if model isa JuMP.Model
-            expr = @expression(
-                model,
-                p[i] * cd[i] - sum(cles_vals[hh] * (1.0 - mps[hh]) * yh[hh] * (1.0 - htax_vals[hh]) for hh in households)
-            )
-            if mcp
-                constraint = mcp_constraint(model, expr, cd[i])
-            else
-                constraint = @NLconstraint(model, expr == 0)
-            end
-        end
+        expr = EEq(
+            EMul([EVar(:p, Any[EIndex(:i)]), EVar(:cd, Any[EIndex(:i)])]),
+            ESum(:hh, households, EMul([
+                EParam(:cles, Any[EIndex(:i), EIndex(:hh)]),
+                EAdd([EConst(1.0), ENeg(EVar(:mps, Any[EIndex(:hh)]))]),
+                EVar(:yh, Any[EIndex(:hh)]),
+                EAdd([EConst(1.0), ENeg(EParam(:htax, Any[EIndex(:hh)]))]),
+            ])),
+        )
+        mcp_var = mcp ? EVar(:cd, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:cdeq, block=block.name,
-            payload=(indices=(i,), info="p*cd = sum(cles*(1-mps)*yh*(1-htax))", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="p*cd = sum(cles*(1-mps)*yh*(1-htax))", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
 
     hhsav = ensure_var!(ctx, model, global_var(:hhsav))
     constraint = nothing
-    if model isa JuMP.Model
-        expr = @expression(
-            model,
-            hhsav - sum(mps[hh] * yh[hh] * (1.0 - htax_vals[hh]) for hh in households)
-        )
-        if mcp
-            constraint = mcp_constraint(model, expr, hhsav)
-        else
-            constraint = @NLconstraint(model, expr == 0)
-        end
-    end
+    expr = EEq(
+        EVar(:hhsav, Any[]),
+        ESum(:hh, households, EMul([
+            EVar(:mps, Any[EIndex(:hh)]),
+            EVar(:yh, Any[EIndex(:hh)]),
+            EAdd([EConst(1.0), ENeg(EParam(:htax, Any[EIndex(:hh)]))]),
+        ])),
+    )
+    mcp_var = mcp ? EVar(:hhsav, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:hhsaveq, block=block.name,
-        payload=(indices=(), info="hhsav = sum(mps*yh*(1-htax))", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="hhsav = sum(mps*yh*(1-htax))", expr=expr, constraint=constraint, mcp_var=mcp_var))
     return nothing
 end
 
@@ -3425,32 +4306,42 @@ function JCGECore.build!(block::HouseholdIncomeLaborCapitalBlock, ctx::JCGERunti
     ypr = ensure_var!(ctx, model, global_var(:ypr))
 
     constraint = nothing
-    if model isa JuMP.Model
-        expr = @expression(model, yh[labor_hh] - sum(wa[lc] * ls[lc] for lc in labor) - remit * er)
-        if mcp
-            constraint = mcp_constraint(model, expr, yh[labor_hh])
-        else
-            constraint = @NLconstraint(model, expr == 0)
-        end
-    end
+    expr = EEq(
+        EVar(:yh, Any[labor_hh]),
+        EAdd([
+            ESum(:lc, labor, EMul([
+                EVar(:wa, Any[EIndex(:lc)]),
+                EVar(:ls, Any[EIndex(:lc)]),
+            ])),
+            EMul([EVar(:remit, Any[]), EVar(:er, Any[])]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:yh, Any[labor_hh]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:labory, block=block.name,
-        payload=(indices=(labor_hh,), info="yh[labor] = sum(wa*ls) + remit*er", constraint=constraint))
+        payload=(indices=(labor_hh,), params=_payload_params(block), index_names=(:hh,),
+            info="yh[labor] = sum(wa*ls) + remit*er", expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        expr = @expression(
-            model,
-            yh[capital_hh] - sum(pva[i] * xd[i] for i in activities) + deprecia +
-                sum(wa[lc] * ls[lc] for lc in labor) - fbor * er - ypr
-        )
-        if mcp
-            constraint = mcp_constraint(model, expr, yh[capital_hh])
-        else
-            constraint = @NLconstraint(model, expr == 0)
-        end
-    end
+    expr = EEq(
+        EVar(:yh, Any[capital_hh]),
+        EAdd([
+            ESum(:i, activities, EMul([
+                EVar(:pva, Any[EIndex(:i)]),
+                EVar(:xd, Any[EIndex(:i)]),
+            ])),
+            ENeg(EVar(:deprecia, Any[])),
+            ENeg(ESum(:lc, labor, EMul([
+                EVar(:wa, Any[EIndex(:lc)]),
+                EVar(:ls, Any[EIndex(:lc)]),
+            ]))),
+            EMul([EVar(:fbor, Any[]), EVar(:er, Any[])]),
+            EVar(:ypr, Any[]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:yh, Any[capital_hh]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:capitaly, block=block.name,
-        payload=(indices=(capital_hh,), info="yh[capital] = sum(pva*xd)-depr-sum(wa*ls)+fbor*er+ypr", constraint=constraint))
+        payload=(indices=(capital_hh,), params=_payload_params(block), index_names=(:hh,),
+            info="yh[capital] = sum(pva*xd)-depr-sum(wa*ls)+fbor*er+ypr", expr=expr, constraint=constraint, mcp_var=mcp_var))
     return nothing
 end
 
@@ -3464,16 +4355,16 @@ function JCGECore.build!(block::HouseholdTaxRevenueBlock, ctx::JCGERuntime.Kerne
     htax_vals = Dict(hh => JCGECore.getparam(block.params, :htax, hh) for hh in households)
 
     constraint = nothing
-    if model isa JuMP.Model
-        expr = @expression(model, tothhtax - sum(htax_vals[hh] * yh[hh] for hh in households))
-        if mcp
-            constraint = mcp_constraint(model, expr, tothhtax)
-        else
-            constraint = @constraint(model, expr == 0)
-        end
-    end
+    expr = EEq(
+        EVar(:tothhtax, Any[]),
+        ESum(:hh, households, EMul([
+            EParam(:htax, Any[EIndex(:hh)]),
+            EVar(:yh, Any[EIndex(:hh)]),
+        ])),
+    )
+    mcp_var = mcp ? EVar(:tothhtax, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:hhtaxdef, block=block.name,
-        payload=(indices=(), info="tothhtax = sum(htax*yh)", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="tothhtax = sum(htax*yh)", expr=expr, constraint=constraint, mcp_var=mcp_var))
     return nothing
 end
 
@@ -3485,16 +4376,13 @@ function JCGECore.build!(block::HouseholdIncomeSumBlock, ctx::JCGERuntime.Kernel
     y = ensure_var!(ctx, model, global_var(:y))
     yh = Dict(hh => ensure_var!(ctx, model, global_var(:yh, hh)) for hh in households)
     constraint = nothing
-    if model isa JuMP.Model
-        expr = @expression(model, y - sum(yh[hh] for hh in households))
-        if mcp
-            constraint = mcp_constraint(model, expr, y)
-        else
-            constraint = @constraint(model, expr == 0)
-        end
-    end
+    expr = EEq(
+        EVar(:y, Any[]),
+        ESum(:hh, households, EVar(:yh, Any[EIndex(:hh)])),
+    )
+    mcp_var = mcp ? EVar(:y, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:gdp, block=block.name,
-        payload=(indices=(), info="y = sum(yh)", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="y = sum(yh)", expr=expr, constraint=constraint, mcp_var=mcp_var))
     return nothing
 end
 
@@ -3507,16 +4395,14 @@ function JCGECore.build!(block::GovernmentShareDemandBlock, ctx::JCGERuntime.Ker
         gd = ensure_var!(ctx, model, global_var(:gd, i))
         gles_i = JCGECore.getparam(block.params, :gles, i)
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, gd - gles_i * gdtot)
-                constraint = mcp_constraint(model, expr, gd)
-            else
-                constraint = @constraint(model, gd == gles_i * gdtot)
-            end
-        end
+        expr = EEq(
+            EVar(:gd, Any[EIndex(:i)]),
+            EMul([EParam(:gles, Any[EIndex(:i)]), EVar(:gdtot, Any[])]),
+        )
+        mcp_var = mcp ? EVar(:gd, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:gdeq, block=block.name,
-            payload=(indices=(i,), info="gd = gles*gdtot", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="gd = gles*gdtot", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3530,16 +4416,14 @@ function JCGECore.build!(block::InventoryDemandBlock, ctx::JCGERuntime.KernelCon
         xd = ensure_var!(ctx, model, global_var(:xd, i))
         dstr_i = JCGECore.getparam(block.params, :dstr, i)
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, dst - dstr_i * xd)
-                constraint = mcp_constraint(model, expr, dst)
-            else
-                constraint = @constraint(model, dst == dstr_i * xd)
-            end
-        end
+        expr = EEq(
+            EVar(:dst, Any[EIndex(:i)]),
+            EMul([EParam(:dstr, Any[EIndex(:i)]), EVar(:xd, Any[EIndex(:i)])]),
+        )
+        mcp_var = mcp ? EVar(:dst, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:dsteq, block=block.name,
-            payload=(indices=(i,), info="dst = dstr*xd", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="dst = dstr*xd", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3571,67 +4455,76 @@ function JCGECore.build!(block::GovernmentFinanceBlock, ctx::JCGERuntime.KernelC
     gd_vars = Dict(i => ensure_var!(ctx, model, global_var(:gd, i)) for i in commodities)
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, tariff - sum(tm_vars[i] * m_vars[i] * pwm_vars[i] for i in traded) * er)
-            constraint = mcp_constraint(model, expr, tariff)
-        else
-            constraint = @NLconstraint(
-                model,
-                tariff == sum(tm_vars[i] * m_vars[i] * pwm_vars[i] for i in traded) * er
-            )
-        end
-    end
+    pwm_expr = hasproperty(block.params, :pwm) ? EParam(:pwm, Any[EIndex(:i)]) : EVar(:pwm, Any[EIndex(:i)])
+    expr = EEq(
+        EVar(:tariff, Any[]),
+        EMul([
+            ESum(:i, traded, EMul([
+                EVar(:tm, Any[EIndex(:i)]),
+                EVar(:m, Any[EIndex(:i)]),
+                pwm_expr,
+            ])),
+            EVar(:er, Any[]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:tariff, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:tariffdef, block=block.name,
-        payload=(indices=(), info="tariff = sum(tm*m*pwm)*er", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="tariff = sum(tm*m*pwm)*er",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, indtax - sum(itax_vals[i] * px_vars[i] * xd_vars[i] for i in commodities))
-            constraint = mcp_constraint(model, expr, indtax)
-        else
-            constraint = @NLconstraint(model, indtax == sum(itax_vals[i] * px_vars[i] * xd_vars[i] for i in commodities))
-        end
-    end
+    expr = EEq(
+        EVar(:indtax, Any[]),
+        ESum(:i, commodities, EMul([
+            EParam(:itax, Any[EIndex(:i)]),
+            EVar(:px, Any[EIndex(:i)]),
+            EVar(:xd, Any[EIndex(:i)]),
+        ])),
+    )
+    mcp_var = mcp ? EVar(:indtax, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:indtaxdef, block=block.name,
-        payload=(indices=(), info="indtax = sum(itax*px*xd)", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="indtax = sum(itax*px*xd)",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, duty - sum(te_vals[i] * e_vars[i] * pe_vars[i] for i in traded))
-            constraint = mcp_constraint(model, expr, duty)
-        else
-            constraint = @NLconstraint(model, duty == sum(te_vals[i] * e_vars[i] * pe_vars[i] for i in traded))
-        end
-    end
+    expr = EEq(
+        EVar(:duty, Any[]),
+        ESum(:i, traded, EMul([
+            EParam(:te, Any[EIndex(:i)]),
+            EVar(:e, Any[EIndex(:i)]),
+            EVar(:pe, Any[EIndex(:i)]),
+        ])),
+    )
+    mcp_var = mcp ? EVar(:duty, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:dutydef, block=block.name,
-        payload=(indices=(), info="duty = sum(te*e*pe)", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="duty = sum(te*e*pe)",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, gr - tariff - duty - indtax)
-            constraint = mcp_constraint(model, expr, gr)
-        else
-            constraint = @constraint(model, gr == tariff + duty + indtax)
-        end
-    end
+    expr = EEq(
+        EVar(:gr, Any[]),
+        EAdd([EVar(:tariff, Any[]), EVar(:duty, Any[]), EVar(:indtax, Any[])]),
+    )
+    mcp_var = mcp ? EVar(:gr, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:greq, block=block.name,
-        payload=(indices=(), info="gr = tariff + duty + indtax", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="gr = tariff + duty + indtax",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, gr - sum(p_vars[i] * gd_vars[i] for i in commodities) - govsav)
-            constraint = mcp_constraint(model, expr, govsav)
-        else
-            constraint = @NLconstraint(model, gr == sum(p_vars[i] * gd_vars[i] for i in commodities) + govsav)
-        end
-    end
+    expr = EEq(
+        EVar(:gr, Any[]),
+        EAdd([
+            ESum(:i, commodities, EMul([
+                EVar(:p, Any[EIndex(:i)]),
+                EVar(:gd, Any[EIndex(:i)]),
+            ])),
+            EVar(:govsav, Any[]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:govsav, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:gruse, block=block.name,
-        payload=(indices=(), info="gr = sum(p*gd) + govsav", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="gr = sum(p*gd) + govsav",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     return nothing
 end
@@ -3665,67 +4558,85 @@ function JCGECore.build!(block::GovernmentRevenueBlock, ctx::JCGERuntime.KernelC
     gd_vars = Dict(i => ensure_var!(ctx, model, global_var(:gd, i)) for i in commodities)
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, tariff - sum(tm_vars[i] * m_vars[i] * pwm_vars[i] for i in traded) * er)
-            constraint = mcp_constraint(model, expr, tariff)
-        else
-            constraint = @NLconstraint(
-                model,
-                tariff == sum(tm_vars[i] * m_vars[i] * pwm_vars[i] for i in traded) * er
-            )
-        end
-    end
+    pwm_expr = hasproperty(block.params, :pwm) ? EParam(:pwm, Any[EIndex(:i)]) : EVar(:pwm, Any[EIndex(:i)])
+    expr = EEq(
+        EVar(:tariff, Any[]),
+        EMul([
+            ESum(:i, traded, EMul([
+                EVar(:tm, Any[EIndex(:i)]),
+                EVar(:m, Any[EIndex(:i)]),
+                pwm_expr,
+            ])),
+            EVar(:er, Any[]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:tariff, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:tariffdef, block=block.name,
-        payload=(indices=(), info="tariff = sum(tm*m*pwm)*er", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="tariff = sum(tm*m*pwm)*er",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, indtax - sum(itax_vals[i] * px_vars[i] * xd_vars[i] for i in commodities))
-            constraint = mcp_constraint(model, expr, indtax)
-        else
-            constraint = @NLconstraint(model, indtax == sum(itax_vals[i] * px_vars[i] * xd_vars[i] for i in commodities))
-        end
-    end
+    expr = EEq(
+        EVar(:indtax, Any[]),
+        ESum(:i, commodities, EMul([
+            EParam(:itax, Any[EIndex(:i)]),
+            EVar(:px, Any[EIndex(:i)]),
+            EVar(:xd, Any[EIndex(:i)]),
+        ])),
+    )
+    mcp_var = mcp ? EVar(:indtax, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:indtaxdef, block=block.name,
-        payload=(indices=(), info="indtax = sum(itax*px*xd)", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="indtax = sum(itax*px*xd)",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, netsub - sum(te_vals[i] * e_vars[i] * pwe_vars[i] for i in traded) * er)
-            constraint = mcp_constraint(model, expr, netsub)
-        else
-            constraint = @NLconstraint(model, netsub == sum(te_vals[i] * e_vars[i] * pwe_vars[i] for i in traded) * er)
-        end
-    end
+    pwe_expr = hasproperty(block.params, :pwe) ? EParam(:pwe, Any[EIndex(:i)]) : EVar(:pwe, Any[EIndex(:i)])
+    expr = EEq(
+        EVar(:netsub, Any[]),
+        EMul([
+            ESum(:i, traded, EMul([
+                EParam(:te, Any[EIndex(:i)]),
+                EVar(:e, Any[EIndex(:i)]),
+                pwe_expr,
+            ])),
+            EVar(:er, Any[]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:netsub, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:netsubdef, block=block.name,
-        payload=(indices=(), info="netsub = sum(te*e*pwe)*er", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="netsub = sum(te*e*pwe)*er",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, gr - (tariff - netsub + indtax + tothhtax))
-            constraint = mcp_constraint(model, expr, gr)
-        else
-            constraint = @constraint(model, gr == tariff - netsub + indtax + tothhtax)
-        end
-    end
+    expr = EEq(
+        EVar(:gr, Any[]),
+        EAdd([
+            EVar(:tariff, Any[]),
+            ENeg(EVar(:netsub, Any[])),
+            EVar(:indtax, Any[]),
+            EVar(:tothhtax, Any[]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:gr, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:greq, block=block.name,
-        payload=(indices=(), info="gr = tariff - netsub + indtax + tothhtax", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="gr = tariff - netsub + indtax + tothhtax",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, gr - sum(p_vars[i] * gd_vars[i] for i in commodities) - govsav)
-            constraint = mcp_constraint(model, expr, govsav)
-        else
-            constraint = @NLconstraint(model, gr == sum(p_vars[i] * gd_vars[i] for i in commodities) + govsav)
-        end
-    end
+    expr = EEq(
+        EVar(:gr, Any[]),
+        EAdd([
+            ESum(:i, commodities, EMul([
+                EVar(:p, Any[EIndex(:i)]),
+                EVar(:gd, Any[EIndex(:i)]),
+            ])),
+            EVar(:govsav, Any[]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:govsav, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:gruse, block=block.name,
-        payload=(indices=(), info="gr = sum(p*gd) + govsav", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="gr = sum(p*gd) + govsav",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     return nothing
 end
@@ -3743,16 +4654,22 @@ function JCGECore.build!(block::ImportPremiumIncomeBlock, ctx::JCGERuntime.Kerne
     m_vars = Dict(i => ensure_var!(ctx, model, global_var(:m, i)) for i in traded)
 
     constraint = nothing
-    if model isa JuMP.Model
-        expr = @expression(model, ypr - sum(pwm_vars[i] * m_vars[i] for i in traded) * er * pr)
-        if mcp
-            constraint = mcp_constraint(model, expr, ypr)
-        else
-            constraint = @NLconstraint(model, expr == 0)
-        end
-    end
+    pwm_expr = hasproperty(block.params, :pwm) ? EParam(:pwm, Any[EIndex(:i)]) : EVar(:pwm, Any[EIndex(:i)])
+    expr = EEq(
+        EVar(:ypr, Any[]),
+        EMul([
+            ESum(:i, traded, EMul([
+                pwm_expr,
+                EVar(:m, Any[EIndex(:i)]),
+            ])),
+            EVar(:er, Any[]),
+            EVar(:pr, Any[]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:ypr, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:premium, block=block.name,
-        payload=(indices=(), info="ypr = sum(pwm*m)*er*pr", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="ypr = sum(pwm*m)*er*pr",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
     return nothing
 end
 
@@ -3765,18 +4682,20 @@ function JCGECore.build!(block::GDPIncomeBlock, ctx::JCGERuntime.KernelContext, 
     pva_vars = Dict(i => ensure_var!(ctx, model, global_var(:pva, i)) for i in activities)
     xd_vars = Dict(i => ensure_var!(ctx, model, global_var(:xd, i)) for i in activities)
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, y - sum(pva_vars[i] * xd_vars[i] for i in activities) + deprecia)
-            constraint = mcp_constraint(model, expr, y)
-        else
-            constraint = @NLconstraint(model,
-                y == sum(pva_vars[i] * xd_vars[i] for i in activities) - deprecia
-            )
-        end
-    end
+    expr = EEq(
+        EVar(:y, Any[]),
+        EAdd([
+            ESum(:i, activities, EMul([
+                EVar(:pva, Any[EIndex(:i)]),
+                EVar(:xd, Any[EIndex(:i)]),
+            ])),
+            ENeg(EVar(:deprecia, Any[])),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:y, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:gdp, block=block.name,
-        payload=(indices=(), info="y = sum(pva*xd) - deprecia", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="y = sum(pva*xd) - deprecia",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
     return nothing
 end
 
@@ -3802,71 +4721,71 @@ function JCGECore.build!(block::SavingsInvestmentBlock, ctx::JCGERuntime.KernelC
     p_vars = Dict(j => ensure_var!(ctx, model, global_var(:p, j)) for j in commodities)
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, deprecia - sum(depr_vals[i] * pk_vars[i] * k_vars[i] for i in activities))
-            constraint = mcp_constraint(model, expr, deprecia)
-        else
-            constraint = @NLconstraint(model,
-                deprecia == sum(depr_vals[i] * pk_vars[i] * k_vars[i] for i in activities)
-            )
-        end
-    end
+    expr = EEq(
+        EVar(:deprecia, Any[]),
+        ESum(:i, activities, EMul([
+            EParam(:depr, Any[EIndex(:i)]),
+            EVar(:pk, Any[EIndex(:i)]),
+            EVar(:k, Any[EIndex(:i)]),
+        ])),
+    )
+    mcp_var = mcp ? EVar(:deprecia, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:depreq, block=block.name,
-        payload=(indices=(), info="deprecia = sum(depr*pk*k)", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="deprecia = sum(depr*pk*k)",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     constraint = nothing
-    if model isa JuMP.Model
-        if mcp
-            expr = @expression(model, savings - (hhsav + govsav + deprecia + fsav * er))
-            constraint = mcp_constraint(model, expr, savings)
-        else
-            constraint = @NLconstraint(model, savings == hhsav + govsav + deprecia + fsav * er)
-        end
-    end
+    expr = EEq(
+        EVar(:savings, Any[]),
+        EAdd([
+            EVar(:hhsav, Any[]),
+            EVar(:govsav, Any[]),
+            EVar(:deprecia, Any[]),
+            EMul([EVar(:fsav, Any[]), EVar(:er, Any[])]),
+        ]),
+    )
+    mcp_var = mcp ? EVar(:savings, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:totsav, block=block.name,
-        payload=(indices=(), info="savings = hhsav + govsav + deprecia + fsav*er", constraint=constraint))
+        payload=(indices=(), params=_payload_params(block), info="savings = hhsav + govsav + deprecia + fsav*er",
+            expr=expr, constraint=constraint, mcp_var=mcp_var))
 
     for i in activities
         kio_i = JCGECore.getparam(block.params, :kio, i)
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(
-                    model,
-                    pk_vars[i] * dk_vars[i] - (kio_i * invest - kio_i * sum(dst_vars[j] * p_vars[j] for j in commodities))
-                )
-                constraint = mcp_constraint(model, expr, dk_vars[i])
-            else
-                constraint = @NLconstraint(
-                    model,
-                    pk_vars[i] * dk_vars[i] == kio_i * invest - kio_i * sum(dst_vars[j] * p_vars[j] for j in commodities)
-                )
-            end
-        end
+        invest_expr = use_invest ? EVar(:invest, Any[]) : EVar(:savings, Any[])
+        expr = EEq(
+            EMul([EVar(:pk, Any[EIndex(:i)]), EVar(:dk, Any[EIndex(:i)])]),
+            EAdd([
+                EMul([EParam(:kio, Any[EIndex(:i)]), invest_expr]),
+                ENeg(EMul([
+                    EParam(:kio, Any[EIndex(:i)]),
+                    ESum(:j, commodities, EMul([
+                        EVar(:dst, Any[EIndex(:j)]),
+                        EVar(:p, Any[EIndex(:j)]),
+                    ])),
+                ])),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:dk, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:prodinv, block=block.name,
-            payload=(indices=(i,), info="pk*dk = kio*invest - kio*sum(dst*p)", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="pk*dk = kio*invest - kio*sum(dst*p)", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
 
     for i in activities
         id = ensure_var!(ctx, model, global_var(:id, i))
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(
-                    model,
-                    id - sum(JCGECore.getparam(block.params, :imat, i, j) * dk_vars[j] for j in activities)
-                )
-                constraint = mcp_constraint(model, expr, id)
-            else
-                constraint = @constraint(
-                    model,
-                    id == sum(JCGECore.getparam(block.params, :imat, i, j) * dk_vars[j] for j in activities)
-                )
-            end
-        end
+        expr = EEq(
+            EVar(:id, Any[EIndex(:i)]),
+            ESum(:j, activities, EMul([
+                EParam(:imat, Any[EIndex(:i), EIndex(:j)]),
+                EVar(:dk, Any[EIndex(:j)]),
+            ])),
+        )
+        mcp_var = mcp ? EVar(:id, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:ieq, block=block.name,
-            payload=(indices=(i,), info="id[i] = sum(imat[i,j]*dk[j])", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="id[i] = sum(imat[i,j]*dk[j])", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
 
     return nothing
@@ -3884,16 +4803,20 @@ function JCGECore.build!(block::FinalDemandClearingBlock, ctx::JCGERuntime.Kerne
         id = ensure_var!(ctx, model, global_var(:id, i))
         dst = ensure_var!(ctx, model, global_var(:dst, i))
         constraint = nothing
-        if model isa JuMP.Model
-            if mcp
-                expr = @expression(model, x - int - cd - gd - id - dst)
-                constraint = mcp_constraint(model, expr, x)
-            else
-                constraint = @constraint(model, x == int + cd + gd + id + dst)
-            end
-        end
+        expr = EEq(
+            EVar(:x, Any[EIndex(:i)]),
+            EAdd([
+                EVar(:int, Any[EIndex(:i)]),
+                EVar(:cd, Any[EIndex(:i)]),
+                EVar(:gd, Any[EIndex(:i)]),
+                EVar(:id, Any[EIndex(:i)]),
+                EVar(:dst, Any[EIndex(:i)]),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:x, Any[EIndex(:i)]) : nothing
         JCGERuntime.register_equation!(ctx; tag=:equil, block=block.name,
-            payload=(indices=(i,), info="x = int + cd + gd + id + dst", constraint=constraint))
+            payload=(indices=(i,), params=_payload_params(block), index_names=(:i,),
+                info="x = int + cd + gd + id + dst", expr=expr, constraint=constraint, mcp_var=mcp_var))
     end
     return nothing
 end
@@ -3904,19 +4827,17 @@ function JCGECore.build!(block::ConsumptionObjectiveBlock, ctx::JCGERuntime.Kern
     mcp = mcp_enabled(block.params)
     omega = ensure_var!(ctx, model, global_var(:omega))
     cd = Dict(i => ensure_var!(ctx, model, global_var(:cd, i)) for i in commodities)
-    if model isa JuMP.Model
-        alpha_vals = Dict(i => JCGECore.getparam(block.params, :alpha, i) for i in commodities)
-        active = [i for i in commodities if alpha_vals[i] > 0.0]
-        if mcp
-            expr = @expression(model, omega - prod(cd[i] ^ alpha_vals[i] for i in active))
-            mcp_constraint(model, expr, omega)
-        else
-            @NLconstraint(model, omega == prod(cd[i] ^ alpha_vals[i] for i in active))
-            @NLobjective(model, Max, omega)
-        end
-    end
+    expr = EEq(
+        EVar(:omega, Any[]),
+        EProd(:i, commodities, EPow(
+            EVar(:cd, Any[EIndex(:i)]),
+            EParam(:alpha, Any[EIndex(:i)]),
+        )),
+    )
+    mcp_var = mcp ? EVar(:omega, Any[]) : nothing
     JCGERuntime.register_equation!(ctx; tag=:objective, block=block.name,
-        payload=(indices=(), info="omega = prod(cd^alpha)", constraint=nothing))
+        payload=(indices=(), params=_payload_params(block), info="omega = prod(cd^alpha)", expr=expr, constraint=nothing,
+            mcp_var=mcp_var, objective_expr=EVar(:omega, Any[]), objective_sense=:Max))
     return nothing
 end
 

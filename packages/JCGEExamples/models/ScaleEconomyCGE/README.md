@@ -8,3 +8,5 @@ GAMS source: `irscge.281`.
 
 Data:
 - `sam_2_2.csv`
+
+Equation dump is saved in `packages/JCGEExamples/models/ScaleEconomyCGE/equations.md`.

@@ -365,7 +365,7 @@ end
 baseline() = model()
 
 function solve(; optimizer=PATHSolver.Optimizer)
-    return JCGERuntime.run!(model(); optimizer=optimizer)
+    return JCGERuntime.run!(model(); optimizer=optimizer, compile_ast=true, compile_objective=false)
 end
 
 function scenario(name::Symbol)

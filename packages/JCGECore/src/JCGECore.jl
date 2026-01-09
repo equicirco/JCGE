@@ -6,6 +6,7 @@ export allowed_sections
 export AbstractBlock, calibrate!, build!, report
 export validate
 export getparam
+export EquationExpr, EIndex, EVar, EParam, EConst, EAdd, EMul, EPow, EDiv, ENeg, ESum, EProd, EEq, ERaw
 
 "Canonical set containers (minimal placeholder)."
 struct Sets
@@ -140,6 +141,73 @@ end
 
 "Abstract interface for model blocks."
 abstract type AbstractBlock end
+
+"Equation expression AST (backend-agnostic)."
+abstract type EquationExpr end
+
+struct EVar <: EquationExpr
+    name::Symbol
+    idxs::Union{Nothing,Vector{Any}}
+end
+
+struct EParam <: EquationExpr
+    name::Symbol
+    idxs::Union{Nothing,Vector{Any}}
+end
+
+struct EConst <: EquationExpr
+    value::Real
+end
+
+struct ERaw <: EquationExpr
+    text::String
+end
+
+struct EIndex <: EquationExpr
+    name::Symbol
+end
+
+struct EAdd <: EquationExpr
+    terms::Vector{EquationExpr}
+end
+
+struct EMul <: EquationExpr
+    factors::Vector{EquationExpr}
+end
+
+struct EPow <: EquationExpr
+    base::EquationExpr
+    exponent::EquationExpr
+end
+
+struct EDiv <: EquationExpr
+    numerator::EquationExpr
+    denominator::EquationExpr
+end
+
+struct ENeg <: EquationExpr
+    expr::EquationExpr
+end
+
+struct ESum <: EquationExpr
+    index::Symbol
+    domain::Vector{Symbol}
+    expr::EquationExpr
+end
+
+struct EProd <: EquationExpr
+    index::Symbol
+    domain::Vector{Symbol}
+    expr::EquationExpr
+end
+
+struct EEq <: EquationExpr
+    lhs::EquationExpr
+    rhs::EquationExpr
+end
+
+EVar(name::Symbol) = EVar(name, nothing)
+EParam(name::Symbol) = EParam(name, nothing)
 
 "Calibration hook (default: not implemented)."
 function calibrate!(block::AbstractBlock, data, benchmark, params)

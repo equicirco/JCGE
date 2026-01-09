@@ -6,3 +6,5 @@ Lewis, J., and Robinson, S., Chapter 11. In Chenery, H. B., Robinson, S., and Sy
 *Industrialization and Growth: A Comparative Study*. Oxford University Press, 1986.
 
 Source GAMS model: https://www.gams.com/latest/gamslib_ml/kormcp.130
+
+Equation dump is saved in `packages/JCGEExamples/models/KorMCP/equations.md`.

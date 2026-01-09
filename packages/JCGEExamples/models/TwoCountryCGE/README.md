@@ -6,3 +6,5 @@ Handbook of Computable General Equilibrium Modeling.
 University of Tokyo Press, Tokyo, Japan, 2004.
 
 This model uses the SAMs in `data/sam_jpn.csv` and `data/sam_usa.csv`.
+
+Equation dump is saved in `packages/JCGEExamples/models/TwoCountryCGE/equations.md`.

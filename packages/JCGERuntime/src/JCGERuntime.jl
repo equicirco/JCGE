@@ -5,6 +5,7 @@ using JuMP
 using JCGECore
 
 export KernelContext, register_variable!, register_equation!, list_equations
+export compile_equations!
 export equation_residuals, summarize_residuals, to_dualsignals
 export snapshot, snapshot_state
 export solve!
@@ -17,7 +18,8 @@ mutable struct KernelContext
     model::Union{JuMP.Model,Nothing}
 end
 
-KernelContext(; model::Union{JuMP.Model,Nothing}=nothing) = KernelContext(Dict{Symbol,Any}(), NamedTuple[], model)
+KernelContext(; model::Union{JuMP.Model,Nothing}=nothing) =
+    KernelContext(Dict{Symbol,Any}(), NamedTuple[], model)
 
 "Register a variable handle under a symbolic name."
 function register_variable!(ctx::KernelContext, name::Symbol, handle)
@@ -43,11 +45,16 @@ function solve!(ctx::KernelContext; optimizer=nothing)
     return model
 end
 
-function run!(spec; optimizer=nothing, dataset_id::String="jcge", tol::Real=1e-6, description::Union{String,Nothing}=nothing)
+function run!(spec; optimizer=nothing, dataset_id::String="jcge", tol::Real=1e-6,
+    description::Union{String,Nothing}=nothing, compile_ast::Bool=true, params=nothing,
+    compile_objective::Bool=true)
     model = JuMP.Model()
     ctx = KernelContext(model=model)
     for block in spec.model.blocks
         JCGECore.build!(block, ctx, spec)
+    end
+    if compile_ast
+        compile_equations!(ctx; params=params, compile_objective=compile_objective)
     end
     solve!(ctx; optimizer=optimizer)
     summary = summarize_residuals(ctx; tol=tol)
@@ -146,15 +153,15 @@ function to_dualsignals(ctx::KernelContext; dataset_id::String="jcge",
         if !haskey(components, component_id)
             components[component_id] = DualSignals.Component(
                 component_id=component_id,
-                component_type=DualSignals.ComponentType.other,
+                component_type=_component_type_enum(:other),
                 name=component_id,
             )
         end
         constraint_id = string(r.block, ":", r.tag, ":", join(string.(r.indices), ","))
         push!(constraints, DualSignals.Constraint(
             constraint_id=constraint_id,
-            kind=DualSignals.ConstraintKind.other,
-            sense=DualSignals.ConstraintSense.eq,
+            kind=_constraint_kind_enum(:other),
+            sense=_constraint_sense_enum(:eq),
             component_ids=[component_id],
         ))
         slack = abs(r.residual)
@@ -175,6 +182,228 @@ function to_dualsignals(ctx::KernelContext; dataset_id::String="jcge",
         constraint_solutions=solutions,
         variables=nothing,
     )
+end
+
+function _enum_by_name(::Type{T}, name::Symbol) where {T}
+    for val in Base.Enums.instances(T)
+        if string(val) == string(name)
+            return val
+        end
+    end
+    error("Unknown enum value $(name) for $(T)")
+end
+
+_component_type_enum(sym::Symbol) = _enum_by_name(DualSignals.ComponentType, sym)
+_constraint_kind_enum(sym::Symbol) = _enum_by_name(DualSignals.ConstraintKind, sym)
+_constraint_sense_enum(sym::Symbol) = _enum_by_name(DualSignals.ConstraintSense, sym)
+
+function compile_equations!(ctx::KernelContext; params=nothing, compile_objective::Bool=true)
+    model = ctx.model
+    model isa JuMP.Model || return ctx
+    local_objective = nothing
+    local_sense = nothing
+    for i in eachindex(ctx.equations)
+        eq = ctx.equations[i]
+        payload = eq.payload
+        if !(payload isa NamedTuple)
+            continue
+        end
+        expr = get(payload, :expr, nothing)
+        objective_expr = get(payload, :objective_expr, nothing)
+        objective_sense = get(payload, :objective_sense, nothing)
+        index_names = get(payload, :index_names, nothing)
+        indices = get(payload, :indices, ())
+        constraint = get(payload, :constraint, nothing)
+        if objective_expr !== nothing
+            if local_objective !== nothing
+                error("Multiple objectives registered; only one objective is supported.")
+            end
+            local_objective = (expr=objective_expr, index_names=index_names, indices=indices,
+                params=get(payload, :params, nothing))
+            local_sense = objective_sense === nothing ? :Max : objective_sense
+        end
+        if constraint !== nothing
+            continue
+        end
+        if expr isa JCGECore.EquationExpr && !(expr isa JCGECore.ERaw)
+            env = _index_env(index_names, indices)
+            local_params = params === nothing ? get(payload, :params, nothing) : params
+            mcp_var = get(payload, :mcp_var, nothing)
+            new_constraint = _compile_equation(expr, ctx, local_params, indices, env; mcp_var=mcp_var)
+            new_payload = merge(payload, (constraint=new_constraint,))
+            ctx.equations[i] = (tag=eq.tag, block=eq.block, payload=new_payload)
+        end
+    end
+    if local_objective !== nothing && compile_objective
+        _compile_objective!(ctx, local_objective; params=params, sense=local_sense)
+    end
+    return ctx
+end
+
+function _compile_equation(expr::JCGECore.EquationExpr, ctx::KernelContext, params, idxs, env::Dict{Symbol,Symbol}; mcp_var=nothing)
+    if expr isa JCGECore.EEq
+        lhs = _compile_expr(expr.lhs, ctx, params, idxs, env)
+        rhs = _compile_expr(expr.rhs, ctx, params, idxs, env)
+        if mcp_var !== nothing
+            var = _compile_mcp_var(mcp_var, ctx, params, idxs, env)
+            return @constraint(ctx.model, lhs - rhs ⟂ var)
+        end
+        return @constraint(ctx.model, lhs == rhs)
+    end
+    error("Unsupported equation expression: expected EEq, got $(typeof(expr))")
+end
+
+function _compile_objective!(ctx::KernelContext, objective; params=nothing, sense=:Max)
+    model = ctx.model
+    model isa JuMP.Model || return nothing
+    expr = objective.expr
+    index_names = objective.index_names
+    indices = objective.indices
+    env = _index_env(index_names, indices)
+    local_params = params === nothing ? objective.params : params
+    value = _compile_expr(expr, ctx, local_params, indices, env)
+    if sense == :Min
+        JuMP.@objective(model, Min, value)
+    elseif sense == :Max
+        JuMP.@objective(model, Max, value)
+    else
+        error("Unsupported objective sense: $(sense)")
+    end
+    return nothing
+end
+
+function _compile_expr(expr::JCGECore.EquationExpr, ctx::KernelContext, params, idxs, env::Dict{Symbol,Symbol})
+    if expr isa JCGECore.EVar
+        resolved = _resolve_indices(expr.idxs, idxs, env)
+        return _resolve_var(ctx, expr.name, resolved)
+    elseif expr isa JCGECore.EParam
+        resolved = _resolve_indices(expr.idxs, idxs, env)
+        return _resolve_param(params, expr.name, resolved)
+    elseif expr isa JCGECore.EConst
+        return expr.value
+    elseif expr isa JCGECore.ERaw
+        error("Cannot compile ERaw expression: $(expr.text)")
+    elseif expr isa JCGECore.EIndex
+        haskey(env, expr.name) || error("Unbound index: $(expr.name)")
+        return env[expr.name]
+    elseif expr isa JCGECore.EAdd
+        parts = map(t -> _compile_expr(t, ctx, params, idxs, env), expr.terms)
+        return sum(parts; init=0.0)
+    elseif expr isa JCGECore.EMul
+        parts = map(t -> _compile_expr(t, ctx, params, idxs, env), expr.factors)
+        return foldl(*, parts)
+    elseif expr isa JCGECore.EPow
+        base = _compile_expr(expr.base, ctx, params, idxs, env)
+        exponent = _compile_expr(expr.exponent, ctx, params, idxs, env)
+        return base ^ exponent
+    elseif expr isa JCGECore.EDiv
+        num = _compile_expr(expr.numerator, ctx, params, idxs, env)
+        den = _compile_expr(expr.denominator, ctx, params, idxs, env)
+        return num / den
+    elseif expr isa JCGECore.ENeg
+        inner = _compile_expr(expr.expr, ctx, params, idxs, env)
+        return -inner
+    elseif expr isa JCGECore.ESum
+        if isempty(expr.domain)
+            error("ESum domain is empty for index $(expr.index)")
+        end
+        parts = Vector{Any}()
+        for val in expr.domain
+            env[expr.index] = val
+            push!(parts, _compile_expr(expr.expr, ctx, params, idxs, env))
+        end
+        delete!(env, expr.index)
+        return sum(parts)
+    elseif expr isa JCGECore.EProd
+        if isempty(expr.domain)
+            error("EProd domain is empty for index $(expr.index)")
+        end
+        vals = Vector{Any}()
+        for val in expr.domain
+            env[expr.index] = val
+            push!(vals, _compile_expr(expr.expr, ctx, params, idxs, env))
+        end
+        delete!(env, expr.index)
+        return foldl(*, vals)
+    else
+        error("Unsupported expression type: $(typeof(expr))")
+    end
+end
+
+function _resolve_var(ctx::KernelContext, name::Symbol, idxs::Vector{Symbol})
+    var_name = isempty(idxs) ? name : _global_var(name, idxs...)
+    haskey(ctx.variables, var_name) || error("Missing variable: $(var_name)")
+    return ctx.variables[var_name]
+end
+
+function _compile_mcp_var(expr, ctx::KernelContext, params, idxs, env::Dict{Symbol,Symbol})
+    if expr isa JCGECore.EVar
+        resolved = _resolve_indices(expr.idxs, idxs, env)
+        return _resolve_var(ctx, expr.name, resolved)
+    elseif expr isa Symbol
+        return _resolve_var(ctx, expr, Symbol[])
+    else
+        error("Unsupported MCP variable expression: $(expr)")
+    end
+end
+
+function _resolve_param(params, name::Symbol, idxs::Vector{Symbol})
+    params === nothing && error("No params provided for parameter $(name)")
+    return JCGECore.getparam(params, name, idxs...)
+end
+
+function _global_var(base::Symbol, idxs::Symbol...)
+    if isempty(idxs)
+        return base
+    end
+    return Symbol(string(base), "_", join(string.(idxs), "_"))
+end
+
+function _resolve_indices(idxs, default_idxs, env::Dict{Symbol,Symbol})
+    if idxs === nothing
+        if default_idxs isa Tuple
+            return Symbol[default_idxs...]
+        elseif default_idxs isa AbstractVector
+            return Symbol[default_idxs...]
+        else
+            return Symbol[]
+        end
+    elseif isempty(idxs)
+        return Symbol[]
+    end
+    resolved = Symbol[]
+    for idx in idxs
+        if idx isa JCGECore.EIndex
+            haskey(env, idx.name) || error("Unbound index: $(idx.name)")
+            push!(resolved, env[idx.name])
+        elseif idx isa Symbol
+            push!(resolved, idx)
+        else
+            push!(resolved, Symbol(idx))
+        end
+    end
+    return resolved
+end
+
+function _index_env(index_names, indices)
+    env = Dict{Symbol,Symbol}()
+    if index_names === nothing
+        return env
+    end
+    if indices isa Tuple
+        values = collect(indices)
+    elseif indices isa AbstractVector
+        values = collect(indices)
+    else
+        values = Any[]
+    end
+    if length(index_names) != length(values)
+        return env
+    end
+    for (name, val) in zip(index_names, values)
+        env[Symbol(name)] = Symbol(val)
+    end
+    return env
 end
 
 end # module

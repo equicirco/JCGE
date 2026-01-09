@@ -22,3 +22,5 @@ results = DynCGE.run_recursive(periods=30)
 ```
 Between periods the runner updates `FF` (mobile factors), `KK`, `Xg`, and `Sf`,
 and keeps `PRICE` fixed at 1, matching the GAMS loop logic.
+
+Equation dump is saved in `packages/JCGEExamples/models/DynCGE/equations.md`.

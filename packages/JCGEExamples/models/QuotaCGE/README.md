@@ -8,3 +8,5 @@ GAMS source: `quocge.280`.
 
 Data:
 - `sam_2_2.csv`
+
+Equation dump is saved in `packages/JCGEExamples/models/QuotaCGE/equations.md`.

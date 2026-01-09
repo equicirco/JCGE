@@ -43,6 +43,7 @@ Rules:
 ## Development approach (near-term)
 - Use a known JuMP CGE model ported into `JCGEExamples` as a concrete target.
 - Fill missing framework capabilities only as demanded by that model (model-driven development).
+- Finish AST representation + compilation across blocks before starting Output steps 2 (results container) and 3 (SAM/IO reporting).
 
 ## Contracts (minimum interface)
 ### Run specification
@@ -129,6 +130,7 @@ JCGERuntime provides:
 - Every equation added by a block must be registered with at least:
   - `block` tag (`Symbol`)
   - `tag` (`Symbol`)
+  - `expr` (`EquationExpr` from JCGECore); if no structured AST is available yet, use `ERaw(info)` as a fallback
 - No “hidden equations”: all model-defining constraints must go through the registry.
 # RunSpec section skeleton (v0.1)
 - Models must assemble RunSpecs via **sections** using the canonical section names:
@@ -143,3 +145,9 @@ JCGERuntime provides:
 ## Model data and calibration (Non-negotiable)
 - All model inputs must come from CSV files and the calibration package; do not embed raw data in model source files.
 - Models may include small CSVs under their own `models/<ModelName>/data/` directory, loaded via JCGECalibrate.
+
+## Output reporting (SAM/IO)
+- JCGEOutput must support SAM/IO-style exports in two valuation modes:
+  - `:model`: numeraire-based values from solver output.
+  - `:baseline`: rescaled to real/base SAM values using calibration data (baseline prices).
+- Real-value reconstruction must use calibration objects from JCGECalibrate (e.g., `StartingValues` or baseline SAM), not ad hoc model logic.

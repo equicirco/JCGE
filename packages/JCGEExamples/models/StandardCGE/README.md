@@ -9,3 +9,5 @@ prod = JCGEBlocks.production(:prod, activities, factors, commodities; form=:cd_l
 hh = JCGEBlocks.household_demand(:household, Symbol[], commodities, factors; form=:cd, consumption_var=:Xp, params=params)
 util = JCGEBlocks.utility(:utility, Symbol[], commodities; form=:cd, consumption_var=:Xp, params=(alpha=params.alpha,))
 ```
+
+Equation dump is saved in `packages/JCGEExamples/models/StandardCGE/equations.md`.
