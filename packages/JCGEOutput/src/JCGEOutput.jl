@@ -1543,7 +1543,7 @@ function _render_symbol(name::Symbol, idxs::Union{Nothing,Vector{Any}}; format::
     end
     if format == :latex
         idx_text = join(map(idx -> _render_index(idx; format=format), idxs), ",")
-        return string("\\mathrm{", _latex_escape(string(name)), "}_{", idx_text, "}")
+        return string(_latex_escape(string(name)), "_{", idx_text, "}")
     end
     idx_text = join(map(idx -> _render_index(idx; format=format), idxs), ",")
     return string(name, "[", idx_text, "]")

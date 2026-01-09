@@ -2,7 +2,7 @@
 `prod.eqpy[AGR]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{b}_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {\mathrm{F}_{h,i}}^{beta_h,i}
+Y_{i} = b_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {F_{h,i}}^{beta_h,i}
 $$
 
 Domain h in { CAP, LAB }
@@ -10,49 +10,49 @@ Domain h in { CAP, LAB }
 `prod.eqF[CAP,AGR]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h,i}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h,i}
 $$
 
 `prod.eqF[LAB,AGR]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h,i}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h,i}
 $$
 
 `prod.eqX[AGR,AGR]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[LMN,AGR]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[HMN,AGR]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[SRV,AGR]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqY[AGR]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{ay}_{i} \cdot \mathrm{Z}_{i}
+Y_{i} = ay_{i} \cdot Z_{i}
 $$
 
 `prod.eqpzs[AGR]`
 
 $$
-\mathrm{pz}_{i} = \mathrm{ay}_{i} \cdot \mathrm{py}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{ax}_{j,i} \cdot \mathrm{pq}_{j}
+pz_{i} = ay_{i} \cdot py_{i} + \sum_{j \in \mathcal{D}_{j}} ax_{j,i} \cdot pq_{j}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -60,7 +60,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `prod.eqpy[LMN]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{b}_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {\mathrm{F}_{h,i}}^{beta_h,i}
+Y_{i} = b_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {F_{h,i}}^{beta_h,i}
 $$
 
 Domain h in { CAP, LAB }
@@ -68,49 +68,49 @@ Domain h in { CAP, LAB }
 `prod.eqF[CAP,LMN]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h,i}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h,i}
 $$
 
 `prod.eqF[LAB,LMN]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h,i}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h,i}
 $$
 
 `prod.eqX[AGR,LMN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[LMN,LMN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[HMN,LMN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[SRV,LMN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqY[LMN]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{ay}_{i} \cdot \mathrm{Z}_{i}
+Y_{i} = ay_{i} \cdot Z_{i}
 $$
 
 `prod.eqpzs[LMN]`
 
 $$
-\mathrm{pz}_{i} = \mathrm{ay}_{i} \cdot \mathrm{py}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{ax}_{j,i} \cdot \mathrm{pq}_{j}
+pz_{i} = ay_{i} \cdot py_{i} + \sum_{j \in \mathcal{D}_{j}} ax_{j,i} \cdot pq_{j}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -118,7 +118,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `prod.eqpy[HMN]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{b}_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {\mathrm{F}_{h,i}}^{beta_h,i}
+Y_{i} = b_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {F_{h,i}}^{beta_h,i}
 $$
 
 Domain h in { CAP, LAB }
@@ -126,49 +126,49 @@ Domain h in { CAP, LAB }
 `prod.eqF[CAP,HMN]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h,i}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h,i}
 $$
 
 `prod.eqF[LAB,HMN]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h,i}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h,i}
 $$
 
 `prod.eqX[AGR,HMN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[LMN,HMN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[HMN,HMN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[SRV,HMN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqY[HMN]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{ay}_{i} \cdot \mathrm{Z}_{i}
+Y_{i} = ay_{i} \cdot Z_{i}
 $$
 
 `prod.eqpzs[HMN]`
 
 $$
-\mathrm{pz}_{i} = \mathrm{ay}_{i} \cdot \mathrm{py}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{ax}_{j,i} \cdot \mathrm{pq}_{j}
+pz_{i} = ay_{i} \cdot py_{i} + \sum_{j \in \mathcal{D}_{j}} ax_{j,i} \cdot pq_{j}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -176,7 +176,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `prod.eqpy[SRV]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{b}_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {\mathrm{F}_{h,i}}^{beta_h,i}
+Y_{i} = b_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {F_{h,i}}^{beta_h,i}
 $$
 
 Domain h in { CAP, LAB }
@@ -184,49 +184,49 @@ Domain h in { CAP, LAB }
 `prod.eqF[CAP,SRV]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h,i}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h,i}
 $$
 
 `prod.eqF[LAB,SRV]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h,i}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h,i}
 $$
 
 `prod.eqX[AGR,SRV]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[LMN,SRV]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[HMN,SRV]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[SRV,SRV]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqY[SRV]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{ay}_{i} \cdot \mathrm{Z}_{i}
+Y_{i} = ay_{i} \cdot Z_{i}
 $$
 
 `prod.eqpzs[SRV]`
 
 $$
-\mathrm{pz}_{i} = \mathrm{ay}_{i} \cdot \mathrm{py}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{ax}_{j,i} \cdot \mathrm{pq}_{j}
+pz_{i} = ay_{i} \cdot py_{i} + \sum_{j \in \mathcal{D}_{j}} ax_{j,i} \cdot pq_{j}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -234,7 +234,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `mobile_factor.eqpf1[LAB]`
 
 $$
-\sum_{j \in \mathcal{D}_{j}} \mathrm{F}_{h,j} = \mathrm{FF}_{h}
+\sum_{j \in \mathcal{D}_{j}} F_{h,j} = FF_{h}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -242,97 +242,97 @@ Domain j in { AGR, LMN, HMN, SRV }
 `mobile_factor.eqpf2[LAB,LMN]`
 
 $$
-\mathrm{pf}_{h,j} = \mathrm{pf}_{h,\text{AGR}}
+pf_{h,j} = pf_{h,\text{AGR}}
 $$
 
 `mobile_factor.eqpf2[LAB,HMN]`
 
 $$
-\mathrm{pf}_{h,j} = \mathrm{pf}_{h,\text{AGR}}
+pf_{h,j} = pf_{h,\text{AGR}}
 $$
 
 `mobile_factor.eqpf2[LAB,SRV]`
 
 $$
-\mathrm{pf}_{h,j} = \mathrm{pf}_{h,\text{AGR}}
+pf_{h,j} = pf_{h,\text{AGR}}
 $$
 
 `capital.eqpf3[AGR]`
 
 $$
-\mathrm{F}_{\text{CAP},j} = ror \cdot \mathrm{KK}_{j}
+F_{\text{CAP},j} = ror \cdot KK_{j}
 $$
 
 `capital.eqpf3[LMN]`
 
 $$
-\mathrm{F}_{\text{CAP},j} = ror \cdot \mathrm{KK}_{j}
+F_{\text{CAP},j} = ror \cdot KK_{j}
 $$
 
 `capital.eqpf3[HMN]`
 
 $$
-\mathrm{F}_{\text{CAP},j} = ror \cdot \mathrm{KK}_{j}
+F_{\text{CAP},j} = ror \cdot KK_{j}
 $$
 
 `capital.eqpf3[SRV]`
 
 $$
-\mathrm{F}_{\text{CAP},j} = ror \cdot \mathrm{KK}_{j}
+F_{\text{CAP},j} = ror \cdot KK_{j}
 $$
 
 `government.eqTz[AGR]`
 
 $$
-\mathrm{Tz}_{i} = \mathrm{tauz}_{i} \cdot \mathrm{pz}_{i} \cdot \mathrm{Z}_{i}
+Tz_{i} = tauz_{i} \cdot pz_{i} \cdot Z_{i}
 $$
 
 `government.eqTm[AGR]`
 
 $$
-\mathrm{Tm}_{i} = \mathrm{taum}_{i} \cdot \mathrm{pm}_{i} \cdot \mathrm{M}_{i}
+Tm_{i} = taum_{i} \cdot pm_{i} \cdot M_{i}
 $$
 
 `government.eqTz[LMN]`
 
 $$
-\mathrm{Tz}_{i} = \mathrm{tauz}_{i} \cdot \mathrm{pz}_{i} \cdot \mathrm{Z}_{i}
+Tz_{i} = tauz_{i} \cdot pz_{i} \cdot Z_{i}
 $$
 
 `government.eqTm[LMN]`
 
 $$
-\mathrm{Tm}_{i} = \mathrm{taum}_{i} \cdot \mathrm{pm}_{i} \cdot \mathrm{M}_{i}
+Tm_{i} = taum_{i} \cdot pm_{i} \cdot M_{i}
 $$
 
 `government.eqTz[HMN]`
 
 $$
-\mathrm{Tz}_{i} = \mathrm{tauz}_{i} \cdot \mathrm{pz}_{i} \cdot \mathrm{Z}_{i}
+Tz_{i} = tauz_{i} \cdot pz_{i} \cdot Z_{i}
 $$
 
 `government.eqTm[HMN]`
 
 $$
-\mathrm{Tm}_{i} = \mathrm{taum}_{i} \cdot \mathrm{pm}_{i} \cdot \mathrm{M}_{i}
+Tm_{i} = taum_{i} \cdot pm_{i} \cdot M_{i}
 $$
 
 `government.eqTz[SRV]`
 
 $$
-\mathrm{Tz}_{i} = \mathrm{tauz}_{i} \cdot \mathrm{pz}_{i} \cdot \mathrm{Z}_{i}
+Tz_{i} = tauz_{i} \cdot pz_{i} \cdot Z_{i}
 $$
 
 `government.eqTm[SRV]`
 
 $$
-\mathrm{Tm}_{i} = \mathrm{taum}_{i} \cdot \mathrm{pm}_{i} \cdot \mathrm{M}_{i}
+Tm_{i} = taum_{i} \cdot pm_{i} \cdot M_{i}
 $$
 
 `government.eqTd`
 
 $$
-Td = \sum_{i \in \mathcal{D}_{i}} \mathrm{pq}_{i} \cdot \mathrm{Xg}_{i} - \sum_{i \in \mathcal{D}_{i}} \mathrm{Tz}_{i} - \sum_{i \in \mathcal{D}_{i}} \mathrm{Tm}_{i}
+Td = \sum_{i \in \mathcal{D}_{i}} pq_{i} \cdot Xg_{i} - \sum_{i \in \mathcal{D}_{i}} Tz_{i} - \sum_{i \in \mathcal{D}_{i}} Tm_{i}
 $$
 
 Domain i in { AGR, LMN, HMN, SRV }
@@ -342,7 +342,7 @@ Domain i in { AGR, LMN, HMN, SRV }
 `private_saving.eqSp`
 
 $$
-Sp = ssp \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} \mathrm{pf}_{h,j} \cdot \mathrm{F}_{h,j} - Td)
+Sp = ssp \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} pf_{h,j} \cdot F_{h,j} - Td)
 $$
 
 Domain h in { CAP, LAB }
@@ -351,7 +351,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `investment.eqXv[AGR]`
 
 $$
-\mathrm{Xv}_{i} = \mathrm{lambda}_{i} \cdot pk \cdot \sum_{j \in \mathcal{D}_{j}} \mathrm{II}_{j} / \mathrm{pq}_{i}
+Xv_{i} = lambda_{i} \cdot pk \cdot \sum_{j \in \mathcal{D}_{j}} II_{j} / pq_{i}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -359,7 +359,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `investment.eqXv[LMN]`
 
 $$
-\mathrm{Xv}_{i} = \mathrm{lambda}_{i} \cdot pk \cdot \sum_{j \in \mathcal{D}_{j}} \mathrm{II}_{j} / \mathrm{pq}_{i}
+Xv_{i} = lambda_{i} \cdot pk \cdot \sum_{j \in \mathcal{D}_{j}} II_{j} / pq_{i}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -367,7 +367,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `investment.eqXv[HMN]`
 
 $$
-\mathrm{Xv}_{i} = \mathrm{lambda}_{i} \cdot pk \cdot \sum_{j \in \mathcal{D}_{j}} \mathrm{II}_{j} / \mathrm{pq}_{i}
+Xv_{i} = lambda_{i} \cdot pk \cdot \sum_{j \in \mathcal{D}_{j}} II_{j} / pq_{i}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -375,7 +375,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `investment.eqXv[SRV]`
 
 $$
-\mathrm{Xv}_{i} = \mathrm{lambda}_{i} \cdot pk \cdot \sum_{j \in \mathcal{D}_{j}} \mathrm{II}_{j} / \mathrm{pq}_{i}
+Xv_{i} = lambda_{i} \cdot pk \cdot \sum_{j \in \mathcal{D}_{j}} II_{j} / pq_{i}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -383,7 +383,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `investment.eqIII`
 
 $$
-III = iota \cdot \prod_{i \in \mathcal{D}_{i}} {\mathrm{Xv}_{i}}^{lambda_i}
+III = iota \cdot \prod_{i \in \mathcal{D}_{i}} {Xv_{i}}^{lambda_i}
 $$
 
 Domain i in { AGR, LMN, HMN, SRV }
@@ -391,7 +391,7 @@ Domain i in { AGR, LMN, HMN, SRV }
 `investment.eqpk`
 
 $$
-\sum_{j \in \mathcal{D}_{j}} \mathrm{II}_{j} = III
+\sum_{j \in \mathcal{D}_{j}} II_{j} = III
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -399,7 +399,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `investment_alloc.eqII[AGR]`
 
 $$
-pk \cdot \mathrm{II}_{j} = ({\mathrm{pf}_{\text{CAP},j}}^{zeta} \cdot \mathrm{F}_{\text{CAP},j} / \sum_{k \in \mathcal{D}_{k}} {\mathrm{pf}_{\text{CAP},k}}^{zeta} \cdot \mathrm{F}_{\text{CAP},k}) \cdot (Sp + epsilon \cdot Sf)
+pk \cdot II_{j} = ({pf_{\text{CAP},j}}^{zeta} \cdot F_{\text{CAP},j} / \sum_{k \in \mathcal{D}_{k}} {pf_{\text{CAP},k}}^{zeta} \cdot F_{\text{CAP},k}) \cdot (Sp + epsilon \cdot Sf)
 $$
 
 Domain k in { AGR, LMN, HMN, SRV }
@@ -407,7 +407,7 @@ Domain k in { AGR, LMN, HMN, SRV }
 `investment_alloc.eqII[LMN]`
 
 $$
-pk \cdot \mathrm{II}_{j} = ({\mathrm{pf}_{\text{CAP},j}}^{zeta} \cdot \mathrm{F}_{\text{CAP},j} / \sum_{k \in \mathcal{D}_{k}} {\mathrm{pf}_{\text{CAP},k}}^{zeta} \cdot \mathrm{F}_{\text{CAP},k}) \cdot (Sp + epsilon \cdot Sf)
+pk \cdot II_{j} = ({pf_{\text{CAP},j}}^{zeta} \cdot F_{\text{CAP},j} / \sum_{k \in \mathcal{D}_{k}} {pf_{\text{CAP},k}}^{zeta} \cdot F_{\text{CAP},k}) \cdot (Sp + epsilon \cdot Sf)
 $$
 
 Domain k in { AGR, LMN, HMN, SRV }
@@ -415,7 +415,7 @@ Domain k in { AGR, LMN, HMN, SRV }
 `investment_alloc.eqII[HMN]`
 
 $$
-pk \cdot \mathrm{II}_{j} = ({\mathrm{pf}_{\text{CAP},j}}^{zeta} \cdot \mathrm{F}_{\text{CAP},j} / \sum_{k \in \mathcal{D}_{k}} {\mathrm{pf}_{\text{CAP},k}}^{zeta} \cdot \mathrm{F}_{\text{CAP},k}) \cdot (Sp + epsilon \cdot Sf)
+pk \cdot II_{j} = ({pf_{\text{CAP},j}}^{zeta} \cdot F_{\text{CAP},j} / \sum_{k \in \mathcal{D}_{k}} {pf_{\text{CAP},k}}^{zeta} \cdot F_{\text{CAP},k}) \cdot (Sp + epsilon \cdot Sf)
 $$
 
 Domain k in { AGR, LMN, HMN, SRV }
@@ -423,7 +423,7 @@ Domain k in { AGR, LMN, HMN, SRV }
 `investment_alloc.eqII[SRV]`
 
 $$
-pk \cdot \mathrm{II}_{j} = ({\mathrm{pf}_{\text{CAP},j}}^{zeta} \cdot \mathrm{F}_{\text{CAP},j} / \sum_{k \in \mathcal{D}_{k}} {\mathrm{pf}_{\text{CAP},k}}^{zeta} \cdot \mathrm{F}_{\text{CAP},k}) \cdot (Sp + epsilon \cdot Sf)
+pk \cdot II_{j} = ({pf_{\text{CAP},j}}^{zeta} \cdot F_{\text{CAP},j} / \sum_{k \in \mathcal{D}_{k}} {pf_{\text{CAP},k}}^{zeta} \cdot F_{\text{CAP},k}) \cdot (Sp + epsilon \cdot Sf)
 $$
 
 Domain k in { AGR, LMN, HMN, SRV }
@@ -431,7 +431,7 @@ Domain k in { AGR, LMN, HMN, SRV }
 `household.eqXp[AGR]`
 
 $$
-\mathrm{Xp}_{i} = \mathrm{alpha}_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} \mathrm{pf}_{h,j} \cdot \mathrm{F}_{h,j} - Sp - Td) / \mathrm{pq}_{i}
+Xp_{i} = alpha_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} pf_{h,j} \cdot F_{h,j} - Sp - Td) / pq_{i}
 $$
 
 Domain h in { CAP, LAB }
@@ -440,7 +440,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `household.eqXp[LMN]`
 
 $$
-\mathrm{Xp}_{i} = \mathrm{alpha}_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} \mathrm{pf}_{h,j} \cdot \mathrm{F}_{h,j} - Sp - Td) / \mathrm{pq}_{i}
+Xp_{i} = alpha_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} pf_{h,j} \cdot F_{h,j} - Sp - Td) / pq_{i}
 $$
 
 Domain h in { CAP, LAB }
@@ -449,7 +449,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `household.eqXp[HMN]`
 
 $$
-\mathrm{Xp}_{i} = \mathrm{alpha}_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} \mathrm{pf}_{h,j} \cdot \mathrm{F}_{h,j} - Sp - Td) / \mathrm{pq}_{i}
+Xp_{i} = alpha_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} pf_{h,j} \cdot F_{h,j} - Sp - Td) / pq_{i}
 $$
 
 Domain h in { CAP, LAB }
@@ -458,7 +458,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `household.eqXp[SRV]`
 
 $$
-\mathrm{Xp}_{i} = \mathrm{alpha}_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} \mathrm{pf}_{h,j} \cdot \mathrm{F}_{h,j} - Sp - Td) / \mathrm{pq}_{i}
+Xp_{i} = alpha_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \sum_{j \in \mathcal{D}_{j}} pf_{h,j} \cdot F_{h,j} - Sp - Td) / pq_{i}
 $$
 
 Domain h in { CAP, LAB }
@@ -467,55 +467,55 @@ Domain j in { AGR, LMN, HMN, SRV }
 `prices.eqpe[AGR]`
 
 $$
-\mathrm{pe}_{i} = epsilon \cdot \mathrm{pWe}_{i}
+pe_{i} = epsilon \cdot pWe_{i}
 $$
 
 `prices.eqpm[AGR]`
 
 $$
-\mathrm{pm}_{i} = epsilon \cdot \mathrm{pWm}_{i}
+pm_{i} = epsilon \cdot pWm_{i}
 $$
 
 `prices.eqpe[LMN]`
 
 $$
-\mathrm{pe}_{i} = epsilon \cdot \mathrm{pWe}_{i}
+pe_{i} = epsilon \cdot pWe_{i}
 $$
 
 `prices.eqpm[LMN]`
 
 $$
-\mathrm{pm}_{i} = epsilon \cdot \mathrm{pWm}_{i}
+pm_{i} = epsilon \cdot pWm_{i}
 $$
 
 `prices.eqpe[HMN]`
 
 $$
-\mathrm{pe}_{i} = epsilon \cdot \mathrm{pWe}_{i}
+pe_{i} = epsilon \cdot pWe_{i}
 $$
 
 `prices.eqpm[HMN]`
 
 $$
-\mathrm{pm}_{i} = epsilon \cdot \mathrm{pWm}_{i}
+pm_{i} = epsilon \cdot pWm_{i}
 $$
 
 `prices.eqpe[SRV]`
 
 $$
-\mathrm{pe}_{i} = epsilon \cdot \mathrm{pWe}_{i}
+pe_{i} = epsilon \cdot pWe_{i}
 $$
 
 `prices.eqpm[SRV]`
 
 $$
-\mathrm{pm}_{i} = epsilon \cdot \mathrm{pWm}_{i}
+pm_{i} = epsilon \cdot pWm_{i}
 $$
 
 `price_level.eqPRICE`
 
 $$
-PRICE = \sum_{i \in \mathcal{D}_{i}} \mathrm{pq}_{i} \cdot \mathrm{w}_{i}
+PRICE = \sum_{i \in \mathcal{D}_{i}} pq_{i} \cdot w_{i}
 $$
 
 Domain i in { AGR, LMN, HMN, SRV }
@@ -523,7 +523,7 @@ Domain i in { AGR, LMN, HMN, SRV }
 `bop.eqBOP`
 
 $$
-\sum_{i \in \mathcal{D}_{i}} \mathrm{pWe}_{i} \cdot \mathrm{E}_{i} + Sf = \sum_{i \in \mathcal{D}_{i}} \mathrm{pWm}_{i} \cdot \mathrm{M}_{i}
+\sum_{i \in \mathcal{D}_{i}} pWe_{i} \cdot E_{i} + Sf = \sum_{i \in \mathcal{D}_{i}} pWm_{i} \cdot M_{i}
 $$
 
 Domain i in { AGR, LMN, HMN, SRV }
@@ -532,151 +532,151 @@ Domain i in { AGR, LMN, HMN, SRV }
 `armington.eqQ[AGR]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{gamma}_{i} \cdot (\mathrm{delta\_m}_{i} \cdot {\mathrm{M}_{i}}^{eta_i} + \mathrm{delta\_d}_{i} \cdot {\mathrm{D}_{i}}^{eta_i})^{1/(eta_i)}
+Q_{i} = gamma_{i} \cdot (delta\_m_{i} \cdot {M_{i}}^{eta_i} + delta\_d_{i} \cdot {D_{i}}^{eta_i})^{1/(eta_i)}
 $$
 
 `armington.eqM[AGR]`
 
 $$
-\mathrm{M}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_m}_{i} \cdot \mathrm{pq}_{i} / (1 + 0 + \mathrm{tau\_m}_{i}) \cdot \mathrm{pm}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+M_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_m_{i} \cdot pq_{i} / (1 + 0 + tau\_m_{i}) \cdot pm_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqD[AGR]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_d}_{i} \cdot \mathrm{pq}_{i} / 1 \cdot \mathrm{pd}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+D_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_d_{i} \cdot pq_{i} / 1 \cdot pd_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqQ[LMN]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{gamma}_{i} \cdot (\mathrm{delta\_m}_{i} \cdot {\mathrm{M}_{i}}^{eta_i} + \mathrm{delta\_d}_{i} \cdot {\mathrm{D}_{i}}^{eta_i})^{1/(eta_i)}
+Q_{i} = gamma_{i} \cdot (delta\_m_{i} \cdot {M_{i}}^{eta_i} + delta\_d_{i} \cdot {D_{i}}^{eta_i})^{1/(eta_i)}
 $$
 
 `armington.eqM[LMN]`
 
 $$
-\mathrm{M}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_m}_{i} \cdot \mathrm{pq}_{i} / (1 + 0 + \mathrm{tau\_m}_{i}) \cdot \mathrm{pm}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+M_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_m_{i} \cdot pq_{i} / (1 + 0 + tau\_m_{i}) \cdot pm_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqD[LMN]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_d}_{i} \cdot \mathrm{pq}_{i} / 1 \cdot \mathrm{pd}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+D_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_d_{i} \cdot pq_{i} / 1 \cdot pd_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqQ[HMN]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{gamma}_{i} \cdot (\mathrm{delta\_m}_{i} \cdot {\mathrm{M}_{i}}^{eta_i} + \mathrm{delta\_d}_{i} \cdot {\mathrm{D}_{i}}^{eta_i})^{1/(eta_i)}
+Q_{i} = gamma_{i} \cdot (delta\_m_{i} \cdot {M_{i}}^{eta_i} + delta\_d_{i} \cdot {D_{i}}^{eta_i})^{1/(eta_i)}
 $$
 
 `armington.eqM[HMN]`
 
 $$
-\mathrm{M}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_m}_{i} \cdot \mathrm{pq}_{i} / (1 + 0 + \mathrm{tau\_m}_{i}) \cdot \mathrm{pm}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+M_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_m_{i} \cdot pq_{i} / (1 + 0 + tau\_m_{i}) \cdot pm_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqD[HMN]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_d}_{i} \cdot \mathrm{pq}_{i} / 1 \cdot \mathrm{pd}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+D_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_d_{i} \cdot pq_{i} / 1 \cdot pd_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqQ[SRV]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{gamma}_{i} \cdot (\mathrm{delta\_m}_{i} \cdot {\mathrm{M}_{i}}^{eta_i} + \mathrm{delta\_d}_{i} \cdot {\mathrm{D}_{i}}^{eta_i})^{1/(eta_i)}
+Q_{i} = gamma_{i} \cdot (delta\_m_{i} \cdot {M_{i}}^{eta_i} + delta\_d_{i} \cdot {D_{i}}^{eta_i})^{1/(eta_i)}
 $$
 
 `armington.eqM[SRV]`
 
 $$
-\mathrm{M}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_m}_{i} \cdot \mathrm{pq}_{i} / (1 + 0 + \mathrm{tau\_m}_{i}) \cdot \mathrm{pm}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+M_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_m_{i} \cdot pq_{i} / (1 + 0 + tau\_m_{i}) \cdot pm_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqD[SRV]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_d}_{i} \cdot \mathrm{pq}_{i} / 1 \cdot \mathrm{pd}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+D_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_d_{i} \cdot pq_{i} / 1 \cdot pd_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `transformation.eqZ[AGR]`
 
 $$
-\mathrm{Z}_{i} = \mathrm{theta}_{i} \cdot (\mathrm{xie}_{i} \cdot {\mathrm{E}_{i}}^{phi_i} + \mathrm{xid}_{i} \cdot {\mathrm{D}_{i}}^{phi_i})^{1/(phi_i)}
+Z_{i} = theta_{i} \cdot (xie_{i} \cdot {E_{i}}^{phi_i} + xid_{i} \cdot {D_{i}}^{phi_i})^{1/(phi_i)}
 $$
 
 `transformation.eqE[AGR]`
 
 $$
-\mathrm{E}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xie}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pe}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+E_{i} = ({theta_{i}}^{phi_i} \cdot xie_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pe_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqDs[AGR]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xid}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pd}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+D_{i} = ({theta_{i}}^{phi_i} \cdot xid_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pd_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqZ[LMN]`
 
 $$
-\mathrm{Z}_{i} = \mathrm{theta}_{i} \cdot (\mathrm{xie}_{i} \cdot {\mathrm{E}_{i}}^{phi_i} + \mathrm{xid}_{i} \cdot {\mathrm{D}_{i}}^{phi_i})^{1/(phi_i)}
+Z_{i} = theta_{i} \cdot (xie_{i} \cdot {E_{i}}^{phi_i} + xid_{i} \cdot {D_{i}}^{phi_i})^{1/(phi_i)}
 $$
 
 `transformation.eqE[LMN]`
 
 $$
-\mathrm{E}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xie}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pe}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+E_{i} = ({theta_{i}}^{phi_i} \cdot xie_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pe_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqDs[LMN]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xid}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pd}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+D_{i} = ({theta_{i}}^{phi_i} \cdot xid_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pd_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqZ[HMN]`
 
 $$
-\mathrm{Z}_{i} = \mathrm{theta}_{i} \cdot (\mathrm{xie}_{i} \cdot {\mathrm{E}_{i}}^{phi_i} + \mathrm{xid}_{i} \cdot {\mathrm{D}_{i}}^{phi_i})^{1/(phi_i)}
+Z_{i} = theta_{i} \cdot (xie_{i} \cdot {E_{i}}^{phi_i} + xid_{i} \cdot {D_{i}}^{phi_i})^{1/(phi_i)}
 $$
 
 `transformation.eqE[HMN]`
 
 $$
-\mathrm{E}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xie}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pe}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+E_{i} = ({theta_{i}}^{phi_i} \cdot xie_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pe_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqDs[HMN]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xid}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pd}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+D_{i} = ({theta_{i}}^{phi_i} \cdot xid_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pd_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqZ[SRV]`
 
 $$
-\mathrm{Z}_{i} = \mathrm{theta}_{i} \cdot (\mathrm{xie}_{i} \cdot {\mathrm{E}_{i}}^{phi_i} + \mathrm{xid}_{i} \cdot {\mathrm{D}_{i}}^{phi_i})^{1/(phi_i)}
+Z_{i} = theta_{i} \cdot (xie_{i} \cdot {E_{i}}^{phi_i} + xid_{i} \cdot {D_{i}}^{phi_i})^{1/(phi_i)}
 $$
 
 `transformation.eqE[SRV]`
 
 $$
-\mathrm{E}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xie}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pe}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+E_{i} = ({theta_{i}}^{phi_i} \cdot xie_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pe_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqDs[SRV]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xid}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pd}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+D_{i} = ({theta_{i}}^{phi_i} \cdot xid_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pd_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `market.eqQ[AGR]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{Xp}_{i} + \mathrm{Xg}_{i} + \mathrm{Xv}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{X}_{i,j}
+Q_{i} = Xp_{i} + Xg_{i} + Xv_{i} + \sum_{j \in \mathcal{D}_{j}} X_{i,j}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -684,7 +684,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `market.eqQ[LMN]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{Xp}_{i} + \mathrm{Xg}_{i} + \mathrm{Xv}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{X}_{i,j}
+Q_{i} = Xp_{i} + Xg_{i} + Xv_{i} + \sum_{j \in \mathcal{D}_{j}} X_{i,j}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -692,7 +692,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `market.eqQ[HMN]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{Xp}_{i} + \mathrm{Xg}_{i} + \mathrm{Xv}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{X}_{i,j}
+Q_{i} = Xp_{i} + Xg_{i} + Xv_{i} + \sum_{j \in \mathcal{D}_{j}} X_{i,j}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -700,7 +700,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `market.eqQ[SRV]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{Xp}_{i} + \mathrm{Xg}_{i} + \mathrm{Xv}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{X}_{i,j}
+Q_{i} = Xp_{i} + Xg_{i} + Xv_{i} + \sum_{j \in \mathcal{D}_{j}} X_{i,j}
 $$
 
 Domain j in { AGR, LMN, HMN, SRV }
@@ -708,7 +708,7 @@ Domain j in { AGR, LMN, HMN, SRV }
 `utility.eqCC`
 
 $$
-CC = a \cdot \prod_{i \in \mathcal{D}_{i}} {\mathrm{Xp}_{i}}^{alpha_i}
+CC = a \cdot \prod_{i \in \mathcal{D}_{i}} {Xp_{i}}^{alpha_i}
 $$
 
 Domain i in { AGR, LMN, HMN, SRV }

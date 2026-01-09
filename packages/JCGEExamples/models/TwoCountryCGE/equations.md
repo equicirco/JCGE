@@ -2,7 +2,7 @@
 `prod.eqpy[BRD_JPN]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{b}_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {\mathrm{F}_{h,i}}^{beta_h,i}
+Y_{i} = b_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {F_{h,i}}^{beta_h,i}
 $$
 
 Domain h in { CAP_JPN, LAB_JPN }
@@ -10,37 +10,37 @@ Domain h in { CAP_JPN, LAB_JPN }
 `prod.eqF[CAP_JPN,BRD_JPN]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h}
 $$
 
 `prod.eqF[LAB_JPN,BRD_JPN]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h}
 $$
 
 `prod.eqX[BRD_JPN,BRD_JPN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[MLK_JPN,BRD_JPN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqY[BRD_JPN]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{ay}_{i} \cdot \mathrm{Z}_{i}
+Y_{i} = ay_{i} \cdot Z_{i}
 $$
 
 `prod.eqpzs[BRD_JPN]`
 
 $$
-\mathrm{pz}_{i} = \mathrm{ay}_{i} \cdot \mathrm{py}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{ax}_{j,i} \cdot \mathrm{pq}_{j} + 0
+pz_{i} = ay_{i} \cdot py_{i} + \sum_{j \in \mathcal{D}_{j}} ax_{j,i} \cdot pq_{j} + 0
 $$
 
 Domain j in { BRD_JPN, MLK_JPN }
@@ -48,7 +48,7 @@ Domain j in { BRD_JPN, MLK_JPN }
 `prod.eqpy[MLK_JPN]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{b}_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {\mathrm{F}_{h,i}}^{beta_h,i}
+Y_{i} = b_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {F_{h,i}}^{beta_h,i}
 $$
 
 Domain h in { CAP_JPN, LAB_JPN }
@@ -56,37 +56,37 @@ Domain h in { CAP_JPN, LAB_JPN }
 `prod.eqF[CAP_JPN,MLK_JPN]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h}
 $$
 
 `prod.eqF[LAB_JPN,MLK_JPN]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h}
 $$
 
 `prod.eqX[BRD_JPN,MLK_JPN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[MLK_JPN,MLK_JPN]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqY[MLK_JPN]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{ay}_{i} \cdot \mathrm{Z}_{i}
+Y_{i} = ay_{i} \cdot Z_{i}
 $$
 
 `prod.eqpzs[MLK_JPN]`
 
 $$
-\mathrm{pz}_{i} = \mathrm{ay}_{i} \cdot \mathrm{py}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{ax}_{j,i} \cdot \mathrm{pq}_{j} + 0
+pz_{i} = ay_{i} \cdot py_{i} + \sum_{j \in \mathcal{D}_{j}} ax_{j,i} \cdot pq_{j} + 0
 $$
 
 Domain j in { BRD_JPN, MLK_JPN }
@@ -94,7 +94,7 @@ Domain j in { BRD_JPN, MLK_JPN }
 `prod.eqpy[BRD_USA]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{b}_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {\mathrm{F}_{h,i}}^{beta_h,i}
+Y_{i} = b_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {F_{h,i}}^{beta_h,i}
 $$
 
 Domain h in { CAP_USA, LAB_USA }
@@ -102,37 +102,37 @@ Domain h in { CAP_USA, LAB_USA }
 `prod.eqF[CAP_USA,BRD_USA]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h}
 $$
 
 `prod.eqF[LAB_USA,BRD_USA]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h}
 $$
 
 `prod.eqX[BRD_USA,BRD_USA]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[MLK_USA,BRD_USA]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqY[BRD_USA]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{ay}_{i} \cdot \mathrm{Z}_{i}
+Y_{i} = ay_{i} \cdot Z_{i}
 $$
 
 `prod.eqpzs[BRD_USA]`
 
 $$
-\mathrm{pz}_{i} = \mathrm{ay}_{i} \cdot \mathrm{py}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{ax}_{j,i} \cdot \mathrm{pq}_{j} + 0
+pz_{i} = ay_{i} \cdot py_{i} + \sum_{j \in \mathcal{D}_{j}} ax_{j,i} \cdot pq_{j} + 0
 $$
 
 Domain j in { BRD_USA, MLK_USA }
@@ -140,7 +140,7 @@ Domain j in { BRD_USA, MLK_USA }
 `prod.eqpy[MLK_USA]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{b}_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {\mathrm{F}_{h,i}}^{beta_h,i}
+Y_{i} = b_{i} \cdot \prod_{h \in \mathcal{D}_{h}} {F_{h,i}}^{beta_h,i}
 $$
 
 Domain h in { CAP_USA, LAB_USA }
@@ -148,37 +148,37 @@ Domain h in { CAP_USA, LAB_USA }
 `prod.eqF[CAP_USA,MLK_USA]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h}
 $$
 
 `prod.eqF[LAB_USA,MLK_USA]`
 
 $$
-\mathrm{F}_{h,i} = \mathrm{beta}_{h,i} \cdot \mathrm{py}_{i} \cdot \mathrm{Y}_{i} / \mathrm{pf}_{h}
+F_{h,i} = beta_{h,i} \cdot py_{i} \cdot Y_{i} / pf_{h}
 $$
 
 `prod.eqX[BRD_USA,MLK_USA]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqX[MLK_USA,MLK_USA]`
 
 $$
-\mathrm{X}_{j,i} = \mathrm{ax}_{j,i} \cdot \mathrm{Z}_{i}
+X_{j,i} = ax_{j,i} \cdot Z_{i}
 $$
 
 `prod.eqY[MLK_USA]`
 
 $$
-\mathrm{Y}_{i} = \mathrm{ay}_{i} \cdot \mathrm{Z}_{i}
+Y_{i} = ay_{i} \cdot Z_{i}
 $$
 
 `prod.eqpzs[MLK_USA]`
 
 $$
-\mathrm{pz}_{i} = \mathrm{ay}_{i} \cdot \mathrm{py}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{ax}_{j,i} \cdot \mathrm{pq}_{j} + 0
+pz_{i} = ay_{i} \cdot py_{i} + \sum_{j \in \mathcal{D}_{j}} ax_{j,i} \cdot pq_{j} + 0
 $$
 
 Domain j in { BRD_USA, MLK_USA }
@@ -186,7 +186,7 @@ Domain j in { BRD_USA, MLK_USA }
 `factor_market.eqF[CAP_JPN]`
 
 $$
-\sum_{j \in \mathcal{D}_{j}} \mathrm{F}_{h,j} = \mathrm{FF}_{h}
+\sum_{j \in \mathcal{D}_{j}} F_{h,j} = FF_{h}
 $$
 
 Domain j in { BRD_JPN, MLK_JPN }
@@ -194,7 +194,7 @@ Domain j in { BRD_JPN, MLK_JPN }
 `factor_market.eqF[LAB_JPN]`
 
 $$
-\sum_{j \in \mathcal{D}_{j}} \mathrm{F}_{h,j} = \mathrm{FF}_{h}
+\sum_{j \in \mathcal{D}_{j}} F_{h,j} = FF_{h}
 $$
 
 Domain j in { BRD_JPN, MLK_JPN }
@@ -202,7 +202,7 @@ Domain j in { BRD_JPN, MLK_JPN }
 `factor_market.eqF[CAP_USA]`
 
 $$
-\sum_{j \in \mathcal{D}_{j}} \mathrm{F}_{h,j} = \mathrm{FF}_{h}
+\sum_{j \in \mathcal{D}_{j}} F_{h,j} = FF_{h}
 $$
 
 Domain j in { BRD_USA, MLK_USA }
@@ -210,7 +210,7 @@ Domain j in { BRD_USA, MLK_USA }
 `factor_market.eqF[LAB_USA]`
 
 $$
-\sum_{j \in \mathcal{D}_{j}} \mathrm{F}_{h,j} = \mathrm{FF}_{h}
+\sum_{j \in \mathcal{D}_{j}} F_{h,j} = FF_{h}
 $$
 
 Domain j in { BRD_USA, MLK_USA }
@@ -218,7 +218,7 @@ Domain j in { BRD_USA, MLK_USA }
 `government.eqTd[JPN]`
 
 $$
-\mathrm{Td}_{\text{JPN}} = tau\_d \cdot \sum_{h \in \mathcal{D}_{h}} \mathrm{pf}_{h} \cdot \mathrm{FF}_{h}
+Td_{\text{JPN}} = tau\_d \cdot \sum_{h \in \mathcal{D}_{h}} pf_{h} \cdot FF_{h}
 $$
 
 Domain h in { CAP_JPN, LAB_JPN }
@@ -226,19 +226,19 @@ Domain h in { CAP_JPN, LAB_JPN }
 `government.eqTz[BRD_JPN]`
 
 $$
-\mathrm{Tz}_{i} = \mathrm{tau\_z}_{i} \cdot \mathrm{pz}_{i} \cdot \mathrm{Z}_{i}
+Tz_{i} = tau\_z_{i} \cdot pz_{i} \cdot Z_{i}
 $$
 
 `government.eqTm[BRD_JPN]`
 
 $$
-\mathrm{Tm}_{i} = \mathrm{tau\_m}_{i} \cdot \mathrm{pm}_{i} \cdot \mathrm{M}_{i}
+Tm_{i} = tau\_m_{i} \cdot pm_{i} \cdot M_{i}
 $$
 
 `government.eqXg[BRD_JPN]`
 
 $$
-\mathrm{Xg}_{i} = \mathrm{mu}_{i} \cdot (\mathrm{Td}_{\text{JPN}} + \sum_{j \in \mathcal{D}_{j}} \mathrm{Tz}_{j} + \sum_{j \in \mathcal{D}_{j}} \mathrm{Tm}_{j} - \mathrm{Sg}_{\text{JPN}}) / \mathrm{pq}_{i}
+Xg_{i} = mu_{i} \cdot (Td_{\text{JPN}} + \sum_{j \in \mathcal{D}_{j}} Tz_{j} + \sum_{j \in \mathcal{D}_{j}} Tm_{j} - Sg_{\text{JPN}}) / pq_{i}
 $$
 
 Domain j in { BRD_JPN, MLK_JPN }
@@ -247,19 +247,19 @@ Domain j in { BRD_JPN, MLK_JPN }
 `government.eqTz[MLK_JPN]`
 
 $$
-\mathrm{Tz}_{i} = \mathrm{tau\_z}_{i} \cdot \mathrm{pz}_{i} \cdot \mathrm{Z}_{i}
+Tz_{i} = tau\_z_{i} \cdot pz_{i} \cdot Z_{i}
 $$
 
 `government.eqTm[MLK_JPN]`
 
 $$
-\mathrm{Tm}_{i} = \mathrm{tau\_m}_{i} \cdot \mathrm{pm}_{i} \cdot \mathrm{M}_{i}
+Tm_{i} = tau\_m_{i} \cdot pm_{i} \cdot M_{i}
 $$
 
 `government.eqXg[MLK_JPN]`
 
 $$
-\mathrm{Xg}_{i} = \mathrm{mu}_{i} \cdot (\mathrm{Td}_{\text{JPN}} + \sum_{j \in \mathcal{D}_{j}} \mathrm{Tz}_{j} + \sum_{j \in \mathcal{D}_{j}} \mathrm{Tm}_{j} - \mathrm{Sg}_{\text{JPN}}) / \mathrm{pq}_{i}
+Xg_{i} = mu_{i} \cdot (Td_{\text{JPN}} + \sum_{j \in \mathcal{D}_{j}} Tz_{j} + \sum_{j \in \mathcal{D}_{j}} Tm_{j} - Sg_{\text{JPN}}) / pq_{i}
 $$
 
 Domain j in { BRD_JPN, MLK_JPN }
@@ -268,7 +268,7 @@ Domain j in { BRD_JPN, MLK_JPN }
 `government.eqSg[JPN]`
 
 $$
-\mathrm{Sg}_{\text{JPN}} = ssg \cdot (\mathrm{Td}_{\text{JPN}} + \sum_{i \in \mathcal{D}_{i}} \mathrm{Tz}_{i} + \sum_{i \in \mathcal{D}_{i}} \mathrm{Tm}_{i})
+Sg_{\text{JPN}} = ssg \cdot (Td_{\text{JPN}} + \sum_{i \in \mathcal{D}_{i}} Tz_{i} + \sum_{i \in \mathcal{D}_{i}} Tm_{i})
 $$
 
 Domain i in { BRD_JPN, MLK_JPN }
@@ -277,7 +277,7 @@ Domain i in { BRD_JPN, MLK_JPN }
 `government.eqTd[USA]`
 
 $$
-\mathrm{Td}_{\text{USA}} = tau\_d \cdot \sum_{h \in \mathcal{D}_{h}} \mathrm{pf}_{h} \cdot \mathrm{FF}_{h}
+Td_{\text{USA}} = tau\_d \cdot \sum_{h \in \mathcal{D}_{h}} pf_{h} \cdot FF_{h}
 $$
 
 Domain h in { CAP_USA, LAB_USA }
@@ -285,19 +285,19 @@ Domain h in { CAP_USA, LAB_USA }
 `government.eqTz[BRD_USA]`
 
 $$
-\mathrm{Tz}_{i} = \mathrm{tau\_z}_{i} \cdot \mathrm{pz}_{i} \cdot \mathrm{Z}_{i}
+Tz_{i} = tau\_z_{i} \cdot pz_{i} \cdot Z_{i}
 $$
 
 `government.eqTm[BRD_USA]`
 
 $$
-\mathrm{Tm}_{i} = \mathrm{tau\_m}_{i} \cdot \mathrm{pm}_{i} \cdot \mathrm{M}_{i}
+Tm_{i} = tau\_m_{i} \cdot pm_{i} \cdot M_{i}
 $$
 
 `government.eqXg[BRD_USA]`
 
 $$
-\mathrm{Xg}_{i} = \mathrm{mu}_{i} \cdot (\mathrm{Td}_{\text{USA}} + \sum_{j \in \mathcal{D}_{j}} \mathrm{Tz}_{j} + \sum_{j \in \mathcal{D}_{j}} \mathrm{Tm}_{j} - \mathrm{Sg}_{\text{USA}}) / \mathrm{pq}_{i}
+Xg_{i} = mu_{i} \cdot (Td_{\text{USA}} + \sum_{j \in \mathcal{D}_{j}} Tz_{j} + \sum_{j \in \mathcal{D}_{j}} Tm_{j} - Sg_{\text{USA}}) / pq_{i}
 $$
 
 Domain j in { BRD_USA, MLK_USA }
@@ -306,19 +306,19 @@ Domain j in { BRD_USA, MLK_USA }
 `government.eqTz[MLK_USA]`
 
 $$
-\mathrm{Tz}_{i} = \mathrm{tau\_z}_{i} \cdot \mathrm{pz}_{i} \cdot \mathrm{Z}_{i}
+Tz_{i} = tau\_z_{i} \cdot pz_{i} \cdot Z_{i}
 $$
 
 `government.eqTm[MLK_USA]`
 
 $$
-\mathrm{Tm}_{i} = \mathrm{tau\_m}_{i} \cdot \mathrm{pm}_{i} \cdot \mathrm{M}_{i}
+Tm_{i} = tau\_m_{i} \cdot pm_{i} \cdot M_{i}
 $$
 
 `government.eqXg[MLK_USA]`
 
 $$
-\mathrm{Xg}_{i} = \mathrm{mu}_{i} \cdot (\mathrm{Td}_{\text{USA}} + \sum_{j \in \mathcal{D}_{j}} \mathrm{Tz}_{j} + \sum_{j \in \mathcal{D}_{j}} \mathrm{Tm}_{j} - \mathrm{Sg}_{\text{USA}}) / \mathrm{pq}_{i}
+Xg_{i} = mu_{i} \cdot (Td_{\text{USA}} + \sum_{j \in \mathcal{D}_{j}} Tz_{j} + \sum_{j \in \mathcal{D}_{j}} Tm_{j} - Sg_{\text{USA}}) / pq_{i}
 $$
 
 Domain j in { BRD_USA, MLK_USA }
@@ -327,7 +327,7 @@ Domain j in { BRD_USA, MLK_USA }
 `government.eqSg[USA]`
 
 $$
-\mathrm{Sg}_{\text{USA}} = ssg \cdot (\mathrm{Td}_{\text{USA}} + \sum_{i \in \mathcal{D}_{i}} \mathrm{Tz}_{i} + \sum_{i \in \mathcal{D}_{i}} \mathrm{Tm}_{i})
+Sg_{\text{USA}} = ssg \cdot (Td_{\text{USA}} + \sum_{i \in \mathcal{D}_{i}} Tz_{i} + \sum_{i \in \mathcal{D}_{i}} Tm_{i})
 $$
 
 Domain i in { BRD_USA, MLK_USA }
@@ -336,7 +336,7 @@ Domain i in { BRD_USA, MLK_USA }
 `private_saving.eqSp[JPN]`
 
 $$
-\mathrm{Sp}_{\text{JPN}} = ssp \cdot \sum_{h \in \mathcal{D}_{h}} \mathrm{pf}_{h} \cdot \mathrm{FF}_{h}
+Sp_{\text{JPN}} = ssp \cdot \sum_{h \in \mathcal{D}_{h}} pf_{h} \cdot FF_{h}
 $$
 
 Domain h in { CAP_JPN, LAB_JPN }
@@ -344,19 +344,19 @@ Domain h in { CAP_JPN, LAB_JPN }
 `investment.eqXv[BRD_JPN]`
 
 $$
-\mathrm{Xv}_{i} = \mathrm{lambda}_{i} \cdot (\mathrm{Sp}_{\text{JPN}} + \mathrm{Sg}_{\text{JPN}} + \mathrm{epsilon}_{\text{JPN}} \cdot Sf) / \mathrm{pq}_{i}
+Xv_{i} = lambda_{i} \cdot (Sp_{\text{JPN}} + Sg_{\text{JPN}} + epsilon_{\text{JPN}} \cdot Sf) / pq_{i}
 $$
 
 `investment.eqXv[MLK_JPN]`
 
 $$
-\mathrm{Xv}_{i} = \mathrm{lambda}_{i} \cdot (\mathrm{Sp}_{\text{JPN}} + \mathrm{Sg}_{\text{JPN}} + \mathrm{epsilon}_{\text{JPN}} \cdot Sf) / \mathrm{pq}_{i}
+Xv_{i} = lambda_{i} \cdot (Sp_{\text{JPN}} + Sg_{\text{JPN}} + epsilon_{\text{JPN}} \cdot Sf) / pq_{i}
 $$
 
 `private_saving.eqSp[USA]`
 
 $$
-\mathrm{Sp}_{\text{USA}} = ssp \cdot \sum_{h \in \mathcal{D}_{h}} \mathrm{pf}_{h} \cdot \mathrm{FF}_{h}
+Sp_{\text{USA}} = ssp \cdot \sum_{h \in \mathcal{D}_{h}} pf_{h} \cdot FF_{h}
 $$
 
 Domain h in { CAP_USA, LAB_USA }
@@ -364,19 +364,19 @@ Domain h in { CAP_USA, LAB_USA }
 `investment.eqXv[BRD_USA]`
 
 $$
-\mathrm{Xv}_{i} = \mathrm{lambda}_{i} \cdot (\mathrm{Sp}_{\text{USA}} + \mathrm{Sg}_{\text{USA}} + \mathrm{epsilon}_{\text{USA}} \cdot Sf) / \mathrm{pq}_{i}
+Xv_{i} = lambda_{i} \cdot (Sp_{\text{USA}} + Sg_{\text{USA}} + epsilon_{\text{USA}} \cdot Sf) / pq_{i}
 $$
 
 `investment.eqXv[MLK_USA]`
 
 $$
-\mathrm{Xv}_{i} = \mathrm{lambda}_{i} \cdot (\mathrm{Sp}_{\text{USA}} + \mathrm{Sg}_{\text{USA}} + \mathrm{epsilon}_{\text{USA}} \cdot Sf) / \mathrm{pq}_{i}
+Xv_{i} = lambda_{i} \cdot (Sp_{\text{USA}} + Sg_{\text{USA}} + epsilon_{\text{USA}} \cdot Sf) / pq_{i}
 $$
 
 `household.eqXp[BRD_JPN,JPN]`
 
 $$
-\mathrm{Xp}_{i} = \mathrm{alpha}_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \mathrm{pf}_{h} \cdot \mathrm{FF}_{h} - \mathrm{Sp}_{r} - \mathrm{Td}_{r}) / \mathrm{pq}_{i}
+Xp_{i} = alpha_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} pf_{h} \cdot FF_{h} - Sp_{r} - Td_{r}) / pq_{i}
 $$
 
 Domain h in { CAP_JPN, LAB_JPN }
@@ -384,7 +384,7 @@ Domain h in { CAP_JPN, LAB_JPN }
 `household.eqXp[MLK_JPN,JPN]`
 
 $$
-\mathrm{Xp}_{i} = \mathrm{alpha}_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \mathrm{pf}_{h} \cdot \mathrm{FF}_{h} - \mathrm{Sp}_{r} - \mathrm{Td}_{r}) / \mathrm{pq}_{i}
+Xp_{i} = alpha_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} pf_{h} \cdot FF_{h} - Sp_{r} - Td_{r}) / pq_{i}
 $$
 
 Domain h in { CAP_JPN, LAB_JPN }
@@ -392,7 +392,7 @@ Domain h in { CAP_JPN, LAB_JPN }
 `household.eqXp[BRD_USA,USA]`
 
 $$
-\mathrm{Xp}_{i} = \mathrm{alpha}_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \mathrm{pf}_{h} \cdot \mathrm{FF}_{h} - \mathrm{Sp}_{r} - \mathrm{Td}_{r}) / \mathrm{pq}_{i}
+Xp_{i} = alpha_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} pf_{h} \cdot FF_{h} - Sp_{r} - Td_{r}) / pq_{i}
 $$
 
 Domain h in { CAP_USA, LAB_USA }
@@ -400,7 +400,7 @@ Domain h in { CAP_USA, LAB_USA }
 `household.eqXp[MLK_USA,USA]`
 
 $$
-\mathrm{Xp}_{i} = \mathrm{alpha}_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} \mathrm{pf}_{h} \cdot \mathrm{FF}_{h} - \mathrm{Sp}_{r} - \mathrm{Td}_{r}) / \mathrm{pq}_{i}
+Xp_{i} = alpha_{i} \cdot (\sum_{h \in \mathcal{D}_{h}} pf_{h} \cdot FF_{h} - Sp_{r} - Td_{r}) / pq_{i}
 $$
 
 Domain h in { CAP_USA, LAB_USA }
@@ -408,55 +408,55 @@ Domain h in { CAP_USA, LAB_USA }
 `prices.eqpe[BRD_JPN,JPN]`
 
 $$
-\mathrm{pe}_{i} = \mathrm{epsilon}_{r} \cdot \mathrm{pWe}_{i}
+pe_{i} = epsilon_{r} \cdot pWe_{i}
 $$
 
 `prices.eqpm[BRD_JPN,JPN]`
 
 $$
-\mathrm{pm}_{i} = \mathrm{epsilon}_{r} \cdot \mathrm{pWm}_{i}
+pm_{i} = epsilon_{r} \cdot pWm_{i}
 $$
 
 `prices.eqpe[MLK_JPN,JPN]`
 
 $$
-\mathrm{pe}_{i} = \mathrm{epsilon}_{r} \cdot \mathrm{pWe}_{i}
+pe_{i} = epsilon_{r} \cdot pWe_{i}
 $$
 
 `prices.eqpm[MLK_JPN,JPN]`
 
 $$
-\mathrm{pm}_{i} = \mathrm{epsilon}_{r} \cdot \mathrm{pWm}_{i}
+pm_{i} = epsilon_{r} \cdot pWm_{i}
 $$
 
 `prices.eqpe[BRD_USA,USA]`
 
 $$
-\mathrm{pe}_{i} = \mathrm{epsilon}_{r} \cdot \mathrm{pWe}_{i}
+pe_{i} = epsilon_{r} \cdot pWe_{i}
 $$
 
 `prices.eqpm[BRD_USA,USA]`
 
 $$
-\mathrm{pm}_{i} = \mathrm{epsilon}_{r} \cdot \mathrm{pWm}_{i}
+pm_{i} = epsilon_{r} \cdot pWm_{i}
 $$
 
 `prices.eqpe[MLK_USA,USA]`
 
 $$
-\mathrm{pe}_{i} = \mathrm{epsilon}_{r} \cdot \mathrm{pWe}_{i}
+pe_{i} = epsilon_{r} \cdot pWe_{i}
 $$
 
 `prices.eqpm[MLK_USA,USA]`
 
 $$
-\mathrm{pm}_{i} = \mathrm{epsilon}_{r} \cdot \mathrm{pWm}_{i}
+pm_{i} = epsilon_{r} \cdot pWm_{i}
 $$
 
 `bop.eqBOP`
 
 $$
-\sum_{i \in \mathcal{D}_{i}} \mathrm{pWe}_{i} \cdot \mathrm{E}_{i} + Sf = \sum_{i \in \mathcal{D}_{i}} \mathrm{pWm}_{i} \cdot \mathrm{M}_{i}
+\sum_{i \in \mathcal{D}_{i}} pWe_{i} \cdot E_{i} + Sf = \sum_{i \in \mathcal{D}_{i}} pWm_{i} \cdot M_{i}
 $$
 
 Domain i in { BRD_JPN, MLK_JPN }
@@ -465,7 +465,7 @@ Domain i in { BRD_JPN, MLK_JPN }
 `bop.eqBOP`
 
 $$
-\sum_{i \in \mathcal{D}_{i}} \mathrm{pWe}_{i} \cdot \mathrm{E}_{i} + Sf = \sum_{i \in \mathcal{D}_{i}} \mathrm{pWm}_{i} \cdot \mathrm{M}_{i}
+\sum_{i \in \mathcal{D}_{i}} pWe_{i} \cdot E_{i} + Sf = \sum_{i \in \mathcal{D}_{i}} pWm_{i} \cdot M_{i}
 $$
 
 Domain i in { BRD_USA, MLK_USA }
@@ -474,199 +474,199 @@ Domain i in { BRD_USA, MLK_USA }
 `world.eqpw[BRD,JPN,USA]`
 
 $$
-\mathrm{pWe}_{\text{BRD\_JPN}} = \mathrm{pWm}_{\text{BRD\_USA}}
+pWe_{\text{BRD\_JPN}} = pWm_{\text{BRD\_USA}}
 $$
 
 `world.eqw[BRD,JPN,USA]`
 
 $$
-\mathrm{E}_{\text{BRD\_JPN}} = \mathrm{M}_{\text{BRD\_USA}}
+E_{\text{BRD\_JPN}} = M_{\text{BRD\_USA}}
 $$
 
 `world.eqpw[BRD,USA,JPN]`
 
 $$
-\mathrm{pWe}_{\text{BRD\_USA}} = \mathrm{pWm}_{\text{BRD\_JPN}}
+pWe_{\text{BRD\_USA}} = pWm_{\text{BRD\_JPN}}
 $$
 
 `world.eqw[BRD,USA,JPN]`
 
 $$
-\mathrm{E}_{\text{BRD\_USA}} = \mathrm{M}_{\text{BRD\_JPN}}
+E_{\text{BRD\_USA}} = M_{\text{BRD\_JPN}}
 $$
 
 `world.eqpw[MLK,JPN,USA]`
 
 $$
-\mathrm{pWe}_{\text{MLK\_JPN}} = \mathrm{pWm}_{\text{MLK\_USA}}
+pWe_{\text{MLK\_JPN}} = pWm_{\text{MLK\_USA}}
 $$
 
 `world.eqw[MLK,JPN,USA]`
 
 $$
-\mathrm{E}_{\text{MLK\_JPN}} = \mathrm{M}_{\text{MLK\_USA}}
+E_{\text{MLK\_JPN}} = M_{\text{MLK\_USA}}
 $$
 
 `world.eqpw[MLK,USA,JPN]`
 
 $$
-\mathrm{pWe}_{\text{MLK\_USA}} = \mathrm{pWm}_{\text{MLK\_JPN}}
+pWe_{\text{MLK\_USA}} = pWm_{\text{MLK\_JPN}}
 $$
 
 `world.eqw[MLK,USA,JPN]`
 
 $$
-\mathrm{E}_{\text{MLK\_USA}} = \mathrm{M}_{\text{MLK\_JPN}}
+E_{\text{MLK\_USA}} = M_{\text{MLK\_JPN}}
 $$
 
 `armington.eqQ[BRD_JPN]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{gamma}_{i} \cdot (\mathrm{delta\_m}_{i} \cdot {\mathrm{M}_{i}}^{eta_i} + \mathrm{delta\_d}_{i} \cdot {\mathrm{D}_{i}}^{eta_i})^{1/(eta_i)}
+Q_{i} = gamma_{i} \cdot (delta\_m_{i} \cdot {M_{i}}^{eta_i} + delta\_d_{i} \cdot {D_{i}}^{eta_i})^{1/(eta_i)}
 $$
 
 `armington.eqM[BRD_JPN]`
 
 $$
-\mathrm{M}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_m}_{i} \cdot \mathrm{pq}_{i} / (1 + 0 + \mathrm{tau\_m}_{i}) \cdot \mathrm{pm}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+M_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_m_{i} \cdot pq_{i} / (1 + 0 + tau\_m_{i}) \cdot pm_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqD[BRD_JPN]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_d}_{i} \cdot \mathrm{pq}_{i} / 1 \cdot \mathrm{pd}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+D_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_d_{i} \cdot pq_{i} / 1 \cdot pd_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqQ[MLK_JPN]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{gamma}_{i} \cdot (\mathrm{delta\_m}_{i} \cdot {\mathrm{M}_{i}}^{eta_i} + \mathrm{delta\_d}_{i} \cdot {\mathrm{D}_{i}}^{eta_i})^{1/(eta_i)}
+Q_{i} = gamma_{i} \cdot (delta\_m_{i} \cdot {M_{i}}^{eta_i} + delta\_d_{i} \cdot {D_{i}}^{eta_i})^{1/(eta_i)}
 $$
 
 `armington.eqM[MLK_JPN]`
 
 $$
-\mathrm{M}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_m}_{i} \cdot \mathrm{pq}_{i} / (1 + 0 + \mathrm{tau\_m}_{i}) \cdot \mathrm{pm}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+M_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_m_{i} \cdot pq_{i} / (1 + 0 + tau\_m_{i}) \cdot pm_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqD[MLK_JPN]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_d}_{i} \cdot \mathrm{pq}_{i} / 1 \cdot \mathrm{pd}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+D_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_d_{i} \cdot pq_{i} / 1 \cdot pd_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `transformation.eqZ[BRD_JPN]`
 
 $$
-\mathrm{Z}_{i} = \mathrm{theta}_{i} \cdot (\mathrm{xie}_{i} \cdot {\mathrm{E}_{i}}^{phi_i} + \mathrm{xid}_{i} \cdot {\mathrm{D}_{i}}^{phi_i})^{1/(phi_i)}
+Z_{i} = theta_{i} \cdot (xie_{i} \cdot {E_{i}}^{phi_i} + xid_{i} \cdot {D_{i}}^{phi_i})^{1/(phi_i)}
 $$
 
 `transformation.eqE[BRD_JPN]`
 
 $$
-\mathrm{E}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xie}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pe}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+E_{i} = ({theta_{i}}^{phi_i} \cdot xie_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pe_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqDs[BRD_JPN]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xid}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pd}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+D_{i} = ({theta_{i}}^{phi_i} \cdot xid_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pd_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqZ[MLK_JPN]`
 
 $$
-\mathrm{Z}_{i} = \mathrm{theta}_{i} \cdot (\mathrm{xie}_{i} \cdot {\mathrm{E}_{i}}^{phi_i} + \mathrm{xid}_{i} \cdot {\mathrm{D}_{i}}^{phi_i})^{1/(phi_i)}
+Z_{i} = theta_{i} \cdot (xie_{i} \cdot {E_{i}}^{phi_i} + xid_{i} \cdot {D_{i}}^{phi_i})^{1/(phi_i)}
 $$
 
 `transformation.eqE[MLK_JPN]`
 
 $$
-\mathrm{E}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xie}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pe}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+E_{i} = ({theta_{i}}^{phi_i} \cdot xie_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pe_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqDs[MLK_JPN]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xid}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pd}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+D_{i} = ({theta_{i}}^{phi_i} \cdot xid_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pd_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `armington.eqQ[BRD_USA]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{gamma}_{i} \cdot (\mathrm{delta\_m}_{i} \cdot {\mathrm{M}_{i}}^{eta_i} + \mathrm{delta\_d}_{i} \cdot {\mathrm{D}_{i}}^{eta_i})^{1/(eta_i)}
+Q_{i} = gamma_{i} \cdot (delta\_m_{i} \cdot {M_{i}}^{eta_i} + delta\_d_{i} \cdot {D_{i}}^{eta_i})^{1/(eta_i)}
 $$
 
 `armington.eqM[BRD_USA]`
 
 $$
-\mathrm{M}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_m}_{i} \cdot \mathrm{pq}_{i} / (1 + 0 + \mathrm{tau\_m}_{i}) \cdot \mathrm{pm}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+M_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_m_{i} \cdot pq_{i} / (1 + 0 + tau\_m_{i}) \cdot pm_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqD[BRD_USA]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_d}_{i} \cdot \mathrm{pq}_{i} / 1 \cdot \mathrm{pd}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+D_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_d_{i} \cdot pq_{i} / 1 \cdot pd_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqQ[MLK_USA]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{gamma}_{i} \cdot (\mathrm{delta\_m}_{i} \cdot {\mathrm{M}_{i}}^{eta_i} + \mathrm{delta\_d}_{i} \cdot {\mathrm{D}_{i}}^{eta_i})^{1/(eta_i)}
+Q_{i} = gamma_{i} \cdot (delta\_m_{i} \cdot {M_{i}}^{eta_i} + delta\_d_{i} \cdot {D_{i}}^{eta_i})^{1/(eta_i)}
 $$
 
 `armington.eqM[MLK_USA]`
 
 $$
-\mathrm{M}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_m}_{i} \cdot \mathrm{pq}_{i} / (1 + 0 + \mathrm{tau\_m}_{i}) \cdot \mathrm{pm}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+M_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_m_{i} \cdot pq_{i} / (1 + 0 + tau\_m_{i}) \cdot pm_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `armington.eqD[MLK_USA]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{gamma}_{i}}^{eta_i} \cdot \mathrm{delta\_d}_{i} \cdot \mathrm{pq}_{i} / 1 \cdot \mathrm{pd}_{i})^{1/(1-eta_i)} \cdot \mathrm{Q}_{i}
+D_{i} = ({gamma_{i}}^{eta_i} \cdot delta\_d_{i} \cdot pq_{i} / 1 \cdot pd_{i})^{1/(1-eta_i)} \cdot Q_{i}
 $$
 
 `transformation.eqZ[BRD_USA]`
 
 $$
-\mathrm{Z}_{i} = \mathrm{theta}_{i} \cdot (\mathrm{xie}_{i} \cdot {\mathrm{E}_{i}}^{phi_i} + \mathrm{xid}_{i} \cdot {\mathrm{D}_{i}}^{phi_i})^{1/(phi_i)}
+Z_{i} = theta_{i} \cdot (xie_{i} \cdot {E_{i}}^{phi_i} + xid_{i} \cdot {D_{i}}^{phi_i})^{1/(phi_i)}
 $$
 
 `transformation.eqE[BRD_USA]`
 
 $$
-\mathrm{E}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xie}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pe}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+E_{i} = ({theta_{i}}^{phi_i} \cdot xie_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pe_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqDs[BRD_USA]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xid}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pd}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+D_{i} = ({theta_{i}}^{phi_i} \cdot xid_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pd_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqZ[MLK_USA]`
 
 $$
-\mathrm{Z}_{i} = \mathrm{theta}_{i} \cdot (\mathrm{xie}_{i} \cdot {\mathrm{E}_{i}}^{phi_i} + \mathrm{xid}_{i} \cdot {\mathrm{D}_{i}}^{phi_i})^{1/(phi_i)}
+Z_{i} = theta_{i} \cdot (xie_{i} \cdot {E_{i}}^{phi_i} + xid_{i} \cdot {D_{i}}^{phi_i})^{1/(phi_i)}
 $$
 
 `transformation.eqE[MLK_USA]`
 
 $$
-\mathrm{E}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xie}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pe}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+E_{i} = ({theta_{i}}^{phi_i} \cdot xie_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pe_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `transformation.eqDs[MLK_USA]`
 
 $$
-\mathrm{D}_{i} = ({\mathrm{theta}_{i}}^{phi_i} \cdot \mathrm{xid}_{i} \cdot (1 + \mathrm{tau\_z}_{i}) \cdot \mathrm{pz}_{i} / \mathrm{pd}_{i})^{1/(1-phi_i)} \cdot \mathrm{Z}_{i}
+D_{i} = ({theta_{i}}^{phi_i} \cdot xid_{i} \cdot (1 + tau\_z_{i}) \cdot pz_{i} / pd_{i})^{1/(1-phi_i)} \cdot Z_{i}
 $$
 
 `market.eqQ[BRD_JPN]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{Xp}_{i} + \mathrm{Xg}_{i} + \mathrm{Xv}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{X}_{i,j}
+Q_{i} = Xp_{i} + Xg_{i} + Xv_{i} + \sum_{j \in \mathcal{D}_{j}} X_{i,j}
 $$
 
 Domain j in { BRD_JPN, MLK_JPN }
@@ -674,7 +674,7 @@ Domain j in { BRD_JPN, MLK_JPN }
 `market.eqQ[MLK_JPN]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{Xp}_{i} + \mathrm{Xg}_{i} + \mathrm{Xv}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{X}_{i,j}
+Q_{i} = Xp_{i} + Xg_{i} + Xv_{i} + \sum_{j \in \mathcal{D}_{j}} X_{i,j}
 $$
 
 Domain j in { BRD_JPN, MLK_JPN }
@@ -682,7 +682,7 @@ Domain j in { BRD_JPN, MLK_JPN }
 `market.eqQ[BRD_USA]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{Xp}_{i} + \mathrm{Xg}_{i} + \mathrm{Xv}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{X}_{i,j}
+Q_{i} = Xp_{i} + Xg_{i} + Xv_{i} + \sum_{j \in \mathcal{D}_{j}} X_{i,j}
 $$
 
 Domain j in { BRD_USA, MLK_USA }
@@ -690,7 +690,7 @@ Domain j in { BRD_USA, MLK_USA }
 `market.eqQ[MLK_USA]`
 
 $$
-\mathrm{Q}_{i} = \mathrm{Xp}_{i} + \mathrm{Xg}_{i} + \mathrm{Xv}_{i} + \sum_{j \in \mathcal{D}_{j}} \mathrm{X}_{i,j}
+Q_{i} = Xp_{i} + Xg_{i} + Xv_{i} + \sum_{j \in \mathcal{D}_{j}} X_{i,j}
 $$
 
 Domain j in { BRD_USA, MLK_USA }
@@ -698,7 +698,7 @@ Domain j in { BRD_USA, MLK_USA }
 `utility.eqUU[JPN]`
 
 $$
-\mathrm{UU}_{r} = \prod_{i \in \mathcal{D}_{i}} {\mathrm{Xp}_{i}}^{alpha_i}
+UU_{r} = \prod_{i \in \mathcal{D}_{i}} {Xp_{i}}^{alpha_i}
 $$
 
 Domain i in { BRD_JPN, MLK_JPN }
@@ -706,7 +706,7 @@ Domain i in { BRD_JPN, MLK_JPN }
 `utility.eqUU[USA]`
 
 $$
-\mathrm{UU}_{r} = \prod_{i \in \mathcal{D}_{i}} {\mathrm{Xp}_{i}}^{alpha_i}
+UU_{r} = \prod_{i \in \mathcal{D}_{i}} {Xp_{i}}^{alpha_i}
 $$
 
 Domain i in { BRD_USA, MLK_USA }
