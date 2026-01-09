@@ -1516,7 +1516,7 @@ end
 
 function _render_exponent_expr(expr::EquationExpr)
     text = _render_expr(expr; format=:plain)
-    text = replace(text, "[" => "_{", "]" => "}")
+    text = replace(text, "[" => "_", "]" => "")
     text = replace(text, " " => "")
     return _latex_escape_exponent(text)
 end
