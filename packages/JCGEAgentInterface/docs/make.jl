@@ -5,7 +5,7 @@ makedocs(
     sitename = "JCGEAgentInterface",
     format = Documenter.HTML(
         prettyurls = get(ENV, "CI", "false") == "true",
-        assets = ["assets/logo-theme.js", "assets/jcge_agentinterface_logo_light.png", "assets/jcge_agentinterface_logo_dark.png"],
+        assets = ["assets/deepwiki-chat.css", "assets/deepwiki-chat.js", "assets/logo-theme.js", "assets/jcge_agentinterface_logo_light.png", "assets/jcge_agentinterface_logo_dark.png"],
         logo = "assets/jcge_agentinterface_logo_light.png",
         logo_dark = "assets/jcge_agentinterface_logo_dark.png",
     ),

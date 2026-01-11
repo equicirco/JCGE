@@ -4,7 +4,7 @@
   <img alt="JCGE logo" src="docs/src/assets/jcge_logo_light.png" width="130">
 </picture>
 
-# JCGE.jl
+# JCGE
 
 This repository is the entry point for the block-based Julia CGE (JCGE) modeling and execution tool.
 
