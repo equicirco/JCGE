@@ -1,3 +1,6 @@
+"""
+JCGEExamples.KorMCP defines the KorMCP example model.
+"""
 module KorMCP
 
 using JCGEBlocks
@@ -8,16 +11,28 @@ using PATHSolver
 
 export model, baseline, scenario, solve, datadir
 
+"""
+Return the data directory for KorMCP.
+"""
 datadir() = joinpath(@__DIR__, "data")
 
+"""
+Load a labeled matrix CSV from the model data directory.
+"""
 function _load_matrix(name::String)
     return JCGECalibrate.load_labeled_matrix(joinpath(datadir(), "$(name).csv"))
 end
 
+"""
+Load a labeled vector CSV from the model data directory.
+"""
 function _load_vector(name::String)
     return JCGECalibrate.load_labeled_vector(joinpath(datadir(), "$(name).csv"))
 end
 
+"""
+Convert a labeled matrix to a Dict keyed by label tuples.
+"""
 function _matdict(mat::JCGECalibrate.LabeledMatrix{Float64})
     out = Dict{Tuple{Symbol,Symbol},Float64}()
     for r in mat.row_labels, c in mat.col_labels
@@ -26,10 +41,16 @@ function _matdict(mat::JCGECalibrate.LabeledMatrix{Float64})
     return out
 end
 
+"""
+Convert a labeled vector to a Dict keyed by labels.
+"""
 function _vecdict(vec::JCGECalibrate.LabeledVector{Float64})
     return Dict(vec.labels[i] => vec.data[i] for i in eachindex(vec.labels))
 end
 
+"""
+Return a RunSpec for KorMCP.
+"""
 function model()
     alphl = _load_matrix("alphl")
     io = _load_matrix("io")
@@ -262,12 +283,21 @@ function model()
     )
 end
 
+"""
+Return the baseline RunSpec for KorMCP.
+"""
 baseline() = model()
 
+"""
+Solve the KorMCP model and return the run result.
+"""
 function solve(; optimizer = PATHSolver.Optimizer)
     return JCGERuntime.run!(model(); optimizer=optimizer, compile_ast=true, compile_objective=false)
 end
 
+"""
+Create a scenario placeholder for KorMCP.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end

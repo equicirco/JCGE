@@ -168,7 +168,11 @@ export activity_analysis
 export consumer_endowment_cd
 export commodity_market_clearing
 
-"Minimal example block used to validate end-to-end wiring."
+"""
+Minimal example block used to validate end-to-end wiring.
+
+Registers a placeholder variable and a dummy equation without solving.
+"""
 struct DummyBlock <: JCGECore.AbstractBlock
     name::Symbol
 end
@@ -180,6 +184,31 @@ function JCGECore.build!(block::DummyBlock, ctx::JCGERuntime.KernelContext, spec
     return nothing
 end
 
+"""
+    production(name, activities, factors, commodities; form=:cd, params)
+
+General production block with per-activity functional forms.
+
+Inputs:
+- `activities`, `factors`, `commodities`: sets to use.
+- `form`: Symbol (applied to all activities) or Dict of activity=>form.
+
+Typical parameters (by form):
+- Cobb-Douglas: `beta[h,i]`, `b[i]`, `ax[j,i]`, `ay[i]`
+- Leontief nests: see `ProductionCDLeontiefBlock` for required coefficients.
+
+Variables (global names):
+- Output/composite: `Y[i]`, `Z[i]`
+- Factor inputs: `F[h,i]`
+- Intermediate inputs: `X[j,i]`
+- Prices: `py[i]`, `pz[i]`, `pq[j]`
+
+Equations (tags):
+- `eqpy`, `eqF`, `eqX`, `eqY`, `eqpzs`
+
+MCP:
+- If `params.mcp=true`, complementarity variables are attached to each equation.
+"""
 production(name::Symbol, activities::Vector{Symbol}, factors::Vector{Symbol}, commodities::Vector{Symbol};
     form::Union{Symbol,Dict{Symbol,Symbol}}=:cd, params::NamedTuple) =
     ProductionBlock(
@@ -191,220 +220,671 @@ production(name::Symbol, activities::Vector{Symbol}, factors::Vector{Symbol}, co
         params,
     )
 
+"""
+    production_sector_pf(name, activities, factors, commodities; params)
+
+Production with sector-level production and factor pricing.
+
+Use when factor prices are activity-specific or when factor markets are
+cleared outside the block. Parameters mirror the Leontief/Cobb-Douglas
+structure used in standard production blocks.
+"""
 production_sector_pf(name::Symbol, activities::Vector{Symbol}, factors::Vector{Symbol}, commodities::Vector{Symbol};
     params::NamedTuple) =
     ProductionCDLeontiefSectorPFBlock(name, activities, factors, commodities, params)
 
+"""
+    production_multilabor_cd(name, activities, labor; params)
+
+Multi-labor Cobb-Douglas production block.
+
+Parameters:
+- `beta[lc,i]` labor shares by labor type and activity.
+- `b[i]` scale parameters (if used).
+"""
 production_multilabor_cd(name::Symbol, activities::Vector{Symbol}, labor::Vector{Symbol}; params::NamedTuple) =
     ProductionMultilaborCDBlock(name, activities, labor, params)
 
+"""
+    factor_supply(name, factors; params)
+
+Factor supply block for endowment or supply curves.
+
+Parameters:
+- `FF[h]` or `endowment[h]` for fixed supplies.
+- Optional elasticities for upward-sloping supply.
+
+Variables:
+- `FF[h]` (supply) and `pf[h]` (price).
+"""
 factor_supply(name::Symbol, factors::Vector{Symbol}, params::NamedTuple) =
     FactorSupplyBlock(name, factors, params)
 
+"""
+    household_demand(name, households, commodities, factors; form=:cd, consumption_var=:Xp, params)
+
+Household demand block with selectable utility form.
+
+Arguments:
+- `form`: utility form symbol (e.g., `:cd`).
+- `consumption_var`: name of consumption variable (default `:Xp`).
+
+Parameters (typical):
+- `alpha[i,hh]` budget shares.
+- `FF[h,hh]` factor endowments by household.
+- Optional taxes/transfers depending on model.
+
+Variables:
+- `Xp[i,hh]` consumption, `Y[hh]` income, `pf[h]` factor prices.
+"""
 household_demand(name::Symbol, households::Vector{Symbol}, commodities::Vector{Symbol}, factors::Vector{Symbol};
     form::Symbol=:cd, consumption_var::Symbol=:Xp, params::NamedTuple) =
     HouseholdDemandBlock(name, households, commodities, factors, form, consumption_var, params)
 
+"""
+    household_demand_regional(name, commodities, factors, region; params)
+
+Regional household demand block (Cobb-Douglas over `:Xp` by region).
+
+Parameters mirror `household_demand` but are indexed by region.
+"""
 household_demand_regional(name::Symbol, commodities::Vector{Symbol}, factors::Vector{Symbol}, region::Symbol;
     params::NamedTuple) =
     HouseholdDemandCDXpRegionalBlock(name, commodities, factors, region, params)
 
+"""
+    household_demand_income(name, commodities, factors, activities; params)
+
+Household demand driven by income identity over factor payments.
+
+This block is useful when household income is computed from activity
+factor payments rather than endowments.
+"""
 household_demand_income(name::Symbol, commodities::Vector{Symbol}, factors::Vector{Symbol}, activities::Vector{Symbol};
     params::NamedTuple) =
     HouseholdDemandIncomeBlock(name, commodities, factors, activities, params)
 
+"""
+    household_share_demand_hh(name, households, commodities; params)
+
+Household demand with explicit budget shares by household.
+
+Parameters:
+- `alpha[i,hh]` shares that sum to one per household.
+"""
 household_share_demand_hh(name::Symbol, households::Vector{Symbol}, commodities::Vector{Symbol}; params::NamedTuple) =
     HouseholdShareDemandHHBlock(name, households, commodities, params)
 
+"""
+    household_income_labor_capital(name, households, activities, labor; params)
+
+Household income from labor and capital sources.
+
+Parameters:
+- Labor income shares or mappings by household/activity.
+"""
 household_income_labor_capital(name::Symbol, households::Vector{Symbol}, activities::Vector{Symbol}, labor::Vector{Symbol};
     params::NamedTuple) =
     HouseholdIncomeLaborCapitalBlock(name, households, activities, labor, params)
 
+"""
+    household_tax_revenue(name, households; params)
+
+Household tax revenue block.
+
+Parameters:
+- `tau_d[hh]` or equivalent direct tax rates.
+"""
 household_tax_revenue(name::Symbol, households::Vector{Symbol}; params::NamedTuple) =
     HouseholdTaxRevenueBlock(name, households, params)
 
+"""
+    household_income_sum(name, households; params=(;))
+
+Aggregate household income identity across households.
+"""
 household_income_sum(name::Symbol, households::Vector{Symbol}; params::NamedTuple=(;)) =
     HouseholdIncomeSumBlock(name, households, params)
 
+"""
+    activity_analysis(name, activities, commodities; params)
+
+Activity analysis block with fixed input/output coefficients.
+
+Required params:
+- `a_in[g,s]`, `a_out[g,s]` by commodity and activity.
+
+Variables:
+- `X[g,s]` inputs, `Z[g,s]` outputs, `Y[s]` activity level, `pq[g]` prices.
+"""
 activity_analysis(name::Symbol, activities::Vector{Symbol}, commodities::Vector{Symbol}; params::NamedTuple) =
     ActivityAnalysisBlock(name, activities, commodities, params)
 
+"""
+    consumer_endowment_cd(name, consumers, commodities; params)
+
+Consumer endowment + Cobb-Douglas demand block.
+
+Required params:
+- `alpha[g,c]` budget shares.
+- `endowment[g,c]` commodity endowments.
+"""
 consumer_endowment_cd(name::Symbol, consumers::Vector{Symbol}, commodities::Vector{Symbol}; params::NamedTuple) =
     ConsumerEndowmentCDBlock(name, consumers, commodities, params)
 
+"""
+    commodity_market_clearing(name, commodities, activities, consumers; params)
+
+Market clearing for commodities with activity outputs and consumer demands.
+
+Parameters:
+- `endowment[g,c]` for consumer endowments (if used).
+
+Equations:
+- `eqMC[g]` with complementarity on `pq[g]` when MCP is enabled.
+"""
 commodity_market_clearing(name::Symbol, commodities::Vector{Symbol}, activities::Vector{Symbol}, consumers::Vector{Symbol}; params::NamedTuple) =
     CommodityMarketClearingBlock(name, commodities, activities, consumers, params)
 
+"""
+    market_clearing(name, commodities, factors)
+
+Joint market clearing for commodities and factors.
+
+Equations:
+- `eqQ[i]`: composite good clearing.
+- `eqF[h]`: factor market clearing.
+
+Variables:
+- `Q[i]`, `Xp[i,hh]`, `Xg[i]`, `Xv[i]`, `X[i,j]`
+- `FF[h]`, `F[h,j]`
+"""
 market_clearing(name::Symbol, commodities::Vector{Symbol}, factors::Vector{Symbol}) =
     MarketClearingBlock(name, commodities, factors)
 
+"""
+    goods_market_clearing(name, commodities)
+
+Market clearing for goods with supply equal to demand.
+
+Equations:
+- `eqX[i]`: `X[i] == Z[i]`-style clearing.
+"""
 goods_market_clearing(name::Symbol, commodities::Vector{Symbol}) =
     GoodsMarketClearingBlock(name, commodities)
 
+"""
+    factor_market_clearing(name, activities, factors; params=(;))
+
+Market clearing for factors across activities.
+
+Equations:
+- `eqF[h]`: sum of factor demands equals endowment.
+"""
 factor_market_clearing(name::Symbol, activities::Vector{Symbol}, factors::Vector{Symbol}; params::NamedTuple=(;)) =
     FactorMarketClearingBlock(name, activities, factors, params)
 
+"""
+    composite_market_clearing(name, commodities, activities)
+
+Market clearing for composite goods (e.g., Armington aggregates).
+"""
 composite_market_clearing(name::Symbol, commodities::Vector{Symbol}, activities::Vector{Symbol}) =
     CompositeMarketClearingBlock(name, commodities, activities)
 
+"""
+    labor_market_clearing(name, labor, activities; params)
+
+Labor market clearing by labor type across activities.
+"""
 labor_market_clearing(name::Symbol, labor::Vector{Symbol}, activities::Vector{Symbol}; params::NamedTuple) =
     LaborMarketClearingBlock(name, labor, activities, params)
 
+"""
+    price_link(name, commodities, params)
+
+Link prices through wedges or policy parameters.
+
+Typical params:
+- ad-valorem taxes or margins that map `pz` to `pq` or `px`.
+"""
 price_link(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     PriceLinkBlock(name, commodities, params)
 
+"""
+    exchange_rate_link(name, commodities)
+
+Link export/import prices to a single exchange rate.
+"""
 exchange_rate_link(name::Symbol, commodities::Vector{Symbol}) =
     ExchangeRateLinkBlock(name, commodities)
 
+"""
+    exchange_rate_link_region(name, commodities, region)
+
+Link trade prices to a region-specific exchange rate.
+"""
 exchange_rate_link_region(name::Symbol, commodities::Vector{Symbol}, region::Symbol) =
     ExchangeRateLinkRegionBlock(name, commodities, region)
 
+"""
+    price_equality(name, commodities)
+
+Enforce equality between demand and supply prices.
+"""
 price_equality(name::Symbol, commodities::Vector{Symbol}) =
     PriceEqualityBlock(name, commodities)
 
+"""
+    numeraire(name, kind, label, value)
+
+Fix a numeraire variable.
+
+`kind` can be `:commodity`, `:factor`, or `:exchange`. The matching price
+variable is fixed at `value`.
+"""
 numeraire(name::Symbol, kind::Symbol, label::Symbol, value::Real) =
     NumeraireBlock(name, kind, label, value)
 
+"""
+    government(name, commodities, factors; params)
+
+Government budget block with revenues and expenditures.
+
+Typical params:
+- `tau_d`, `tau_z`, `tau_m`, `mu` shares, and optional rents.
+"""
 government(name::Symbol, commodities::Vector{Symbol}, factors::Vector{Symbol}, params::NamedTuple) =
     GovernmentBlock(name, commodities, factors, params)
 
+"""
+    government_regional(name, commodities, factors, region; params)
+
+Regional government budget block.
+"""
 government_regional(name::Symbol, commodities::Vector{Symbol}, factors::Vector{Symbol}, region::Symbol, params::NamedTuple) =
     GovernmentRegionalBlock(name, commodities, factors, region, params)
 
+"""
+    government_budget_balance(name, commodities; params)
+
+Government budget balance equation (revenues minus savings).
+"""
 government_budget_balance(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     GovernmentBudgetBalanceBlock(name, commodities, params)
 
+"""
+    government_revenue(name, commodities; params)
+
+Government revenue aggregation block.
+"""
 government_revenue(name::Symbol, commodities::Vector{Symbol}; params::NamedTuple) =
     GovernmentRevenueBlock(name, commodities, params)
 
+"""
+    private_saving(name, factors; params)
+
+Private saving from factor incomes.
+"""
 private_saving(name::Symbol, factors::Vector{Symbol}, params::NamedTuple) =
     PrivateSavingBlock(name, factors, params)
 
+"""
+    private_saving_regional(name, factors, region; params)
+
+Regional private saving block.
+"""
 private_saving_regional(name::Symbol, factors::Vector{Symbol}, region::Symbol, params::NamedTuple) =
     PrivateSavingRegionalBlock(name, factors, region, params)
 
+"""
+    private_saving_income(name, factors, activities; params)
+
+Private saving from activity-level incomes.
+"""
 private_saving_income(name::Symbol, factors::Vector{Symbol}, activities::Vector{Symbol}, params::NamedTuple) =
     PrivateSavingIncomeBlock(name, factors, activities, params)
 
+"""
+    investment(name, commodities; params)
+
+Investment demand block.
+"""
 investment(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     InvestmentBlock(name, commodities, params)
 
+"""
+    investment_regional(name, commodities, region; params)
+
+Regional investment demand block.
+"""
 investment_regional(name::Symbol, commodities::Vector{Symbol}, region::Symbol, params::NamedTuple) =
     InvestmentRegionalBlock(name, commodities, region, params)
 
+"""
+    armington(name, commodities; params)
+
+Armington CES composite of imports and domestic goods.
+
+Parameters:
+- `delta_m`, `delta_d`, `gamma`, `eta`, `tau_m`
+"""
 armington(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ArmingtonCESBlock(name, commodities, params)
 
+"""
+    transformation(name, commodities; params)
+
+CET transformation between domestic supply and exports.
+
+Parameters:
+- `xie`, `xid`, `theta`, `phi`, `tau_z`
+"""
 transformation(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     TransformationCETBlock(name, commodities, params)
 
+"""
+    monopoly_rent(name, commodities; params)
+
+Monopoly rent block for markup or rent extraction.
+"""
 monopoly_rent(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     MonopolyRentBlock(name, commodities, params)
 
+"""
+    import_quota(name, commodities; params)
+
+Import quota block with complementarity on quota slack.
+"""
 import_quota(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ImportQuotaBlock(name, commodities, params)
 
+"""
+    mobile_factor_market(name, factors, activities)
+
+Mobile factor market clearing across activities.
+"""
 mobile_factor_market(name::Symbol, factors::Vector{Symbol}, activities::Vector{Symbol}) =
     MobileFactorMarketBlock(name, factors, activities)
 
+"""
+    capital_stock_return(name, factor, activities; params)
+
+Capital return block linking sectoral returns to a stock return.
+"""
 capital_stock_return(name::Symbol, factor::Symbol, activities::Vector{Symbol}, params::NamedTuple) =
     CapitalStockReturnBlock(name, factor, activities, params)
 
+"""
+    composite_investment(name, commodities, activities; params)
+
+Composite investment aggregation over commodities.
+"""
 composite_investment(name::Symbol, commodities::Vector{Symbol}, activities::Vector{Symbol}, params::NamedTuple) =
     CompositeInvestmentBlock(name, commodities, activities, params)
 
+"""
+    investment_allocation(name, factor, activities; params)
+
+Allocate investment to activities based on shares or returns.
+"""
 investment_allocation(name::Symbol, factor::Symbol, activities::Vector{Symbol}, params::NamedTuple) =
     InvestmentAllocationBlock(name, factor, activities, params)
 
+"""
+    composite_consumption(name, commodities; params)
+
+Aggregate consumption bundle over commodities.
+"""
 composite_consumption(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     CompositeConsumptionBlock(name, commodities, params)
 
+"""
+    price_level(name, commodities; params)
+
+Compute a price level index.
+"""
 price_level(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     PriceLevelBlock(name, commodities, params)
 
+"""
+    price_index(name, commodities; params)
+
+Compute a price index (weighted average).
+"""
 price_index(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     PriceIndexBlock(name, commodities, params)
 
+"""
+    closure(name, params)
+
+Closure block used to enforce macro closure identities.
+
+Parameters depend on the closure rules (e.g., savings-investment,
+government balance, external balance).
+"""
 closure(name::Symbol, params::NamedTuple) =
     ClosureBlock(name, params)
 
+"""
+    utility(name, households, commodities; form=:cd, consumption_var=:Xp, params)
+
+Household utility block.
+
+Parameters:
+- `alpha[i,hh]` for Cobb-Douglas utility.
+"""
 utility(name::Symbol, households::Vector{Symbol}, commodities::Vector{Symbol};
     form::Symbol=:cd, consumption_var::Symbol=:Xp, params::NamedTuple) =
     UtilityBlock(name, households, commodities, form, consumption_var, params)
 
+"""
+    utility_regional(name, goods_by_region, params)
+
+Regional utility aggregation block.
+
+`goods_by_region` maps region => commodity list.
+"""
 utility_regional(name::Symbol, goods_by_region::Dict{Symbol,Vector{Symbol}}, params::NamedTuple) =
     UtilityCDRegionalBlock(name, goods_by_region, params)
 
+"""
+    external_balance(name, commodities; params)
+
+External balance (BOP) block with fixed world prices.
+
+Parameters typically include `pWe`, `pWm`, and foreign savings `Sf`.
+"""
 external_balance(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ExternalBalanceBlock(name, commodities, params)
 
+"""
+    external_balance_var_price(name, commodities; params)
+
+External balance block with variable world prices or exchange rates.
+"""
 external_balance_var_price(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ExternalBalanceVarPriceBlock(name, commodities, params)
 
+"""
+    external_balance_remit(name, commodities; params)
+
+External balance block including remittances.
+"""
 external_balance_remit(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ExternalBalanceRemitBlock(name, commodities, params)
 
+"""
+    foreign_trade(name, commodities; params)
+
+Foreign trade block combining export demand and import supply.
+"""
 foreign_trade(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ForeignTradeBlock(name, commodities, params)
 
+"""
+    price_aggregation(name, commodities, activities; params)
+
+Aggregate prices across activities or sources.
+"""
 price_aggregation(name::Symbol, commodities::Vector{Symbol}, activities::Vector{Symbol}, params::NamedTuple) =
     PriceAggregationBlock(name, commodities, activities, params)
 
+"""
+    international_market(name, goods, regions, mapping)
+
+International market clearing with region-specific trade flows.
+
+`mapping` maps (good, region) to a composite good identifier.
+"""
 international_market(name::Symbol, goods::Vector{Symbol}, regions::Vector{Symbol},
     mapping::Dict{Tuple{Symbol,Symbol},Symbol}) =
     InternationalMarketBlock(name, goods, regions, mapping)
 
+"""
+    activity_price_io(name, activities, commodities; params)
+
+Activity price with input-output structure.
+"""
 activity_price_io(name::Symbol, activities::Vector{Symbol}, commodities::Vector{Symbol}, params::NamedTuple) =
     ActivityPriceIOBlock(name, activities, commodities, params)
 
+"""
+    capital_price_composition(name, activities, commodities; params)
+
+Capital price composition from activity prices.
+"""
 capital_price_composition(name::Symbol, activities::Vector{Symbol}, commodities::Vector{Symbol}, params::NamedTuple) =
     CapitalPriceCompositionBlock(name, activities, commodities, params)
 
+"""
+    trade_price_link(name, commodities; params)
+
+Link domestic prices to trade prices with wedges.
+"""
 trade_price_link(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     TradePriceLinkBlock(name, commodities, params)
 
+"""
+    import_premium_income(name, commodities; params)
+
+Import premium income block.
+"""
 import_premium_income(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ImportPremiumIncomeBlock(name, commodities, params)
 
+"""
+    absorption_sales(name, commodities; params)
+
+Absorption and sales identities for commodities.
+"""
 absorption_sales(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     AbsorptionSalesBlock(name, commodities, params)
 
+"""
+    armington_m_xxd(name, commodities; params)
+
+Armington block with explicit M/XXD split.
+"""
 armington_m_xxd(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ArmingtonMXxdBlock(name, commodities, params)
 
+"""
+    cet_xxd_e(name, commodities; params)
+
+CET block with explicit domestic/export split.
+"""
 cet_xxd_e(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     CETXXDEBlock(name, commodities, params)
 
+"""
+    export_demand(name, commodities; params)
+
+Export demand block for foreign demand functions.
+"""
 export_demand(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ExportDemandBlock(name, commodities, params)
 
+"""
+    nontraded_supply(name, commodities; params)
+
+Non-traded supply block for domestic-only goods.
+"""
 nontraded_supply(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     NontradedSupplyBlock(name, commodities, params)
 
+"""
+    household_share_demand(name, commodities; params)
+
+Household share demand across commodities.
+"""
 household_share_demand(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     HouseholdShareDemandBlock(name, commodities, params)
 
+"""
+    government_share_demand(name, commodities; params)
+
+Government demand by fixed shares.
+"""
 government_share_demand(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     GovernmentShareDemandBlock(name, commodities, params)
 
+"""
+    inventory_demand(name, commodities; params)
+
+Inventory demand block.
+"""
 inventory_demand(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     InventoryDemandBlock(name, commodities, params)
 
+"""
+    government_finance(name, commodities; params)
+
+Government finance block including taxes and savings.
+"""
 government_finance(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     GovernmentFinanceBlock(name, commodities, params)
 
+"""
+    gdp_income(name, activities; params)
+
+GDP income aggregation block.
+"""
 gdp_income(name::Symbol, activities::Vector{Symbol}, params::NamedTuple) =
     GDPIncomeBlock(name, activities, params)
 
+"""
+    savings_investment(name, activities, commodities; params)
+
+Savings-investment balance block.
+"""
 savings_investment(name::Symbol, activities::Vector{Symbol}, commodities::Vector{Symbol}, params::NamedTuple) =
     SavingsInvestmentBlock(name, activities, commodities, params)
 
+"""
+    final_demand_clearing(name, commodities; params)
+
+Final demand market clearing block.
+"""
 final_demand_clearing(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     FinalDemandClearingBlock(name, commodities, params)
 
+"""
+    consumption_objective(name, commodities; params)
+
+Consumption objective (utility) block for optimization.
+"""
 consumption_objective(name::Symbol, commodities::Vector{Symbol}, params::NamedTuple) =
     ConsumptionObjectiveBlock(name, commodities, params)
 
+"""
+    initial_values(name, params)
+
+Initial values and bounds helper block.
+
+Parameters:
+- `start`, `lower`, `upper`, `fixed` dictionaries by variable symbol.
+"""
 initial_values(name::Symbol, params::NamedTuple) =
     InitialValuesBlock(name, params)
 

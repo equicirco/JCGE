@@ -1,6 +1,9 @@
 using MPSGE
 using JuMP
 
+"""
+Build MPSGE set definitions from the provided data.
+"""
 function _mpsge_sets(data)
     I = data.sectors
     IT = data.traded
@@ -9,6 +12,9 @@ function _mpsge_sets(data)
     return (I=I, IT=IT, LC=LC, DSTR=DSTR)
 end
 
+"""
+Build MPSGE parameter definitions from the provided data.
+"""
 function _mpsge_params(data)
     I = data.sectors
     LC = data.labor

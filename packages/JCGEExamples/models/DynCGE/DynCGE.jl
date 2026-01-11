@@ -1,3 +1,6 @@
+"""
+JCGEExamples.DynCGE defines the DynCGE example model.
+"""
 module DynCGE
 
 using JCGEBlocks
@@ -291,16 +294,28 @@ function model(; sam_path::Union{Nothing,AbstractString} = nothing,
     )
 end
 
+"""
+Return the baseline RunSpec for DynCGE.
+"""
 baseline() = model()
 
+"""
+Solve the DynCGE model and return the run result.
+"""
 function solve(; periods=30, optimizer=Ipopt.Optimizer, kwargs...)
     return run_recursive(; periods=periods, optimizer=optimizer, kwargs...)
 end
 
+"""
+Create a scenario placeholder for DynCGE.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end
 
+"""
+Return the data directory for DynCGE.
+"""
 datadir() = joinpath(@__DIR__, "data")
 
 """

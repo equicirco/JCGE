@@ -1,3 +1,6 @@
+"""
+Core data model and block interfaces for JCGE.
+"""
 module JCGECore
 
 export Sets, Mappings, ModelSpec, ClosureSpec, ScenarioSpec, RunSpec
@@ -9,7 +12,11 @@ export validate_spec
 export getparam
 export EquationExpr, EIndex, EVar, EParam, EConst, EAdd, EMul, EPow, EDiv, ENeg, ESum, EProd, EEq, ERaw
 
-"Canonical set containers (minimal placeholder)."
+"""
+Canonical set containers.
+
+Holds the standard sets used across models.
+"""
 struct Sets
     commodities::Vector{Symbol}
     activities::Vector{Symbol}
@@ -17,30 +24,44 @@ struct Sets
     institutions::Vector{Symbol}
 end
 
-"Canonical mapping containers (minimal placeholder)."
+"""
+Canonical mapping containers.
+
+The minimal mapping is activity to output commodity.
+"""
 struct Mappings
     activity_to_output::Dict{Symbol,Symbol}
 end
 
-"Model structure: selected blocks and high-level configuration."
+"""
+Model structure: blocks plus sets and mappings.
+"""
 struct ModelSpec
     blocks::Vector{Any}          # typically Vector{<:AbstractBlock}
     sets::Sets
     mappings::Mappings
 end
 
-"Closure choices (minimal placeholder)."
+"""
+Closure choices for a run.
+
+Currently only numeraire is required.
+"""
 struct ClosureSpec
     numeraire::Symbol
 end
 
-"Scenario changes (delta relative to baseline; minimal placeholder)."
+"""
+Scenario changes relative to a baseline.
+"""
 struct ScenarioSpec
     name::Symbol
     shocks::Dict{Symbol,Any}
 end
 
-"Full run specification."
+"""
+Full run specification for a model run.
+"""
 struct RunSpec
     name::String
     model::ModelSpec
@@ -48,19 +69,25 @@ struct RunSpec
     scenario::ScenarioSpec
 end
 
-"Named section grouping a set of blocks."
+"""
+Named section grouping a set of blocks.
+"""
 struct SectionSpec
     name::Symbol
     blocks::Vector{Any}
 end
 
-"Template for standardized RunSpec assembly."
+"""
+Template for standardized RunSpec assembly.
+"""
 struct RunSpecTemplate
     name::String
     required_sections::Vector{Symbol}
 end
 
-"Canonical section names for RunSpec assembly."
+"""
+Return the canonical section names for RunSpec assembly.
+"""
 function allowed_sections()
     return [
         :production,
@@ -78,15 +105,28 @@ function allowed_sections()
     ]
 end
 
-"Create a named section."
+"""
+Create a named section from blocks.
+"""
 section(name::Symbol, blocks::Vector{Any}) = SectionSpec(name, blocks)
 
-"Create a template describing required sections."
+"""
+Create a template describing required sections.
+
+This is a lightweight declaration for a model family; the template is
+used by `build_spec` to enforce required sections consistently.
+"""
 function template(name::String; required_sections::Vector{Symbol}=Symbol[])
     return RunSpecTemplate(name, required_sections)
 end
 
-"Assemble a RunSpec from sections and a template."
+"""
+Assemble a RunSpec from sections and a template.
+
+Validates required and allowed sections before building the RunSpec.
+
+This variant takes a `RunSpecTemplate` and reuses its `required_sections`.
+"""
 function build_spec(
     tpl::RunSpecTemplate,
     sets::Sets,
@@ -103,7 +143,20 @@ function build_spec(
         required_nonempty=required_nonempty)
 end
 
-"Assemble a RunSpec from sections (with optional required section checks)."
+"""
+Assemble a RunSpec from sections.
+
+Optionally validates required/allowed sections and required-nonempty sections.
+
+Arguments:
+- `required_sections`: sections that must be present.
+- `allowed_sections`: if non-empty, only these section names are allowed.
+- `required_nonempty`: sections that must exist and contain at least one block.
+
+Notes:
+- Sections are flattened into a single `ModelSpec.blocks` vector.
+- A minimal structural `validate` is performed at the end.
+"""
 function build_spec(
     name::String,
     sets::Sets,
@@ -140,92 +193,152 @@ function build_spec(
     return spec
 end
 
-"Abstract interface for model blocks."
+"""
+Abstract interface for model blocks.
+"""
 abstract type AbstractBlock end
 
-"Equation expression AST (backend-agnostic)."
+"""
+Equation expression AST (backend-agnostic).
+"""
 abstract type EquationExpr end
 
+"""
+Variable reference expression.
+"""
 struct EVar <: EquationExpr
     name::Symbol
     idxs::Union{Nothing,Vector{Any}}
 end
 
+"""
+Parameter reference expression.
+"""
 struct EParam <: EquationExpr
     name::Symbol
     idxs::Union{Nothing,Vector{Any}}
 end
 
+"""
+Constant expression.
+"""
 struct EConst <: EquationExpr
     value::Real
 end
 
+"""
+Raw expression placeholder (string-based).
+"""
 struct ERaw <: EquationExpr
     text::String
 end
 
+"""
+Index placeholder used in param/var references.
+"""
 struct EIndex <: EquationExpr
     name::Symbol
 end
 
+"""
+Addition expression.
+"""
 struct EAdd <: EquationExpr
     terms::Vector{EquationExpr}
 end
 
+"""
+Multiplication expression.
+"""
 struct EMul <: EquationExpr
     factors::Vector{EquationExpr}
 end
 
+"""
+Power expression.
+"""
 struct EPow <: EquationExpr
     base::EquationExpr
     exponent::EquationExpr
 end
 
+"""
+Division expression.
+"""
 struct EDiv <: EquationExpr
     numerator::EquationExpr
     denominator::EquationExpr
 end
 
+"""
+Negation expression.
+"""
 struct ENeg <: EquationExpr
     expr::EquationExpr
 end
 
+"""
+Summation expression over a domain.
+"""
 struct ESum <: EquationExpr
     index::Symbol
     domain::Vector{Symbol}
     expr::EquationExpr
 end
 
+"""
+Product expression over a domain.
+"""
 struct EProd <: EquationExpr
     index::Symbol
     domain::Vector{Symbol}
     expr::EquationExpr
 end
 
+"""
+Equality expression.
+"""
 struct EEq <: EquationExpr
     lhs::EquationExpr
     rhs::EquationExpr
 end
 
+"""
+Shorthand for variable references without indices.
+"""
 EVar(name::Symbol) = EVar(name, nothing)
+"""
+Shorthand for parameter references without indices.
+"""
 EParam(name::Symbol) = EParam(name, nothing)
 
-"Calibration hook (default: not implemented)."
+"""
+Calibration hook for blocks.
+"""
 function calibrate!(block::AbstractBlock, data, benchmark, params)
     throw(MethodError(calibrate!, (block, data, benchmark, params)))
 end
 
-"Build hook (default: not implemented)."
+"""
+Build hook for blocks.
+"""
 function build!(block::AbstractBlock, ctx, spec::RunSpec)
     throw(MethodError(build!, (block, ctx, spec)))
 end
 
-"Reporting hook (default: not implemented)."
+"""
+Reporting hook for blocks.
+"""
 function report(block::AbstractBlock, solution)
     throw(MethodError(report, (block, solution)))
 end
 
-"Validate that the RunSpec is structurally consistent (minimal checks)."
+"""
+Validate that the RunSpec is structurally consistent (minimal checks).
+
+Throws on missing core sets. This is intentionally minimal and used by
+the builder; for richer diagnostics use `validate_spec`.
+"""
 function validate(spec::RunSpec)
     isempty(spec.model.sets.commodities) && error("Sets.commodities is empty")
     isempty(spec.model.sets.activities) && error("Sets.activities is empty")
@@ -234,7 +347,12 @@ function validate(spec::RunSpec)
     return true
 end
 
-"Validate RunSpec structure and closure; returns a report instead of throwing."
+"""
+Validate RunSpec structure and closure; returns a report instead of throwing.
+
+This function is meant for pre-solve diagnostics and returns a report
+with categorized errors and warnings.
+"""
 function validate_spec(spec::RunSpec; data=nothing)
     report = _new_report()
     structural = _category!(report, :structural)
@@ -269,10 +387,16 @@ function validate_spec(spec::RunSpec; data=nothing)
     return _finalize_report(report)
 end
 
+"""
+Create a new validation report container.
+"""
 function _new_report()
     return Dict{Symbol,Dict{Symbol,Vector{String}}}()
 end
 
+"""
+Get or create a category entry within a validation report.
+"""
 function _category!(report, name::Symbol)
     if !haskey(report, name)
         report[name] = Dict(
@@ -284,6 +408,9 @@ function _category!(report, name::Symbol)
     return report[name]
 end
 
+"""
+Finalize a report into a summary NamedTuple.
+"""
 function _finalize_report(report)
     errors = 0
     warnings = 0
@@ -294,7 +421,11 @@ function _finalize_report(report)
     return (ok=errors == 0, errors=errors, warnings=warnings, categories=report)
 end
 
-"Get parameter values from dict- or table-like containers."
+"""
+Get parameter values from dict- or table-like containers.
+
+This is the canonical parameter accessor used by blocks.
+"""
 function getparam(params, name::Symbol, idxs...)
     hasproperty(params, name) || error("Missing parameter: $(name)")
     data = getproperty(params, name)

@@ -1,3 +1,6 @@
+"""
+Calibration utilities, labeled data containers, and SAM helpers for JCGE.
+"""
 module JCGECalibrate
 
 using CSV
@@ -12,10 +15,14 @@ export load_canonical_sets, load_canonical_labels, load_canonical_subsets
 export load_canonical_params, load_canonical_sam
 export load_labeled_matrix, load_labeled_vector
 
-"Convert CES elasticity sigma to rho (rho = (sigma - 1)/sigma)."
+"""
+Convert CES elasticity sigma to rho (rho = (sigma - 1)/sigma).
+"""
 rho_from_sigma(sigma::Real) = (sigma - 1) / sigma
 
-"Convert CES rho back to sigma (sigma = 1/(1-rho))."
+"""
+Convert CES rho back to sigma (sigma = 1/(1-rho)).
+"""
 sigma_from_rho(rho::Real) = 1 / (1 - rho)
 
 """
@@ -26,12 +33,18 @@ function calibrate_ces_share_scale(; shares::AbstractVector, scale::Real=1.0)
     return (α = collect(shares), A = scale)
 end
 
+"""
+Vector with labels and lookup indices.
+"""
 struct LabeledVector{T}
     data::Vector{T}
     labels::Vector{Symbol}
     index::Dict{Symbol,Int}
 end
 
+"""
+Matrix with row/column labels and lookup indices.
+"""
 struct LabeledMatrix{T}
     data::Matrix{T}
     row_labels::Vector{Symbol}
@@ -40,9 +53,15 @@ struct LabeledMatrix{T}
     col_index::Dict{Symbol,Int}
 end
 
+"""
+Construct a labeled vector from data and labels.
+"""
 LabeledVector(data::Vector{T}, labels::Vector{Symbol}) where {T} =
     LabeledVector{T}(data, labels, Dict(l => i for (i, l) in pairs(labels)))
 
+"""
+Construct a labeled matrix from data and row/column labels.
+"""
 LabeledMatrix(data::Matrix{T}, row_labels::Vector{Symbol}, col_labels::Vector{Symbol}) where {T} =
     LabeledMatrix{T}(
         data,
@@ -56,6 +75,7 @@ LabeledMatrix(data::Matrix{T}, row_labels::Vector{Symbol}, col_labels::Vector{Sy
     load_labeled_matrix(path::AbstractString; label_col::String="label") -> LabeledMatrix
 
 Load a CSV with a row label column and return a `LabeledMatrix`.
+All data columns are coerced to `Float64`.
 """
 function load_labeled_matrix(path::AbstractString; label_col::String="label")
     df = DataFrame(CSV.File(path))
@@ -69,6 +89,7 @@ end
     load_labeled_vector(path::AbstractString; label_col::String="label", value_col::String="value") -> LabeledVector
 
 Load a CSV with a label and value column and return a `LabeledVector`.
+Values are coerced to `Float64`.
 """
 function load_labeled_vector(path::AbstractString; label_col::String="label", value_col::String="value")
     df = DataFrame(CSV.File(path))
@@ -77,19 +98,43 @@ function load_labeled_vector(path::AbstractString; label_col::String="label", va
     return LabeledVector(values, labels)
 end
 
+"""
+Sum of labeled vector values.
+"""
 Base.sum(v::LabeledVector) = sum(v.data)
 
+"""
+Index into a labeled vector by symbol.
+"""
 Base.getindex(v::LabeledVector, label::Symbol) = v.data[v.index[label]]
+"""
+Index into a labeled vector by a list of symbols.
+"""
 Base.getindex(v::LabeledVector, labels::Vector{Symbol}) = v.data[[v.index[l] for l in labels]]
 
+"""
+Index into a labeled matrix by row and column symbols.
+"""
 Base.getindex(m::LabeledMatrix, r::Symbol, c::Symbol) = m.data[m.row_index[r], m.col_index[c]]
+"""
+Index into a labeled matrix by row/column symbol vectors.
+"""
 Base.getindex(m::LabeledMatrix, rows::Vector{Symbol}, cols::Vector{Symbol}) =
     m.data[[m.row_index[r] for r in rows], [m.col_index[c] for c in cols]]
+"""
+Index into a labeled matrix by a single row symbol and column vector.
+"""
 Base.getindex(m::LabeledMatrix, r::Symbol, cols::Vector{Symbol}) =
     vec(m.data[m.row_index[r], [m.col_index[c] for c in cols]])
+"""
+Index into a labeled matrix by row vector and single column symbol.
+"""
 Base.getindex(m::LabeledMatrix, rows::Vector{Symbol}, c::Symbol) =
     vec(m.data[[m.row_index[r] for r in rows], m.col_index[c]])
 
+"""
+Social Accounting Matrix with labeled accounts and key labels.
+"""
 struct SAMTable
     goods::Vector{Symbol}
     factors::Vector{Symbol}
@@ -103,6 +148,9 @@ struct SAMTable
     sam::LabeledMatrix{Float64}
 end
 
+"""
+Starting values computed from a SAM table.
+"""
 struct StartingValues
     Td0::Float64
     Tz0::LabeledVector{Float64}
@@ -136,6 +184,9 @@ struct StartingValues
     epsilon0::Float64
 end
 
+"""
+Calibrated model parameters derived from starting values.
+"""
 struct ModelParameters
     sigma::LabeledVector{Float64}
     psi::LabeledVector{Float64}
@@ -159,12 +210,16 @@ struct ModelParameters
     tau_d::Float64
 end
 
+"""
+Convert a vector of values to symbols.
+"""
 to_symbols(values::Vector) = Symbol.(values)
 
 """
     load_sam_table(file_path::AbstractString; kwargs...) -> SAMTable
 
 Load a SAM CSV from `file_path` and return a `SAMTable`.
+Missing values are replaced with zeros.
 """
 function load_sam_table(file_path::AbstractString; goods::Vector{String} = ["BRD", "MLK"],
     factors::Vector{String} = ["CAP", "LAB"],
@@ -203,6 +258,7 @@ end
     load_sam_table(io::IO; kwargs...) -> SAMTable
 
 Load a SAM CSV from an `IO` stream and return a `SAMTable`.
+Missing values are replaced with zeros.
 """
 function load_sam_table(io::IO; goods::Vector{String} = ["BRD", "MLK"],
     factors::Vector{String} = ["CAP", "LAB"],
@@ -313,6 +369,8 @@ end
     compute_starting_values(sam_table::SAMTable) -> StartingValues
 
 Compute calibrated starting values from a `SAMTable`.
+
+The output includes base flows, tax rates, and benchmark prices.
 """
 function compute_starting_values(sam_table::SAMTable)
     sam = sam_table.sam
@@ -386,6 +444,8 @@ end
     compute_calibration_params(sam_table::SAMTable, start::StartingValues) -> ModelParameters
 
 Compute calibrated model parameters from a `SAMTable` and starting values.
+
+The parameters follow standard CGE calibration formulas for CES/CET nests.
 """
 function compute_calibration_params(sam_table::SAMTable, start::StartingValues)
     goods = sam_table.goods

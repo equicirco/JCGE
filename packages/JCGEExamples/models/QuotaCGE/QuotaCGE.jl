@@ -1,3 +1,6 @@
+"""
+JCGEExamples.QuotaCGE defines the QuotaCGE example model.
+"""
 module QuotaCGE
 
 using JCGEBlocks
@@ -236,16 +239,28 @@ function model(; sam_path::Union{Nothing,AbstractString} = nothing,
     )
 end
 
+"""
+Return the baseline RunSpec for QuotaCGE.
+"""
 baseline() = model()
 
+"""
+Solve the QuotaCGE model and return the run result.
+"""
 function solve(; optimizer=Ipopt.Optimizer, kwargs...)
     return JCGERuntime.run!(model(; kwargs...); optimizer=optimizer)
 end
 
+"""
+Create a scenario placeholder for QuotaCGE.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end
 
+"""
+Return the data directory for QuotaCGE.
+"""
 datadir() = joinpath(@__DIR__, "data")
 
 end # module

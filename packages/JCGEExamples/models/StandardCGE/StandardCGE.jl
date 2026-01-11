@@ -1,3 +1,6 @@
+"""
+JCGEExamples.StandardCGE defines the StandardCGE example model.
+"""
 module StandardCGE
 
 using JCGEBlocks
@@ -180,16 +183,28 @@ function model(; sam_table::Union{Nothing,JCGECalibrate.SAMTable} = nothing,
     )
 end
 
+"""
+Return the baseline RunSpec for StandardCGE.
+"""
 baseline() = model()
 
+"""
+Solve the StandardCGE model and return the run result.
+"""
 function solve(; optimizer=Ipopt.Optimizer, kwargs...)
     return JCGERuntime.run!(model(; kwargs...); optimizer=optimizer)
 end
 
+"""
+Create a scenario placeholder for StandardCGE.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end
 
+"""
+Return the data directory for StandardCGE.
+"""
 datadir() = joinpath(@__DIR__, "data")
 
 end # module

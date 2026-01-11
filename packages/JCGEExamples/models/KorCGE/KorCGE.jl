@@ -1,3 +1,6 @@
+"""
+JCGEExamples.KorCGE defines the KorCGE example model.
+"""
 module KorCGE
 
 using JCGEBlocks
@@ -8,16 +11,28 @@ using Ipopt
 
 export model, baseline, scenario, solve, datadir
 
+"""
+Return the data directory for KorCGE.
+"""
 datadir() = joinpath(@__DIR__, "data")
 
+"""
+Load a labeled matrix CSV from the model data directory.
+"""
 function _load_matrix(name::String)
     return JCGECalibrate.load_labeled_matrix(joinpath(datadir(), "$(name).csv"))
 end
 
+"""
+Load a labeled vector CSV from the model data directory.
+"""
 function _load_vector(name::String)
     return JCGECalibrate.load_labeled_vector(joinpath(datadir(), "$(name).csv"))
 end
 
+"""
+Convert a labeled matrix to a Dict keyed by label tuples.
+"""
 function _matdict(mat::JCGECalibrate.LabeledMatrix{Float64})
     out = Dict{Tuple{Symbol,Symbol},Float64}()
     for r in mat.row_labels, c in mat.col_labels
@@ -26,10 +41,16 @@ function _matdict(mat::JCGECalibrate.LabeledMatrix{Float64})
     return out
 end
 
+"""
+Convert a labeled vector to a Dict keyed by labels.
+"""
 function _vecdict(vec::JCGECalibrate.LabeledVector{Float64})
     return Dict(vec.labels[i] => vec.data[i] for i in eachindex(vec.labels))
 end
 
+"""
+Return a RunSpec for KorCGE.
+"""
 function model()
     alphl = _load_matrix("alphl")
     io = _load_matrix("io")
@@ -277,12 +298,21 @@ function model()
     )
 end
 
+"""
+Return the baseline RunSpec for KorCGE.
+"""
 baseline() = model()
 
+"""
+Solve the KorCGE model and return the run result.
+"""
 function solve(; optimizer = Ipopt.Optimizer)
     return JCGERuntime.run!(model(); optimizer = optimizer)
 end
 
+"""
+Create a scenario placeholder for KorCGE.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end

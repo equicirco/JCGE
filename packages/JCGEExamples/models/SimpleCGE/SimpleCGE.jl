@@ -1,3 +1,6 @@
+"""
+JCGEExamples.SimpleCGE defines the SimpleCGE example model.
+"""
 module SimpleCGE
 
 using JCGECore
@@ -102,16 +105,28 @@ function model(; sam_path::Union{Nothing,AbstractString}=nothing)
     )
 end
 
+"""
+Return the baseline RunSpec for SimpleCGE.
+"""
 baseline() = model()
 
+"""
+Solve the SimpleCGE model and return the run result.
+"""
 function solve(; optimizer=Ipopt.Optimizer, kwargs...)
     return JCGERuntime.run!(model(; kwargs...); optimizer=optimizer)
 end
 
+"""
+Create a scenario placeholder for SimpleCGE.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end
 
+"""
+Return the data directory for SimpleCGE.
+"""
 datadir() = joinpath(@__DIR__, "data")
 
 end # module

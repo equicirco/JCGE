@@ -1,3 +1,6 @@
+"""
+JCGEExamples.TwoCountryCGE defines the TwoCountryCGE example model.
+"""
 module TwoCountryCGE
 
 using JCGEBlocks
@@ -264,16 +267,28 @@ function model(; sam_paths::Dict{Symbol,String}=Dict(
     )
 end
 
+"""
+Return the baseline RunSpec for TwoCountryCGE.
+"""
 baseline() = model()
 
+"""
+Solve the TwoCountryCGE model and return the run result.
+"""
 function solve(; optimizer=Ipopt.Optimizer, kwargs...)
     return JCGERuntime.run!(model(; kwargs...); optimizer=optimizer)
 end
 
+"""
+Create a scenario placeholder for TwoCountryCGE.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end
 
+"""
+Return the data directory for TwoCountryCGE.
+"""
 datadir() = joinpath(@__DIR__, "data")
 
 end # module

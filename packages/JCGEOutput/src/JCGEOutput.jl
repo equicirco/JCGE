@@ -1,3 +1,6 @@
+"""
+Output utilities: equation rendering, results collection, persistence, and reporting.
+"""
 module JCGEOutput
 
 import JCGECore
@@ -24,6 +27,16 @@ export DEFAULT_CONSTRAINT_KIND_TAG_MAP, constraint_kind_enum, component_type_enu
 export EquationExpr, EIndex, EVar, EParam, EConst, EAdd, EMul, EPow, EDiv, ENeg, ESum, EProd, EEq, ERaw
 export render_expr
 
+"""
+Container for solver results and metadata.
+
+Fields:
+- `primals`: variable levels by symbol.
+- `reduced_costs`: reduced costs by symbol.
+- `duals`: vector of (block, tag, indices, value).
+- `complements`: complementarity diagnostics for MCP equations.
+- `metadata`: solver and scenario metadata.
+"""
 struct Results
     primals::Dict{Symbol,Float64}
     reduced_costs::Dict{Symbol,Float64}
@@ -32,6 +45,12 @@ struct Results
     metadata::Dict{Symbol,Any}
 end
 
+"""
+    collect_results(obj; metadata=Dict()) -> Results
+
+Collect primals, reduced costs, duals, and complementarity diagnostics
+from a `KernelContext`, `RunSpec` result, or equivalent object.
+"""
 function collect_results(obj; metadata=Dict{Symbol,Any}())
     ctx = _context(obj)
     primals = Dict{Symbol,Float64}()
@@ -125,6 +144,11 @@ function collect_results(obj; metadata=Dict{Symbol,Any}())
     return Results(primals, reduced_costs, duals, complements, meta)
 end
 
+"""
+    tidy(results; kinds=..., encode_indices=false) -> Vector{NamedTuple}
+
+Return a long-table representation of results suitable for CSV/Arrow/Parquet.
+"""
 function tidy(results::Results; kinds=(:level, :dual, :reduced_cost, :complement), encode_indices::Bool=false)
     rows = NamedTuple[]
     if :level in kinds
@@ -153,6 +177,11 @@ function tidy(results::Results; kinds=(:level, :dual, :reduced_cost, :complement
     return rows
 end
 
+"""
+    to_json(results, path)
+
+Write results and a tidy table to a JSON file.
+"""
 function to_json(results::Results, path::AbstractString)
     payload = (
         metadata=_stringify_keys(results.metadata),
@@ -168,6 +197,11 @@ function to_json(results::Results, path::AbstractString)
     return path
 end
 
+"""
+    to_csv(results, path; kinds=...)
+
+Write a tidy table to CSV.
+"""
 function to_csv(results::Results, path::AbstractString; kinds=(:level, :dual, :reduced_cost, :complement))
     rows = tidy(results; kinds=kinds, encode_indices=true)
     if isempty(rows)
@@ -180,12 +214,22 @@ function to_csv(results::Results, path::AbstractString; kinds=(:level, :dual, :r
     return path
 end
 
+"""
+    to_arrow(results, path; kinds=...)
+
+Write a tidy table to Arrow.
+"""
 function to_arrow(results::Results, path::AbstractString; kinds=(:level, :dual, :reduced_cost, :complement))
     rows = tidy(results; kinds=kinds, encode_indices=true)
     Arrow.write(path, rows)
     return path
 end
 
+"""
+    to_parquet(results, path; kinds=...)
+
+Write a tidy table to Parquet.
+"""
 function to_parquet(results::Results, path::AbstractString; kinds=(:level, :dual, :reduced_cost, :complement))
     rows = tidy(results; kinds=kinds, encode_indices=true)
     parquet_rows = [
@@ -200,6 +244,11 @@ function to_parquet(results::Results, path::AbstractString; kinds=(:level, :dual
     return path
 end
 
+"""
+    results_from_json(path) -> Results
+
+Load a Results object from JSON.
+"""
 function results_from_json(path::AbstractString)
     data = JSON3.read(read(path, String))
     metadata = Dict{Symbol,Any}()
@@ -215,18 +264,38 @@ function results_from_json(path::AbstractString)
     return Results(primals, reduced, duals, complements, metadata)
 end
 
+"""
+    results_from_csv(path) -> Results
+
+Load a Results object from a tidy CSV file.
+"""
 function results_from_csv(path::AbstractString)
     return results_from_table(CSV.File(path))
 end
 
+"""
+    results_from_arrow(path) -> Results
+
+Load a Results object from Arrow.
+"""
 function results_from_arrow(path::AbstractString)
     return results_from_table(Arrow.Table(path))
 end
 
+"""
+    results_from_parquet(path) -> Results
+
+Load a Results object from Parquet.
+"""
 function results_from_parquet(path::AbstractString)
     return results_from_table(Parquet.read_parquet(path))
 end
 
+"""
+    to_dualsignals(results; kwargs...) -> DualSignalsDataset
+
+Map results into DualSignals components and constraints for analysis.
+"""
 function to_dualsignals(results::Results; dataset_id::String="jcge",
     description::Union{String,Nothing}=nothing,
     scenario::Union{String,Nothing}=nothing,
@@ -342,6 +411,12 @@ const BASELINE_PRICE_FIELDS = Dict(
     :pWm => :pWm,
 )
 
+"""
+    sam_from_solution(obj; kwargs...) -> LabeledMatrix
+
+Build a SAM-style table from a solved model.
+Only entries backed by model flows are populated.
+"""
 function sam_from_solution(obj;
     spec::JCGECore.RunSpec,
     sam_table::JCGECalibrate.SAMTable,
@@ -469,6 +544,11 @@ function sam_from_solution(obj;
     return qty_sam === nothing ? (values=value_sam,) : (values=value_sam, quantities=qty_sam)
 end
 
+"""
+    write_sam_csv(sam, path; label_col="label")
+
+Write a labeled SAM matrix to CSV.
+"""
 function write_sam_csv(sam::JCGECalibrate.LabeledMatrix, path::AbstractString; label_col::String="label")
     rows = NamedTuple[]
     for (i, row) in pairs(sam.row_labels)
@@ -554,6 +634,11 @@ function to_dualsignals(obj::NamedTuple; kwargs...)
     return to_dualsignals(results; kwargs...)
 end
 
+"""
+    write_dualsignals_json(results, path; kwargs...)
+
+Write a DualSignals dataset to JSON.
+"""
 function write_dualsignals_json(results::Results, path::AbstractString; kwargs...)
     dataset = to_dualsignals(results; kwargs...)
     DualSignals.write_json(path, dataset)
@@ -568,6 +653,11 @@ function write_dualsignals_json(obj::NamedTuple, path::AbstractString; kwargs...
     return write_dualsignals_json(collect_results(_context(obj)), path; kwargs...)
 end
 
+"""
+    write_dualsignals_csv(results, dir; prefix="dualsignals", kwargs...)
+
+Write DualSignals tables to CSV files in a directory.
+"""
 function write_dualsignals_csv(results::Results, dir::AbstractString; prefix::AbstractString="dualsignals", kwargs...)
     dataset = to_dualsignals(results; kwargs...)
     DualSignals.write_csv(dataset, dir; prefix=prefix)
@@ -583,7 +673,19 @@ function write_dualsignals_csv(obj::NamedTuple, dir::AbstractString; prefix::Abs
 end
 
 """
-Render model equations from a KernelContext or a run result.
+    render_equations(obj; format=:markdown, level=:block, show_defs=true)
+
+Render equations registered in a `KernelContext` or run result.
+
+Inputs
+- `obj`: a `JCGERuntime.KernelContext`, a run result (`NamedTuple` with `context`),
+  or a `JCGECore.RunSpec` (via a `KernelContext`).
+- `format`: `:markdown`, `:latex`, or `:plain`.
+- `level`: `:block` to group equations by block, or `:equation` for a flat list.
+- `show_defs`: include equation labels and block tags.
+
+Returns a formatted string. The output is derived from the equation AST, not
+solver-specific objects, so it is backend-agnostic.
 """
 function render_equations(obj; format::Symbol=:markdown, level::Symbol=:block, show_defs::Bool=true)
     ctx = _context(obj)
@@ -592,7 +694,12 @@ function render_equations(obj; format::Symbol=:markdown, level::Symbol=:block, s
 end
 
 """
-Render equations for a single block.
+    render_block(obj, block_id; format=:markdown, show_defs=true)
+
+Render equations for one block.
+
+`block_id` can be a `Symbol` or a string-like identifier; it is converted to a
+`Symbol` and matched against `EquationInfo.block` entries.
 """
 function render_block(obj, block_id; format::Symbol=:markdown, show_defs::Bool=true)
     ctx = _context(obj)
@@ -603,7 +710,12 @@ function render_block(obj, block_id; format::Symbol=:markdown, show_defs::Bool=t
 end
 
 """
-Render a symbol table from registered variables in a KernelContext or run result.
+    render_symbols(obj; format=:markdown, show_values=true)
+
+Render a symbol table for registered variables.
+
+When `show_values=true`, the table includes current values from the snapshot
+state in the context/run result.
 """
 function render_symbols(obj; format::Symbol=:markdown, show_values::Bool=true)
     ctx = _context(obj)
@@ -626,7 +738,12 @@ function render_symbols(obj; format::Symbol=:markdown, show_values::Bool=true)
 end
 
 """
-Render a block list from a RunSpec or from section specs.
+    render_blocks(obj; format=:markdown)
+
+Render a block list.
+
+Accepts either a `JCGECore.RunSpec` or a `Vector{JCGECore.SectionSpec}` and
+renders block names grouped by section when section metadata is available.
 """
 function render_blocks(obj; format::Symbol=:markdown)
     if obj isa JCGECore.RunSpec
@@ -639,7 +756,9 @@ function render_blocks(obj; format::Symbol=:markdown)
 end
 
 """
-Render section+block structure.
+    render_sections(sections; format=:markdown)
+
+Render the section/block skeleton from a vector of `SectionSpec`.
 """
 function render_sections(sections::Vector{JCGECore.SectionSpec}; format::Symbol=:markdown)
     lines = String[]
@@ -744,6 +863,23 @@ function _component_type(block::Symbol; section=nothing,
     return _component_type_from_block(block)
 end
 
+"""
+    constraint_kind_enum(sym)
+
+Convert a `Symbol` to `DualSignals.ConstraintKind`.
+
+This is used by tag/component mappers to attach consistent constraint metadata
+to rendered equations and results.
+"""
+constraint_kind_enum(sym::Symbol) = _enum_by_name(DualSignals.ConstraintKind, sym)
+
+"""
+    component_type_enum(sym)
+
+Convert a `Symbol` to `DualSignals.ComponentType`.
+"""
+component_type_enum(sym::Symbol) = _enum_by_name(DualSignals.ComponentType, sym)
+
 function _enum_by_name(::Type{T}, name::Symbol) where {T}
     for val in Base.Enums.instances(T)
         if string(val) == string(name)
@@ -753,8 +889,6 @@ function _enum_by_name(::Type{T}, name::Symbol) where {T}
     error("Unknown enum value $(name) for $(T)")
 end
 
-constraint_kind_enum(sym::Symbol) = _enum_by_name(DualSignals.ConstraintKind, sym)
-component_type_enum(sym::Symbol) = _enum_by_name(DualSignals.ComponentType, sym)
 _constraint_kind_enum(sym::Symbol) = constraint_kind_enum(sym)
 _component_type_enum(sym::Symbol) = component_type_enum(sym)
 _constraint_sense_enum(sym::Symbol) = _enum_by_name(DualSignals.ConstraintSense, sym)
@@ -895,6 +1029,14 @@ function _constraint_kind_from_tag(block::Symbol, tag::Symbol)
 end
 
 
+"""
+    DEFAULT_CONSTRAINT_KIND_TAG_MAP
+
+Default map of equation tags to `DualSignals.ConstraintKind`.
+
+Used by result export and reporting to categorize constraints when explicit
+metadata is not provided in the model.
+"""
 const DEFAULT_CONSTRAINT_KIND_TAG_MAP = Dict{Symbol,DualSignals.ConstraintKind}(
     # Technology / production / transformation
     :eqpy => _constraint_kind_enum(:technology),
@@ -1163,6 +1305,11 @@ function _render_equations(eqs; format::Symbol, level::Symbol, show_defs::Bool)
     return join(lines, "\n")
 end
 
+"""
+    _render_block_list(blocks; format)
+
+Render a compact list of blocks for a section or model summary.
+"""
 function _render_block_list(blocks; format::Symbol)
     lines = String[]
     header = "Blocks"
@@ -1186,6 +1333,11 @@ function _block_label(block)
     return string(nameof(typeof(block)))
 end
 
+"""
+    _render_symbol_table(rows; format, show_values)
+
+Dispatch to the table renderer for the chosen `format`.
+"""
 function _render_symbol_table(rows; format::Symbol, show_values::Bool)
     if format == :markdown
         return _render_symbol_table_markdown(rows; show_values=show_values)
@@ -1196,6 +1348,11 @@ function _render_symbol_table(rows; format::Symbol, show_values::Bool)
     end
 end
 
+"""
+    _render_symbol_table_markdown(rows; show_values)
+
+Render a symbol table in Markdown.
+"""
 function _render_symbol_table_markdown(rows; show_values::Bool)
     cols = show_values ? ["symbol", "value", "lower", "upper", "fixed"] : ["symbol", "lower", "upper", "fixed"]
     lines = String[]
@@ -1211,6 +1368,11 @@ function _render_symbol_table_markdown(rows; show_values::Bool)
     return join(lines, "\n")
 end
 
+"""
+    _render_symbol_table_latex(rows; show_values)
+
+Render a symbol table in LaTeX.
+"""
 function _render_symbol_table_latex(rows; show_values::Bool)
     cols = show_values ? ["symbol", "value", "lower", "upper", "fixed"] : ["symbol", "lower", "upper", "fixed"]
     lines = String[]
@@ -1225,6 +1387,11 @@ function _render_symbol_table_latex(rows; show_values::Bool)
     return join(lines, "\n")
 end
 
+"""
+    _render_symbol_table_plain(rows; show_values)
+
+Render a symbol table in plain text.
+"""
 function _render_symbol_table_plain(rows; show_values::Bool)
     cols = show_values ? ["symbol", "value", "lower", "upper", "fixed"] : ["symbol", "lower", "upper", "fixed"]
     lines = String[]
@@ -1239,6 +1406,11 @@ function _render_symbol_table_plain(rows; show_values::Bool)
     return join(lines, "\n")
 end
 
+"""
+    _render_block_section(block, eqs; format, show_defs)
+
+Render a block heading followed by its equations.
+"""
 function _render_block_section(block, eqs; format::Symbol, show_defs::Bool)
     lines = String[]
     header = "Block: $(block)"
@@ -1255,6 +1427,11 @@ function _render_block_section(block, eqs; format::Symbol, show_defs::Bool)
     return lines
 end
 
+"""
+    _render_equation_line(eq; format, show_defs)
+
+Render a single equation line with label and optional domain annotations.
+"""
 function _render_equation_line(eq; format::Symbol, show_defs::Bool)
     info, is_math = _equation_info(eq; format=format)
     domains = Pair{String,Vector{String}}[]
@@ -1334,6 +1511,11 @@ function _collect_domains!(domains::Vector{Pair{String,Vector{String}}}, expr::E
     return domains
 end
 
+"""
+    _render_domains(domains)
+
+Render domain annotations (index sets) for an equation.
+"""
 function _render_domains(domains::Vector{Pair{String,Vector{String}}})
     if isempty(domains)
         return ""
@@ -1402,10 +1584,23 @@ function _format_text(format::Symbol, text::String)
     end
 end
 
+"""
+    render_expr(expr; format=:plain)
+
+Render an equation AST node to a string.
+
+Supported formats: `:plain`, `:markdown`, `:latex`. This is the lowest-level
+renderer used by `render_equations` and the equation file generators.
+"""
 function render_expr(expr::EquationExpr; format::Symbol=:plain)
     return _render_expr(expr; format=format)
 end
 
+"""
+    _render_expr(expr; format)
+
+Recursive expression renderer for the equation AST.
+"""
 function _render_expr(expr::EquationExpr; format::Symbol)
     if format == :markdown
         format = :latex
@@ -1514,6 +1709,11 @@ function _simplify_exponent_latex(text::AbstractString)
     return simplified
 end
 
+"""
+    _render_exponent_expr(expr)
+
+Render exponents using a plain representation to keep power formatting stable.
+"""
 function _render_exponent_expr(expr::EquationExpr)
     text = _render_expr(expr; format=:plain)
     text = replace(text, "[" => "_", "]" => "")
@@ -1536,6 +1736,11 @@ function _wrap_if_needed(expr::EquationExpr, rendered::AbstractString; format::S
     return rendered
 end
 
+"""
+    _render_symbol(name, idxs; format)
+
+Render a symbol name with optional indices.
+"""
 function _render_symbol(name::Symbol, idxs::Union{Nothing,Vector{Any}}; format::Symbol)
     if idxs === nothing || isempty(idxs)
         text = string(name)
@@ -1553,6 +1758,11 @@ function _render_symbol(name::Symbol, idxs::Union{Nothing,Vector{Any}}; format::
     return string(name, "[", idx_text, "]")
 end
 
+"""
+    _render_index(idx; format)
+
+Render a single index value (symbol/number/string) in the chosen format.
+"""
 function _render_index(idx; format::Symbol)
     if idx isa EIndex
         text = string(idx.name)

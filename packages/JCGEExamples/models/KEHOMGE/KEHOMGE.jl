@@ -1,3 +1,6 @@
+"""
+JCGEExamples.KEHOMGE defines the KEHOMGE example model.
+"""
 module KEHOMGE
 
 using JCGEBlocks
@@ -10,6 +13,9 @@ export model, baseline, scenario, solve, mpsge_model
 
 include("mpsge_model.jl")
 
+"""
+Load model data tables from the local data directory.
+"""
 function _load_data()
     datadir = joinpath(@__DIR__, "data")
     a_mat = JCGECalibrate.load_labeled_matrix(joinpath(datadir, "a.csv"))
@@ -88,9 +94,15 @@ function model(; eq::Symbol=:EQ1)
     )
 end
 
+"""
+Return the baseline RunSpec for KEHOMGE.
+"""
 baseline(; eq::Symbol=:EQ1) = model(eq=eq)
 scenario(; eq::Symbol=:EQ1) = model(eq=eq)
 
+"""
+Solve the KEHOMGE model and return the run result.
+"""
 function solve(; optimizer=PATHSolver.Optimizer, eq::Symbol=:EQ1)
     return JCGERuntime.run!(model(eq=eq); optimizer=optimizer, compile_ast=true, compile_objective=false)
 end

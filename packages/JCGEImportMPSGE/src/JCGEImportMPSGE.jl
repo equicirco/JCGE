@@ -1,3 +1,6 @@
+"""
+JCGEImportMPSGE converts `MPSGE.jl` model objects into JCGE block RunSpecs.
+"""
 module JCGEImportMPSGE
 
 using JCGEBlocks
@@ -8,7 +11,13 @@ using MPSGE
 export import_mpsge
 
 """
-Import an MPSGE.jl model object into a JCGE RunSpec.
+    import_mpsge(model; name="MPSGEImport", data=nothing)
+
+Import an `MPSGE.jl` model object into a JCGE `RunSpec`.
+
+When `data` is provided, it is used to populate a data-rich, MCP-style
+specification via `_import_mpsge_data`. Otherwise a minimal structure is built
+from the MPSGE production and demand trees.
 """
 function import_mpsge(model::MPSGEModel; name::String="MPSGEImport", data=nothing)
     if data !== nothing
@@ -17,6 +26,11 @@ function import_mpsge(model::MPSGEModel; name::String="MPSGEImport", data=nothin
     return _import_mpsge_minimal(model; name=name)
 end
 
+"""
+    _import_mpsge_minimal(model; name)
+
+Internal: build a minimal RunSpec using production, demand, and endowment flows.
+"""
 function _import_mpsge_minimal(model::MPSGEModel; name::String)
     commodity_objs = MPSGE.commodities(model)
     sector_objs = MPSGE.sectors(model)
@@ -130,6 +144,11 @@ function _import_mpsge_minimal(model::MPSGEModel; name::String)
     )
 end
 
+"""
+    _import_mpsge_data(model, data; name)
+
+Internal: build a detailed RunSpec using precomputed data tables.
+"""
 function _import_mpsge_data(::MPSGEModel, data; name::String)
     sectors = data.sectors
     labor = data.labor
@@ -300,11 +319,21 @@ function _import_mpsge_data(::MPSGEModel, data; name::String)
     )
 end
 
+"""
+    _scalar_value(x)
+
+Internal: coerce a scalar or MPSGE value to `Float64`.
+"""
 function _scalar_value(x)
     x isa Number && return Float64(x)
     return Float64(MPSGE.value(x))
 end
 
+"""
+    _strip_index_name(sym)
+
+Internal: strip `[idx]` suffixes from MPSGE symbol names and normalize separators.
+"""
 function _strip_index_name(sym::Symbol)
     s = String(sym)
     open_idx = findfirst('[', s)

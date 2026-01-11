@@ -1,3 +1,6 @@
+"""
+JCGEExamples.ScaleEconomyCGE defines the ScaleEconomyCGE example model.
+"""
 module ScaleEconomyCGE
 
 using JCGEBlocks
@@ -242,16 +245,28 @@ function model(; sam_path::Union{Nothing,AbstractString} = nothing,
     )
 end
 
+"""
+Return the baseline RunSpec for ScaleEconomyCGE.
+"""
 baseline() = model()
 
+"""
+Solve the ScaleEconomyCGE model and return the run result.
+"""
 function solve(; optimizer=Ipopt.Optimizer, kwargs...)
     return JCGERuntime.run!(model(; kwargs...); optimizer=optimizer)
 end
 
+"""
+Create a scenario placeholder for ScaleEconomyCGE.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end
 
+"""
+Return the data directory for ScaleEconomyCGE.
+"""
 datadir() = joinpath(@__DIR__, "data")
 
 end # module

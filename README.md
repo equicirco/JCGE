@@ -4,26 +4,12 @@
   <img alt="JCGE logo" src="docs/src/assets/jcge_logo_light.png" width="130">
 </picture>
 
-JCGE.jl is a modular, block-based framework for building and running computable general equilibrium (CGE) models in Julia.
+# JCGE.jl
 
-## Repository layout
-- `packages/`: independently testable Julia packages
-  - `JCGECore`: canonical data model and interfaces (no JuMP)
-  - `JCGECalibrate`: calibration utilities for standard functional forms (no JuMP)
-  - `JCGERuntime`: JuMP-facing runtime (model building, closure, diagnostics)
-  - `JCGEBlocks`: standard CGE blocks built on the interfaces
-  - `JCGEOutput`: equation rendering and results/IO reporting utilities
-  - `JCGEAgentInterface`: MCP passthrough for AI agent usage
-  - `JCGEImportMPSGE`: converter from MPSGE.jl model objects into blocks
-  - `JCGEImportData`: ETL utilities to emit canonical JCGE CSV datasets
-  - `JCGEExamples`: runnable reference models and scenarios
-- `docs/`: documentation sources (optional)
-- `scripts/`: developer utilities (optional)
-- `data/`: tiny toy datasets only (no large/proprietary files)
+This repository is the entry point for the block-based Julia CGE (JCGE) modeling and execution tool.
 
-## Solvers
-- NLP: Ipopt (via JuMP)
-- MCP: PATH (via PATHSolver.jl; runs without a license for small problems, license required for larger ones: https://pages.cs.wisc.edu/~ferris/path.html)
+Project documentation is available on the docs site, which will be reachable at `jcge.org`.
 
-## Status
-Pre-release. APIs are unstable until a tagged v0.1.
+Author: Riccardo Boero <ribo@nilu.no>
+
+License: Apache-2.0 (applies to all project components).

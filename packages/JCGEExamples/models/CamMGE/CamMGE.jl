@@ -1,3 +1,6 @@
+"""
+JCGEExamples.CamMGE defines the CamMGE example model.
+"""
 module CamMGE
 
 using JCGEBlocks
@@ -8,10 +11,16 @@ using PATHSolver
 
 export model, baseline, scenario, solve, mpsge_model
 
+"""
+Convert a labeled vector to a Dict keyed by labels.
+"""
 function _vecdict(vec::JCGECalibrate.LabeledVector{Float64})
     return Dict(vec.labels[i] => vec.data[i] for i in eachindex(vec.labels))
 end
 
+"""
+Convert a labeled matrix to a Dict keyed by label tuples.
+"""
 function _matdict(mat::JCGECalibrate.LabeledMatrix{Float64})
     out = Dict{Tuple{Symbol,Symbol},Float64}()
     for r in mat.row_labels, c in mat.col_labels
@@ -20,6 +29,9 @@ function _matdict(mat::JCGECalibrate.LabeledMatrix{Float64})
     return out
 end
 
+"""
+Load model data tables from the local data directory.
+"""
 function _load_data()
     datadir = joinpath(@__DIR__, "data")
     io_mat = JCGECalibrate.load_labeled_matrix(joinpath(datadir, "io.csv"))
@@ -363,12 +375,21 @@ function model()
     )
 end
 
+"""
+Return the baseline RunSpec for CamMGE.
+"""
 baseline() = model()
 
+"""
+Solve the CamMGE model and return the run result.
+"""
 function solve(; optimizer=PATHSolver.Optimizer)
     return JCGERuntime.run!(model(); optimizer=optimizer, compile_ast=true, compile_objective=false)
 end
 
+"""
+Create a scenario placeholder for CamMGE.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end

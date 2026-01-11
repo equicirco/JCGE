@@ -1,6 +1,9 @@
 using JCGECalibrate
 using MPSGE
 
+"""
+Return the data used to build the MPSGE model.
+"""
 function _mpsge_data()
     datadir = joinpath(@__DIR__, "data")
     a_mat = JCGECalibrate.load_labeled_matrix(joinpath(datadir, "a.csv"))

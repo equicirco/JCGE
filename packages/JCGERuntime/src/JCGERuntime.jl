@@ -1,3 +1,6 @@
+"""
+JuMP-facing runtime for building, solving, and inspecting JCGE models.
+"""
 module JCGERuntime
 
 using DualSignals
@@ -12,30 +15,47 @@ export snapshot, snapshot_state
 export solve!
 export run!
 
-"Minimal kernel context with registries."
+"""
+Minimal kernel context with registries.
+"""
 mutable struct KernelContext
     variables::Dict{Symbol,Any}
     equations::Vector{NamedTuple}
     model::Union{JuMP.Model,Nothing}
 end
 
+"""
+Create a `KernelContext` with an optional JuMP model.
+"""
 KernelContext(; model::Union{JuMP.Model,Nothing}=nothing) =
     KernelContext(Dict{Symbol,Any}(), NamedTuple[], model)
 
-"Register a variable handle under a symbolic name."
+"""
+Register a variable handle under a symbolic name.
+"""
 function register_variable!(ctx::KernelContext, name::Symbol, handle)
     ctx.variables[name] = handle
     return handle
 end
 
-"Register an equation with tags and an opaque payload."
+"""
+Register an equation with tags and an opaque payload.
+"""
 function register_equation!(ctx::KernelContext; tag::Symbol, block::Symbol, payload)
     push!(ctx.equations, (tag=tag, block=block, payload=payload))
     return nothing
 end
 
+"""
+List registered equations in the context.
+"""
 list_equations(ctx::KernelContext) = ctx.equations
 
+"""
+Solve the JuMP model attached to the context.
+
+If `optimizer` is provided it is set on the model before solving.
+"""
 function solve!(ctx::KernelContext; optimizer=nothing)
     model = ctx.model
     model isa JuMP.Model || error("KernelContext.model is not set; provide a JuMP.Model to solve.")
@@ -46,6 +66,19 @@ function solve!(ctx::KernelContext; optimizer=nothing)
     return model
 end
 
+"""
+Build, compile, solve, and summarize a RunSpec.
+
+Key options:
+- `compile_ast`: when true, compile the AST into JuMP constraints.
+- `compile_objective`: when false, skip objective compilation.
+- `mcp_fix`: optional dictionary of fixed MCP variables by symbol.
+
+Returns a NamedTuple with:
+- `context`: the KernelContext
+- `summary`: residual summary
+- `signals`: DualSignals dataset
+"""
 function run!(spec; optimizer=nothing, dataset_id::String="jcge", tol::Real=1e-6,
     description::Union{String,Nothing}=nothing, compile_ast::Bool=true, params=nothing,
     compile_objective::Bool=true, mcp_fix=nothing)
@@ -70,6 +103,11 @@ function run!(spec; optimizer=nothing, dataset_id::String="jcge", tol::Real=1e-6
     return (context=ctx, summary=summary, signals=signals)
 end
 
+"""
+Snapshot solved variable values into a dictionary.
+
+Only finite values are recorded.
+"""
 function snapshot(ctx::KernelContext)
     out = Dict{Symbol,Float64}()
     for (name, var) in ctx.variables
@@ -87,8 +125,16 @@ function snapshot(ctx::KernelContext)
     return out
 end
 
+"""
+Snapshot solved variable values from a result.
+"""
 snapshot(result::NamedTuple) = snapshot(result.context)
 
+"""
+Snapshot start/lower/upper/fixed variable states from a context.
+
+Only finite bounds and fixed values are recorded.
+"""
 function snapshot_state(ctx::KernelContext)
     start = Dict{Symbol,Float64}()
     lower = Dict{Symbol,Float64}()
@@ -123,8 +169,14 @@ function snapshot_state(ctx::KernelContext)
     return (start=start, lower=lower, upper=upper, fixed=fixed)
 end
 
+"""
+Snapshot start/lower/upper/fixed variable states from a result.
+"""
 snapshot_state(result::NamedTuple) = snapshot_state(result.context)
 
+"""
+Collect equation residuals from the registry.
+"""
 function equation_residuals(ctx::KernelContext)
     out = NamedTuple[]
     for eq in ctx.equations
@@ -136,6 +188,9 @@ function equation_residuals(ctx::KernelContext)
     return out
 end
 
+"""
+Summarize residuals with max and count above tolerance.
+"""
 function summarize_residuals(ctx::KernelContext; tol::Real=1e-6)
     res = equation_residuals(ctx)
     if isempty(res)
@@ -148,6 +203,12 @@ function summarize_residuals(ctx::KernelContext; tol::Real=1e-6)
     return (count=length(res), max_abs=absvals[max_idx], worst=worst, above_tol=above_tol)
 end
 
+"""
+Validate a built model context and return a report.
+
+The report includes residual summaries and MCP metadata checks if present.
+Use `level=:full` to include top residuals and basic scaling warnings.
+"""
 function validate_model(ctx::KernelContext; data=nothing, level::Symbol=:basic, tol::Real=1e-6)
     report = _new_report()
     structural = _category!(report, :structural)
@@ -225,6 +286,11 @@ function validate_model(ctx::KernelContext; data=nothing, level::Symbol=:basic, 
     return _finalize_report(report)
 end
 
+"""
+Convert residuals into a DualSignals dataset.
+
+This is a lightweight mapping focused on constraint residuals.
+"""
 function to_dualsignals(ctx::KernelContext; dataset_id::String="jcge",
     description::Union{String,Nothing}=nothing,
     tol::Real=1e-6)
@@ -269,6 +335,9 @@ function to_dualsignals(ctx::KernelContext; dataset_id::String="jcge",
     )
 end
 
+"""
+Map a Symbol to an enum member by name.
+"""
 function _enum_by_name(::Type{T}, name::Symbol) where {T}
     for val in Base.Enums.instances(T)
         if string(val) == string(name)
@@ -278,10 +347,24 @@ function _enum_by_name(::Type{T}, name::Symbol) where {T}
     error("Unknown enum value $(name) for $(T)")
 end
 
+"""
+Return a DualSignals ComponentType enum by name.
+"""
 _component_type_enum(sym::Symbol) = _enum_by_name(DualSignals.ComponentType, sym)
+"""
+Return a DualSignals ConstraintKind enum by name.
+"""
 _constraint_kind_enum(sym::Symbol) = _enum_by_name(DualSignals.ConstraintKind, sym)
+"""
+Return a DualSignals ConstraintSense enum by name.
+"""
 _constraint_sense_enum(sym::Symbol) = _enum_by_name(DualSignals.ConstraintSense, sym)
 
+"""
+Compile registered equations into JuMP constraints/objective.
+
+If `compile_objective` is true, a single objective is compiled.
+"""
 function compile_equations!(ctx::KernelContext; params=nothing, compile_objective::Bool=true)
     model = ctx.model
     model isa JuMP.Model || return ctx
@@ -325,10 +408,16 @@ function compile_equations!(ctx::KernelContext; params=nothing, compile_objectiv
     return ctx
 end
 
+"""
+Create a new validation report container.
+"""
 function _new_report()
     return Dict{Symbol,Dict{Symbol,Vector{String}}}()
 end
 
+"""
+Get or create a category entry within a validation report.
+"""
 function _category!(report, name::Symbol)
     if !haskey(report, name)
         report[name] = Dict(
@@ -340,6 +429,9 @@ function _category!(report, name::Symbol)
     return report[name]
 end
 
+"""
+Finalize a report into a summary NamedTuple.
+"""
 function _finalize_report(report)
     errors = 0
     warnings = 0
@@ -350,6 +442,9 @@ function _finalize_report(report)
     return (ok=errors == 0, errors=errors, warnings=warnings, categories=report)
 end
 
+"""
+Compile a single equation expression into a JuMP constraint.
+"""
 function _compile_equation(expr::JCGECore.EquationExpr, ctx::KernelContext, params, idxs, env::Dict{Symbol,Symbol}; mcp_var=nothing)
     if expr isa JCGECore.EEq
         lhs = _compile_expr(expr.lhs, ctx, params, idxs, env)
@@ -363,6 +458,9 @@ function _compile_equation(expr::JCGECore.EquationExpr, ctx::KernelContext, para
     error("Unsupported equation expression: expected EEq, got $(typeof(expr))")
 end
 
+"""
+Compile an objective expression into the JuMP model.
+"""
 function _compile_objective!(ctx::KernelContext, objective; params=nothing, sense=:Max)
     model = ctx.model
     model isa JuMP.Model || return nothing
@@ -382,6 +480,9 @@ function _compile_objective!(ctx::KernelContext, objective; params=nothing, sens
     return nothing
 end
 
+"""
+Compile an expression AST node into a JuMP-compatible expression.
+"""
 function _compile_expr(expr::JCGECore.EquationExpr, ctx::KernelContext, params, idxs, env::Dict{Symbol,Symbol})
     if expr isa JCGECore.EVar
         resolved = _resolve_indices(expr.idxs, idxs, env)
@@ -440,12 +541,18 @@ function _compile_expr(expr::JCGECore.EquationExpr, ctx::KernelContext, params, 
     end
 end
 
+"""
+Resolve a variable reference by name and indices.
+"""
 function _resolve_var(ctx::KernelContext, name::Symbol, idxs::Vector{Symbol})
     var_name = isempty(idxs) ? name : _global_var(name, idxs...)
     haskey(ctx.variables, var_name) || error("Missing variable: $(var_name)")
     return ctx.variables[var_name]
 end
 
+"""
+Resolve an MCP complementarity variable expression.
+"""
 function _compile_mcp_var(expr, ctx::KernelContext, params, idxs, env::Dict{Symbol,Symbol})
     if expr isa JCGECore.EVar
         resolved = _resolve_indices(expr.idxs, idxs, env)
@@ -457,11 +564,17 @@ function _compile_mcp_var(expr, ctx::KernelContext, params, idxs, env::Dict{Symb
     end
 end
 
+"""
+Resolve a parameter reference by name and indices.
+"""
 function _resolve_param(params, name::Symbol, idxs::Vector{Symbol})
     params === nothing && error("No params provided for parameter $(name)")
     return JCGECore.getparam(params, name, idxs...)
 end
 
+"""
+Build a global variable name from a base and indices.
+"""
 function _global_var(base::Symbol, idxs::Symbol...)
     if isempty(idxs)
         return base
@@ -469,6 +582,9 @@ function _global_var(base::Symbol, idxs::Symbol...)
     return Symbol(string(base), "_", join(string.(idxs), "_"))
 end
 
+"""
+Resolve indices from explicit indices or default indices and environment.
+"""
 function _resolve_indices(idxs, default_idxs, env::Dict{Symbol,Symbol})
     if idxs === nothing
         if default_idxs isa Tuple
@@ -495,6 +611,9 @@ function _resolve_indices(idxs, default_idxs, env::Dict{Symbol,Symbol})
     return resolved
 end
 
+"""
+Build an index environment mapping index names to values.
+"""
 function _index_env(index_names, indices)
     env = Dict{Symbol,Symbol}()
     if index_names === nothing

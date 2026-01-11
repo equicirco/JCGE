@@ -1,3 +1,6 @@
+"""
+JCGEExamples.LargeCountryCGE defines the LargeCountryCGE example model.
+"""
 module LargeCountryCGE
 
 using JCGEBlocks
@@ -190,16 +193,28 @@ function model(; sam_table::Union{Nothing,JCGECalibrate.SAMTable} = nothing,
     )
 end
 
+"""
+Return the baseline RunSpec for LargeCountryCGE.
+"""
 baseline() = model()
 
+"""
+Solve the LargeCountryCGE model and return the run result.
+"""
 function solve(; optimizer=Ipopt.Optimizer, kwargs...)
     return JCGERuntime.run!(model(; kwargs...); optimizer=optimizer)
 end
 
+"""
+Create a scenario placeholder for LargeCountryCGE.
+"""
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end
 
+"""
+Return the data directory for LargeCountryCGE.
+"""
 datadir() = joinpath(@__DIR__, "data")
 
 end # module

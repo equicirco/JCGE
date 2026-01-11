@@ -1,3 +1,6 @@
+"""
+Collection of example CGE models built with JCGE blocks.
+"""
 module JCGEExamples
 
 export StandardCGE
