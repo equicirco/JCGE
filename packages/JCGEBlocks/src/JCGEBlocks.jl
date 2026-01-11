@@ -60,6 +60,9 @@ export ForeignTradeBlock
 export PriceAggregationBlock
 export InternationalMarketBlock
 export ActivityPriceIOBlock
+export ActivityAnalysisBlock
+export ConsumerEndowmentCDBlock
+export CommodityMarketClearingBlock
 export CapitalPriceCompositionBlock
 export TradePriceLinkBlock
 export AbsorptionSalesBlock
@@ -161,6 +164,9 @@ export savings_investment
 export final_demand_clearing
 export consumption_objective
 export initial_values
+export activity_analysis
+export consumer_endowment_cd
+export commodity_market_clearing
 
 "Minimal example block used to validate end-to-end wiring."
 struct DummyBlock <: JCGECore.AbstractBlock
@@ -219,6 +225,15 @@ household_tax_revenue(name::Symbol, households::Vector{Symbol}; params::NamedTup
 
 household_income_sum(name::Symbol, households::Vector{Symbol}; params::NamedTuple=(;)) =
     HouseholdIncomeSumBlock(name, households, params)
+
+activity_analysis(name::Symbol, activities::Vector{Symbol}, commodities::Vector{Symbol}; params::NamedTuple) =
+    ActivityAnalysisBlock(name, activities, commodities, params)
+
+consumer_endowment_cd(name::Symbol, consumers::Vector{Symbol}, commodities::Vector{Symbol}; params::NamedTuple) =
+    ConsumerEndowmentCDBlock(name, consumers, commodities, params)
+
+commodity_market_clearing(name::Symbol, commodities::Vector{Symbol}, activities::Vector{Symbol}, consumers::Vector{Symbol}; params::NamedTuple) =
+    CommodityMarketClearingBlock(name, commodities, activities, consumers, params)
 
 market_clearing(name::Symbol, commodities::Vector{Symbol}, factors::Vector{Symbol}) =
     MarketClearingBlock(name, commodities, factors)
@@ -483,6 +498,28 @@ struct HouseholdDemandIncomeBlock <: JCGECore.AbstractBlock
     commodities::Vector{Symbol}
     factors::Vector{Symbol}
     activities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct ActivityAnalysisBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    activities::Vector{Symbol}
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct ConsumerEndowmentCDBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    consumers::Vector{Symbol}
+    commodities::Vector{Symbol}
+    params::NamedTuple
+end
+
+struct CommodityMarketClearingBlock <: JCGECore.AbstractBlock
+    name::Symbol
+    commodities::Vector{Symbol}
+    activities::Vector{Symbol}
+    consumers::Vector{Symbol}
     params::NamedTuple
 end
 
@@ -932,6 +969,33 @@ function var_name(block::FactorSupplyBlock, base::Symbol, idxs::Symbol...)
 end
 
 function register_eq!(ctx::JCGERuntime.KernelContext, block::FactorSupplyBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
+    return nothing
+end
+
+function var_name(block::ActivityAnalysisBlock, base::Symbol, idxs::Symbol...)
+    return global_var(base, idxs...)
+end
+
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ActivityAnalysisBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
+    return nothing
+end
+
+function var_name(block::ConsumerEndowmentCDBlock, base::Symbol, idxs::Symbol...)
+    return global_var(base, idxs...)
+end
+
+function register_eq!(ctx::JCGERuntime.KernelContext, block::ConsumerEndowmentCDBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
+    JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
+    return nothing
+end
+
+function var_name(block::CommodityMarketClearingBlock, base::Symbol, idxs::Symbol...)
+    return global_var(base, idxs...)
+end
+
+function register_eq!(ctx::JCGERuntime.KernelContext, block::CommodityMarketClearingBlock, tag::Symbol, idxs::Symbol...; info=nothing, expr=nothing, index_names=nothing, constraint=nothing, mcp_var=nothing, objective_expr=nothing, objective_sense=nothing)
     JCGERuntime.register_equation!(ctx; tag=tag, block=block.name, payload=_build_payload(block, idxs, index_names, info, expr, constraint, mcp_var, objective_expr, objective_sense))
     return nothing
 end
@@ -1965,6 +2029,156 @@ function JCGECore.build!(block::HouseholdDemandBlock, ctx::JCGERuntime.KernelCon
     else
         error("Unsupported consumption variable: $(block.consumption_var)")
     end
+end
+
+function JCGECore.build!(block::ActivityAnalysisBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
+    activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+    mcp = mcp_enabled(block.params)
+
+    Y = Dict{Symbol,Any}()
+    pq = Dict{Symbol,Any}()
+    X = Dict{Tuple{Symbol,Symbol},Any}()
+    Z = Dict{Tuple{Symbol,Symbol},Any}()
+
+    for s in activities
+        Y[s] = ensure_var!(ctx, model, global_var(:Y, s))
+    end
+    for g in commodities
+        pq[g] = ensure_var!(ctx, model, global_var(:pq, g))
+    end
+    for g in commodities, s in activities
+        X[(g, s)] = ensure_var!(ctx, model, global_var(:X, g, s))
+        Z[(g, s)] = ensure_var!(ctx, model, global_var(:Z, g, s))
+    end
+
+    for g in commodities, s in activities
+        constraint = nothing
+        expr = EEq(
+            EVar(:X, Any[EIndex(:g), EIndex(:s)]),
+            EMul([
+                EParam(:a_in, Any[EIndex(:g), EIndex(:s)]),
+                EVar(:Y, Any[EIndex(:s)]),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:X, Any[EIndex(:g), EIndex(:s)]) : nothing
+        register_eq!(ctx, block, :eqX, g, s;
+            info="X[g,s] == a_in[g,s] * Y[s]", expr=expr, index_names=(:g, :s), constraint=constraint, mcp_var=mcp_var)
+
+        constraint = nothing
+        expr = EEq(
+            EVar(:Z, Any[EIndex(:g), EIndex(:s)]),
+            EMul([
+                EParam(:a_out, Any[EIndex(:g), EIndex(:s)]),
+                EVar(:Y, Any[EIndex(:s)]),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:Z, Any[EIndex(:g), EIndex(:s)]) : nothing
+        register_eq!(ctx, block, :eqZ, g, s;
+            info="Z[g,s] == a_out[g,s] * Y[s]", expr=expr, index_names=(:g, :s), constraint=constraint, mcp_var=mcp_var)
+    end
+
+    for s in activities
+        constraint = nothing
+        lhs = ESum(:g, commodities, EMul([
+            EVar(:pq, Any[EIndex(:g)]),
+            EParam(:a_out, Any[EIndex(:g), EIndex(:s)]),
+        ]))
+        rhs = ESum(:g, commodities, EMul([
+            EVar(:pq, Any[EIndex(:g)]),
+            EParam(:a_in, Any[EIndex(:g), EIndex(:s)]),
+        ]))
+        expr = EEq(lhs, rhs)
+        mcp_var = mcp ? EVar(:Y, Any[EIndex(:s)]) : nothing
+        register_eq!(ctx, block, :eqZP, s;
+            info="sum(pq[g]*a_out[g,s]) == sum(pq[g]*a_in[g,s])", expr=expr, index_names=(:s,), constraint=constraint, mcp_var=mcp_var)
+    end
+
+    return nothing
+end
+
+function JCGECore.build!(block::ConsumerEndowmentCDBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
+    consumers = isempty(block.consumers) ? spec.model.sets.institutions : block.consumers
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    model = ctx.model
+    mcp = mcp_enabled(block.params)
+
+    Xp = Dict{Tuple{Symbol,Symbol},Any}()
+    Y = Dict{Symbol,Any}()
+    pq = Dict{Symbol,Any}()
+
+    for g in commodities
+        pq[g] = ensure_var!(ctx, model, global_var(:pq, g))
+    end
+    for c in consumers
+        Y[c] = ensure_var!(ctx, model, global_var(:Y, c))
+    end
+    for g in commodities, c in consumers
+        Xp[(g, c)] = ensure_var!(ctx, model, global_var(:Xp, g, c))
+    end
+
+    for c in consumers
+        constraint = nothing
+        expr = EEq(
+            EVar(:Y, Any[EIndex(:c)]),
+            ESum(:g, commodities, EMul([
+                EVar(:pq, Any[EIndex(:g)]),
+                EParam(:endowment, Any[EIndex(:g), EIndex(:c)]),
+            ])),
+        )
+        mcp_var = mcp ? EVar(:Y, Any[EIndex(:c)]) : nothing
+        register_eq!(ctx, block, :eqY, c;
+            info="Y[c] == sum(pq[g] * endowment[g,c])", expr=expr, index_names=(:c,), constraint=constraint, mcp_var=mcp_var)
+    end
+
+    for g in commodities, c in consumers
+        constraint = nothing
+        expr = EEq(
+            EVar(:Xp, Any[EIndex(:g), EIndex(:c)]),
+            EDiv(
+                EMul([
+                    EParam(:alpha, Any[EIndex(:g), EIndex(:c)]),
+                    EVar(:Y, Any[EIndex(:c)]),
+                ]),
+                EVar(:pq, Any[EIndex(:g)]),
+            ),
+        )
+        mcp_var = mcp ? EVar(:Xp, Any[EIndex(:g), EIndex(:c)]) : nothing
+        register_eq!(ctx, block, :eqXp, g, c;
+            info="Xp[g,c] == alpha[g,c] * Y[c] / pq[g]", expr=expr, index_names=(:g, :c), constraint=constraint, mcp_var=mcp_var)
+    end
+
+    return nothing
+end
+
+function JCGECore.build!(block::CommodityMarketClearingBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)
+    commodities = isempty(block.commodities) ? spec.model.sets.commodities : block.commodities
+    activities = isempty(block.activities) ? spec.model.sets.activities : block.activities
+    consumers = isempty(block.consumers) ? spec.model.sets.institutions : block.consumers
+    model = ctx.model
+    mcp = mcp_enabled(block.params)
+
+    for g in commodities
+        pq = ensure_var!(ctx, model, global_var(:pq, g))
+        constraint = nothing
+        expr = EEq(
+            EAdd([
+                ESum(:s, activities, EVar(:Z, Any[EIndex(:g), EIndex(:s)])),
+                ESum(:c, consumers, EParam(:endowment, Any[EIndex(:g), EIndex(:c)])),
+            ]),
+            EAdd([
+                ESum(:s, activities, EVar(:X, Any[EIndex(:g), EIndex(:s)])),
+                ESum(:c, consumers, EVar(:Xp, Any[EIndex(:g), EIndex(:c)])),
+            ]),
+        )
+        mcp_var = mcp ? EVar(:pq, Any[EIndex(:g)]) : nothing
+        register_eq!(ctx, block, :eqMC, g;
+            info="sum(Z[g,s])+sum(endowment[g,c]) == sum(X[g,s])+sum(Xp[g,c])",
+            expr=expr, index_names=(:g,), constraint=constraint, mcp_var=mcp_var)
+    end
+
+    return nothing
 end
 
 function JCGECore.build!(block::MarketClearingBlock, ctx::JCGERuntime.KernelContext, spec::JCGECore.RunSpec)

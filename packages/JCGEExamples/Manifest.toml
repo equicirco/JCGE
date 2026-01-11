@@ -2,7 +2,7 @@
 
 julia_version = "1.12.3"
 manifest_format = "2.0"
-project_hash = "49f51019768ff8e5768ddc257e71f30f383cc473"
+project_hash = "e8b4f70f83d612561805893712256cdf50f06537"
 
 [[deps.ASL_jll]]
 deps = ["Artifacts", "JLLWrappers", "Libdl", "Pkg"]
@@ -239,7 +239,7 @@ uuid = "9fb9d605-0ed3-4980-82c1-f0874844db5d"
 version = "0.0.0"
 
 [[deps.JCGEExamples]]
-deps = ["CSV", "DataFrames", "Ipopt", "JCGEBlocks", "JCGECalibrate", "JCGECore", "JCGERuntime", "JuMP", "MathOptInterface", "PATHSolver", "Pkg", "Test"]
+deps = ["CSV", "DataFrames", "Ipopt", "JCGEBlocks", "JCGECalibrate", "JCGECore", "JCGERuntime", "JuMP", "MPSGE", "MathOptInterface", "PATHSolver", "Pkg", "Statistics", "Test"]
 path = "."
 uuid = "0291785c-4d3c-45ec-ba8e-d8f5428f97c2"
 version = "0.0.0"
@@ -372,6 +372,12 @@ deps = ["Artifacts", "JLLWrappers", "Libdl"]
 git-tree-sha1 = "2eefa8baa858871ae7770c98c3c2a7e46daba5b4"
 uuid = "d00139f3-1899-568f-a2f0-47f597d42d70"
 version = "5.1.3+0"
+
+[[deps.MPSGE]]
+deps = ["DataFrames", "JuMP", "OrderedCollections", "PATHSolver"]
+git-tree-sha1 = "c41433d82612252b090300f38af9259436394ae2"
+uuid = "d5dc2f44-7ae2-49e9-bc77-b47b6bca565d"
+version = "0.6.4"
 
 [[deps.MUMPS_seq_jll]]
 deps = ["Artifacts", "CompilerSupportLibraries_jll", "JLLWrappers", "Libdl", "METIS_jll", "libblastrampoline_jll"]

@@ -9,7 +9,9 @@ export QuotaCGE
 export ScaleEconomyCGE
 export DynCGE
 export CamCGE
+export CamMGE
 export CamMCP
+export KEHOMGE
 export KorCGE
 export KorMCP
 
@@ -22,7 +24,9 @@ include("../models/QuotaCGE/QuotaCGE.jl")
 include("../models/ScaleEconomyCGE/ScaleEconomyCGE.jl")
 include("../models/DynCGE/DynCGE.jl")
 include("../models/CamCGE/CamCGE.jl")
+include("../models/CamMGE/CamMGE.jl")
 include("../models/CamMCP/CamMCP.jl")
+include("../models/KEHOMGE/KEHOMGE.jl")
 include("../models/KorCGE/KorCGE.jl")
 include("../models/KorMCP/KorMCP.jl")
 

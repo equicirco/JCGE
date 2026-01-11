@@ -45,7 +45,9 @@ All sections should be present (empty is allowed), and the following must be non
 - `ScaleEconomyCGE`: Chapter 10.6 (IRSCGE, SEQ=281)
 - `DynCGE`: Recursive-dynamic model (DYNCGE, SEQ=410, Japanese edition)
 - `CamCGE`: Cameroon CGE model (CAMCGE, SEQ=81)
+- `CamMGE`: Cameroon CGE model (MPSGE syntax, CAMMGE, SEQ=140)
 - `CamMCP`: Cameroon CGE model as MCP (CAMMCP, SEQ=129)
+- `KEHOMGE`: Multiple equilibria model (KEHOMGE, SEQ=149)
 - `KorCGE`: Korea CGE model (KORCGE, SEQ=100, Chapter 11 in Chenery et al., 1986)
 - `KorMCP`: Korea CGE model as MCP (KORMCP, SEQ=130, Chapter 11 in Chenery et al., 1986)
 

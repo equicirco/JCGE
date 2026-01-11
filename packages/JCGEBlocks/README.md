@@ -63,6 +63,9 @@ world = international_market(:world, goods, regions, mapping)
 - Prices: `WorldPriceLinkBlock`, `ExchangeRateLinkBlock`
 - External balance: balance of payments (foreign savings)
 - Market clearing: `GoodsMarketClearingBlock`, `CompositeMarketClearingBlock`, `FactorMarketClearingBlock`
+- Activity analysis (fixed coefficients): `ActivityAnalysisBlock`
+- Endowment-based CD demand: `ConsumerEndowmentCDBlock`
+- Commodity market clearing (MPSGE-style): `CommodityMarketClearingBlock`
 - Factor mobility/capital stock: `MobileFactorMarketBlock`, `CapitalStockReturnBlock`
 - Composite consumption/price level: `CompositeConsumptionBlock`, `PriceLevelBlock`
 - Closure: numeraire + macro closure choices

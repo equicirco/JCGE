@@ -1,4 +1,4 @@
-module CamMCP
+module CamMGE
 
 using JCGEBlocks
 using JCGECore
@@ -6,7 +6,7 @@ using JCGERuntime
 using JCGECalibrate
 using PATHSolver
 
-export model, baseline, scenario, solve
+export model, baseline, scenario, solve, mpsge_model
 
 function _vecdict(vec::JCGECalibrate.LabeledVector{Float64})
     return Dict(vec.labels[i] => vec.data[i] for i in eachindex(vec.labels))
@@ -189,9 +189,9 @@ end
 """
     model() -> RunSpec
 
-Return a RunSpec for the Cameroon CGE MCP port (block-based).
+Return a RunSpec for the Cameroon CGE MPSGE port (block-based MCP).
 """
-function model(; fix_er::Bool=false)
+function model()
     data = _load_data()
     sectors = data.sectors
     labor = data.labor
@@ -307,9 +307,7 @@ function model(; fix_er::Bool=false)
     fixed_vals[:fsav] = data.fsav0
     fixed_vals[:mps] = data.mps0
     fixed_vals[:gdtot] = data.gdtot0
-    if fix_er
-        fixed_vals[:er] = data.er
-    end
+    fixed_vals[:er] = data.er
 
     for i in sectors
         fixed_vals[JCGEBlocks.global_var(:k, i)] = data.k0[i]
@@ -353,7 +351,7 @@ function model(; fix_er::Bool=false)
     sections = [JCGECore.section(sym, section_blocks[sym]) for sym in allowed_sections]
     required_nonempty = [:production, :households, :markets]
     return JCGECore.build_spec(
-        "CamMCP",
+        "CamMGE",
         sets,
         mappings,
         sections;
@@ -367,12 +365,14 @@ end
 
 baseline() = model()
 
-function solve(; optimizer=PATHSolver.Optimizer, fix_er::Bool=false)
-    return JCGERuntime.run!(model(fix_er=fix_er); optimizer=optimizer, compile_ast=true, compile_objective=false)
+function solve(; optimizer=PATHSolver.Optimizer)
+    return JCGERuntime.run!(model(); optimizer=optimizer, compile_ast=true, compile_objective=false)
 end
 
 function scenario(name::Symbol)
     return JCGECore.ScenarioSpec(name, Dict{Symbol,Any}())
 end
+
+include("mpsge_model.jl")
 
 end # module

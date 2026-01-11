@@ -9,6 +9,7 @@ using JCGEExamples.QuotaCGE
 using JCGEExamples.ScaleEconomyCGE
 using JCGEExamples.DynCGE
 using JCGEExamples.CamCGE
+using JCGEExamples.CamMGE
 using JCGEExamples.CamMCP
 using JCGEExamples.KorCGE
 using JCGEExamples.KorMCP
@@ -48,6 +49,10 @@ import MathOptInterface as MOI
     cam_spec = CamCGE.model()
     @test cam_spec.name == "CamCGE"
 
+    cammge_spec = CamMGE.model()
+    @test cammge_spec.name == "CamMGE"
+
+
     cammcp_spec = CamMCP.model()
     @test cammcp_spec.name == "CamMCP"
 
@@ -56,6 +61,7 @@ import MathOptInterface as MOI
 
     kormcp_spec = KorMCP.model()
     @test kormcp_spec.name == "KorMCP"
+
 
 end
 
@@ -184,6 +190,7 @@ if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
         else
             @test max_constraint_residual(result_kor) <= 1e-5
         end
+
     end
 end
 
@@ -191,18 +198,53 @@ end
     result_mcp = CamMCP.solve()
     @test result_mcp.summary.count >= 0
 
+    result_mge = CamMGE.solve()
+    @test result_mge.summary.count >= 0
+
     result_kor_mcp = KorMCP.solve()
     @test result_kor_mcp.summary.count >= 0
+
+    result_kehomge = KEHOMGE.solve()
+    @test result_kehomge.summary.count >= 0
+
+
+    for eq in result_mcp.context.equations
+        payload = eq.payload
+        if payload isa NamedTuple && eq.block != :init && eq.block != :numeraire
+            @test haskey(payload, :mcp_var)
+        end
+    end
+    for eq in result_kor_mcp.context.equations
+        payload = eq.payload
+        if payload isa NamedTuple && eq.block != :init && eq.block != :numeraire
+            @test haskey(payload, :mcp_var)
+        end
+    end
+
+    for eq in result_mge.context.equations
+        payload = eq.payload
+        if payload isa NamedTuple && eq.block != :init && eq.block != :numeraire
+            @test haskey(payload, :mcp_var)
+        end
+    end
+
+    for eq in result_kehomge.context.equations
+        payload = eq.payload
+        if payload isa NamedTuple && eq.block != :init && eq.block != :numeraire
+            @test haskey(payload, :mcp_var)
+        end
+    end
 end
 
 
-if get(ENV, "JCGE_COMPARE_STANDARD", "0") == "1"
-    @testset "JCGEExamples.Compare.StandardCGE" begin
+if get(ENV, "JCGE_COMPARE_SOLUTIONS", "0") == "1"
+    @testset "JCGEExamples.Compare.Solutions" begin
         using Pkg
         using CSV
         using DataFrames
         Pkg.add("StandardCGE")
         import StandardCGE as StdCGE
+        import MPSGE
 
         sam_path = joinpath(StandardCGE.datadir(), "sam_2_2.csv")
         df = DataFrame(CSV.File(sam_path))
@@ -228,5 +270,85 @@ if get(ENV, "JCGE_COMPARE_STANDARD", "0") == "1"
         @test isfinite(std_obj)
         @test isfinite(ours_obj)
         @test isapprox.(ours_Xp, std_Xp; rtol=1e-5, atol=1e-6) |> all
+
+        cam_data = CamMGE._load_data()
+        mpsge_model = CamMGE.mpsge_model()
+        MPSGE.solve!(mpsge_model)
+
+        result_mge = CamMGE.solve()
+        result_mcp = CamMCP.solve(fix_er=true)
+
+        cammge_vars = result_mge.context.variables
+        cammcp_vars = result_mcp.context.variables
+
+        sectors = CamMGE.model().model.sets.commodities
+        traded = cam_data.traded
+        labor = CamMGE.model().model.sets.factors
+
+        function jcge_value(vars, sym)
+            return JuMP.value(vars[sym])
+        end
+
+        for i in sectors
+            @test isapprox(jcge_value(cammge_vars, JCGEBlocks.global_var(:xd, i)),
+                jcge_value(cammcp_vars, JCGEBlocks.global_var(:xd, i)); rtol=1e-4, atol=1e-6)
+            @test isapprox(jcge_value(cammge_vars, JCGEBlocks.global_var(:pd, i)),
+                jcge_value(cammcp_vars, JCGEBlocks.global_var(:pd, i)); rtol=1e-4, atol=1e-6)
+            @test isapprox(jcge_value(cammge_vars, JCGEBlocks.global_var(:p, i)),
+                jcge_value(cammcp_vars, JCGEBlocks.global_var(:p, i)); rtol=1e-4, atol=1e-6)
+        end
+
+        for i in traded
+            @test isapprox(jcge_value(cammge_vars, JCGEBlocks.global_var(:m, i)),
+                jcge_value(cammcp_vars, JCGEBlocks.global_var(:m, i)); rtol=1e-4, atol=1e-6)
+            @test isapprox(jcge_value(cammge_vars, JCGEBlocks.global_var(:e, i)),
+                jcge_value(cammcp_vars, JCGEBlocks.global_var(:e, i)); rtol=1e-4, atol=1e-6)
+            @test isapprox(jcge_value(cammge_vars, JCGEBlocks.global_var(:pm, i)),
+                jcge_value(cammcp_vars, JCGEBlocks.global_var(:pm, i)); rtol=1e-4, atol=1e-6)
+            @test isapprox(jcge_value(cammge_vars, JCGEBlocks.global_var(:pe, i)),
+                jcge_value(cammcp_vars, JCGEBlocks.global_var(:pe, i)); rtol=1e-4, atol=1e-6)
+        end
+
+        for lc in labor
+            @test isapprox(jcge_value(cammge_vars, JCGEBlocks.global_var(:wa, lc)),
+                jcge_value(cammcp_vars, JCGEBlocks.global_var(:wa, lc)); rtol=1e-4, atol=1e-6)
+        end
+
+        for i in sectors
+            xd_val = jcge_value(cammge_vars, JCGEBlocks.global_var(:xd, i))
+            pd_val = jcge_value(cammge_vars, JCGEBlocks.global_var(:pd, i))
+            p_val = jcge_value(cammge_vars, JCGEBlocks.global_var(:p, i))
+
+            xd_mpsge = JuMP.value(mpsge_model[:XD][i]) * cam_data.xd0[i]
+            pd_mpsge = JuMP.value(mpsge_model[:PD][i]) * cam_data.pd0[i]
+            p_mpsge = JuMP.value(mpsge_model[:P][i]) * cam_data.pd0[i]
+
+            @test isapprox(xd_val, xd_mpsge; rtol=1e-4, atol=1e-6)
+            @test isapprox(pd_val, pd_mpsge; rtol=1e-4, atol=1e-6)
+            @test isapprox(p_val, p_mpsge; rtol=1e-4, atol=1e-6)
+        end
+
+        for i in traded
+            m_val = jcge_value(cammge_vars, JCGEBlocks.global_var(:m, i))
+            pm_val = jcge_value(cammge_vars, JCGEBlocks.global_var(:pm, i))
+            pe_val = jcge_value(cammge_vars, JCGEBlocks.global_var(:pe, i))
+
+            m_mpsge = JuMP.value(mpsge_model[:M][i]) * cam_data.m0[i]
+            pm_base = cam_data.pwm0[i] * cam_data.er * (1.0 + cam_data.tm0[i])
+            pe_base = cam_data.pwe0[i] * cam_data.er / (1.0 + cam_data.te[i])
+            pm_mpsge = JuMP.value(mpsge_model[:PM][i]) * pm_base
+            pe_mpsge = JuMP.value(mpsge_model[:PE][i]) * pe_base
+
+            @test isapprox(m_val, m_mpsge; rtol=1e-4, atol=1e-6)
+            @test isapprox(pm_val, pm_mpsge; rtol=1e-4, atol=1e-6)
+            @test isapprox(pe_val, pe_mpsge; rtol=1e-4, atol=1e-6)
+        end
+
+        for lc in labor
+            wa_val = jcge_value(cammge_vars, JCGEBlocks.global_var(:wa, lc))
+            wa_mpsge = JuMP.value(mpsge_model[:PL][lc]) * cam_data.wa0[lc]
+            @test isapprox(wa_val, wa_mpsge; rtol=1e-4, atol=1e-6)
+        end
+
     end
 end

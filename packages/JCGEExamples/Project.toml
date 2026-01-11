@@ -13,8 +13,10 @@ JCGECore = "9fb9d605-0ed3-4980-82c1-f0874844db5d"
 JCGERuntime = "cc244198-1562-43f7-ad75-589e1d675269"
 JuMP = "4076af6c-e467-56ae-b986-b466b2749572"
 MathOptInterface = "b8f27783-ece8-5eb3-8dc8-9495eed66fee"
+MPSGE = "d5dc2f44-7ae2-49e9-bc77-b47b6bca565d"
 PATHSolver = "f5f7c340-0bb3-5c69-969a-41884d311d1b"
 Pkg = "44cfe95a-1eb2-52ea-b672-e2afdf69b78f"
+Statistics = "10745b16-79ce-11e8-11f9-7d13ad32a3b2"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 
 [sources]

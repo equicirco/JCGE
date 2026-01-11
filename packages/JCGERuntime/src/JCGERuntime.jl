@@ -47,11 +47,18 @@ end
 
 function run!(spec; optimizer=nothing, dataset_id::String="jcge", tol::Real=1e-6,
     description::Union{String,Nothing}=nothing, compile_ast::Bool=true, params=nothing,
-    compile_objective::Bool=true)
+    compile_objective::Bool=true, mcp_fix=nothing)
     model = JuMP.Model()
     ctx = KernelContext(model=model)
     for block in spec.model.blocks
         JCGECore.build!(block, ctx, spec)
+    end
+    if mcp_fix !== nothing
+        for (name, value) in mcp_fix
+            var = get(ctx.variables, name, nothing)
+            var isa JuMP.VariableRef || error("mcp_fix expects a variable Symbol registered in context: $(name)")
+            JuMP.fix(var, value; force=true)
+        end
     end
     if compile_ast
         compile_equations!(ctx; params=params, compile_objective=compile_objective)
