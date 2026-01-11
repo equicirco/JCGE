@@ -7,6 +7,7 @@ using JCGECore
 export KernelContext, register_variable!, register_equation!, list_equations
 export compile_equations!
 export equation_residuals, summarize_residuals, to_dualsignals
+export validate_model
 export snapshot, snapshot_state
 export solve!
 export run!
@@ -147,6 +148,83 @@ function summarize_residuals(ctx::KernelContext; tol::Real=1e-6)
     return (count=length(res), max_abs=absvals[max_idx], worst=worst, above_tol=above_tol)
 end
 
+function validate_model(ctx::KernelContext; data=nothing, level::Symbol=:basic, tol::Real=1e-6)
+    report = _new_report()
+    structural = _category!(report, :structural)
+    residuals = _category!(report, :residuals)
+    mcp = _category!(report, :mcp)
+    scaling = _category!(report, :scaling)
+
+    isempty(ctx.equations) && push!(structural[:warnings], "No equations registered in context")
+    isempty(ctx.variables) && push!(structural[:warnings], "No variables registered in context")
+
+    res = equation_residuals(ctx)
+    if isempty(res)
+        push!(residuals[:warnings], "No residuals recorded; call compile_equations! and solve before validation")
+    else
+        summary = summarize_residuals(ctx; tol=tol)
+        push!(residuals[:notes], "max_abs=$(summary.max_abs), above_tol=$(summary.above_tol)")
+        if summary.above_tol > 0
+            push!(residuals[:warnings], "Residuals above tolerance: $(summary.above_tol)")
+        end
+        if level == :full
+            absvals = map(r -> abs(r.residual), res)
+            order = sortperm(absvals; rev=true)
+            topk = min(length(order), 5)
+            for i in 1:topk
+                r = res[order[i]]
+                push!(residuals[:notes], "worst $(i): $(r.block).$(r.tag) $(r.indices) residual=$(r.residual)")
+            end
+        end
+    end
+
+    has_mcp = any(eq -> eq.payload isa NamedTuple && haskey(eq.payload, :mcp_var), ctx.equations)
+    if has_mcp
+        skip_tags = Set([:objective, :numeraire, :start, :lower, :upper, :fixed])
+        for eq in ctx.equations
+            payload = eq.payload
+            if !(payload isa NamedTuple)
+                continue
+            end
+            expr = get(payload, :expr, nothing)
+            if expr isa JCGECore.EquationExpr && !(eq.tag in skip_tags) && !haskey(payload, :mcp_var)
+                push!(mcp[:warnings], "Missing mcp_var for $(eq.block).$(eq.tag) $(get(payload, :indices, ()))")
+            end
+        end
+    else
+        push!(mcp[:notes], "No MCP equations detected")
+    end
+
+    if level == :full
+        values = Float64[]
+        for var in values(ctx.variables)
+            if var isa JuMP.VariableRef
+                v = try
+                    JuMP.value(var)
+                catch
+                    continue
+                end
+                isfinite(v) || continue
+                push!(values, v)
+            end
+        end
+        if !isempty(values)
+            maxval = maximum(abs.(values))
+            minval = minimum(abs.(values))
+            if maxval > 1e6
+                push!(scaling[:warnings], "Large variable magnitude detected: max=$(maxval)")
+            end
+            if minval < 1e-8
+                push!(scaling[:warnings], "Very small variable magnitude detected: min=$(minval)")
+            end
+        end
+    end
+
+    data === nothing || push!(structural[:notes], "data provided but not used by validate_model yet")
+
+    return _finalize_report(report)
+end
+
 function to_dualsignals(ctx::KernelContext; dataset_id::String="jcge",
     description::Union{String,Nothing}=nothing,
     tol::Real=1e-6)
@@ -245,6 +323,31 @@ function compile_equations!(ctx::KernelContext; params=nothing, compile_objectiv
         _compile_objective!(ctx, local_objective; params=params, sense=local_sense)
     end
     return ctx
+end
+
+function _new_report()
+    return Dict{Symbol,Dict{Symbol,Vector{String}}}()
+end
+
+function _category!(report, name::Symbol)
+    if !haskey(report, name)
+        report[name] = Dict(
+            :errors => String[],
+            :warnings => String[],
+            :notes => String[],
+        )
+    end
+    return report[name]
+end
+
+function _finalize_report(report)
+    errors = 0
+    warnings = 0
+    for cat in values(report)
+        errors += length(cat[:errors])
+        warnings += length(cat[:warnings])
+    end
+    return (ok=errors == 0, errors=errors, warnings=warnings, categories=report)
 end
 
 function _compile_equation(expr::JCGECore.EquationExpr, ctx::KernelContext, params, idxs, env::Dict{Symbol,Symbol}; mcp_var=nothing)

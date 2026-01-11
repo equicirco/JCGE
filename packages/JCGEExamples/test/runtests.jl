@@ -13,6 +13,7 @@ using JCGEExamples.CamMGE
 using JCGEExamples.CamMCP
 using JCGEExamples.KorCGE
 using JCGEExamples.KorMCP
+using JCGECore
 using JCGERuntime
 using JCGEBlocks
 using JuMP
@@ -23,6 +24,8 @@ import MathOptInterface as MOI
     sam_path = joinpath(StandardCGE.datadir(), "sam_2_2.csv")
     spec = StandardCGE.model(sam_path=sam_path)
     @test spec.name == "StandardCGE"
+    report = validate_spec(spec)
+    @test report.ok
 
     lrg_sam = joinpath(LargeCountryCGE.datadir(), "sam_2_2.csv")
     lrg_spec = LargeCountryCGE.model(sam_path=lrg_sam)
@@ -100,6 +103,8 @@ if get(ENV, "JCGE_SOLVE_TESTS", "0") == "1"
         result = StandardCGE.solve(sam_path=sam_path; optimizer=Ipopt.Optimizer)
         status = MOI.get(result.context.model, MOI.TerminationStatus())
         @test status in (MOI.OPTIMAL, MOI.LOCALLY_SOLVED, MOI.FEASIBLE_POINT)
+        validate_report = JCGERuntime.validate_model(result.context; level=:basic)
+        @test validate_report.ok
 
         result_simple = SimpleCGE.solve(; optimizer=Ipopt.Optimizer)
         status_simple = MOI.get(result_simple.context.model, MOI.TerminationStatus())

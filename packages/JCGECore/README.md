@@ -17,3 +17,10 @@ JCGECore provides a lightweight builder to standardize RunSpec assembly:
 
 ## Non-goals
 - Solving, model construction, or calibration implementations
+
+## Validation
+Use `validate_spec` for optional structural checks on a `RunSpec`:
+```julia
+report = JCGECore.validate_spec(spec)
+report.ok || println(report.categories)
+```

@@ -5,6 +5,7 @@ export SectionSpec, RunSpecTemplate, section, template, build_spec
 export allowed_sections
 export AbstractBlock, calibrate!, build!, report
 export validate
+export validate_spec
 export getparam
 export EquationExpr, EIndex, EVar, EParam, EConst, EAdd, EMul, EPow, EDiv, ENeg, ESum, EProd, EEq, ERaw
 
@@ -231,6 +232,66 @@ function validate(spec::RunSpec)
     isempty(spec.model.sets.factors) && error("Sets.factors is empty")
     isempty(spec.model.sets.institutions) && error("Sets.institutions is empty")
     return true
+end
+
+"Validate RunSpec structure and closure; returns a report instead of throwing."
+function validate_spec(spec::RunSpec; data=nothing)
+    report = _new_report()
+    structural = _category!(report, :structural)
+    closure = _category!(report, :closure)
+    accounting = _category!(report, :accounting)
+
+    if isempty(spec.model.blocks)
+        push!(structural[:errors], "RunSpec has no blocks")
+    end
+    if isempty(spec.model.sets.commodities)
+        push!(structural[:errors], "Sets.commodities is empty")
+    end
+    if isempty(spec.model.sets.activities)
+        push!(structural[:errors], "Sets.activities is empty")
+    end
+    if isempty(spec.model.sets.factors)
+        push!(structural[:errors], "Sets.factors is empty")
+    end
+    if isempty(spec.model.sets.institutions)
+        push!(structural[:errors], "Sets.institutions is empty")
+    end
+
+    num = spec.closure.numeraire
+    if !(num in spec.model.sets.commodities || num in spec.model.sets.factors)
+        push!(closure[:warnings], "Numeraire $(num) not found in commodities or factors")
+    end
+
+    if data === nothing
+        push!(accounting[:notes], "No data provided for SAM or flow consistency checks")
+    end
+
+    return _finalize_report(report)
+end
+
+function _new_report()
+    return Dict{Symbol,Dict{Symbol,Vector{String}}}()
+end
+
+function _category!(report, name::Symbol)
+    if !haskey(report, name)
+        report[name] = Dict(
+            :errors => String[],
+            :warnings => String[],
+            :notes => String[],
+        )
+    end
+    return report[name]
+end
+
+function _finalize_report(report)
+    errors = 0
+    warnings = 0
+    for cat in values(report)
+        errors += length(cat[:errors])
+        warnings += length(cat[:warnings])
+    end
+    return (ok=errors == 0, errors=errors, warnings=warnings, categories=report)
 end
 
 "Get parameter values from dict- or table-like containers."

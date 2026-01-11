@@ -27,3 +27,11 @@ You can also use the shortcut:
 ```julia
 result2 = JCGEBlocks.rerun!(spec2; from=result, optimizer=Ipopt.Optimizer)
 ```
+
+## Validation
+Optional runtime checks are available once a model is built or solved:
+```julia
+result = JCGERuntime.run!(spec; optimizer=Ipopt.Optimizer)
+report = JCGERuntime.validate_model(result.context; level=:basic)
+report.ok || println(report.categories)
+```
