@@ -21,3 +21,9 @@ makedocs(
         ],
     ],
 )
+
+deploydocs(
+    repo = "github.com/equicirco/JCGE.jl.git",
+    branch = "gh-pages",
+    devbranch = "main",
+)
