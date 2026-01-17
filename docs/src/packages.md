@@ -21,12 +21,14 @@ those package docs.
 
 ## Resources
 
-- JCGECore: code https://github.com/equicirco/JCGECore.jl, docs https://equicirco.github.io/JCGECore.jl
-- JCGEBlocks: code https://github.com/equicirco/JCGEBlocks.jl, docs https://equicirco.github.io/JCGEBlocks.jl
-- JCGERuntime: code https://github.com/equicirco/JCGERuntime.jl, docs https://equicirco.github.io/JCGERuntime.jl
-- JCGECalibrate: code https://github.com/equicirco/JCGECalibrate.jl, docs https://equicirco.github.io/JCGECalibrate.jl
-- JCGEOutput: code https://github.com/equicirco/JCGEOutput.jl, docs https://equicirco.github.io/JCGEOutput.jl
-- JCGEExamples: code https://github.com/equicirco/JCGEExamples.jl, docs https://equicirco.github.io/JCGEExamples.jl
-- JCGEImportData: code https://github.com/equicirco/JCGEImportData.jl, docs https://equicirco.github.io/JCGEImportData.jl
-- JCGEImportMPSGE: code https://github.com/equicirco/JCGEImportMPSGE.jl, docs https://equicirco.github.io/JCGEImportMPSGE.jl
-- JCGEAgentInterface: code https://github.com/equicirco/JCGEAgentInterface.jl, docs https://equicirco.github.io/JCGEAgentInterface.jl
+| Package | Source Code | Documentation |
+|---|---|---|
+| `JCGECore` | <https://github.com/equicirco/JCGECore.jl> | <https://equicirco.github.io/JCGECore.jl> |
+| `JCGEBlocks` | <https://github.com/equicirco/JCGEBlocks.jl> | <https://equicirco.github.io/JCGEBlocks.jl> |
+| `JCGERuntime` | <https://github.com/equicirco/JCGERuntime.jl> | <https://equicirco.github.io/JCGERuntime.jl> |
+| `JCGECalibrate` | <https://github.com/equicirco/JCGECalibrate.jl> | <https://equicirco.github.io/JCGECalibrate.jl> |
+| `JCGEOutput` | <https://github.com/equicirco/JCGEOutput.jl> | <https://equicirco.github.io/JCGEOutput.jl> |
+| `JCGEExamples` | <https://github.com/equicirco/JCGEExamples.jl> | <https://equicirco.github.io/JCGEExamples.jl> |
+| `JCGEImportData` | <https://github.com/equicirco/JCGEImportData.jl> | <https://equicirco.github.io/JCGEImportData.jl> |
+| `JCGEImportMPSGE` | <https://github.com/equicirco/JCGEImportMPSGE.jl> | <https://equicirco.github.io/JCGEImportMPSGE.jl> |
+| `JCGEAgentInterface` | <https://github.com/equicirco/JCGEAgentInterface.jl> | <https://equicirco.github.io/JCGEAgentInterface.jl> |

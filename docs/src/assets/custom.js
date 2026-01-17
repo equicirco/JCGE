@@ -11,8 +11,9 @@ document.addEventListener("DOMContentLoaded", () => {
     sidebar.querySelector(".docs-header") ||
     sidebar;
 
-  if (header.querySelector(".jcge-logo")) {
-    return;
+  const existing = sidebar.querySelector(".jcge-logo");
+  if (existing) {
+    existing.remove();
   }
 
   const link =
