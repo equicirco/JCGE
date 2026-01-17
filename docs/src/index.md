@@ -3,7 +3,7 @@
 ```@raw html
 <picture>
   <source srcset="assets/jcge_logo_dark.png" media="(prefers-color-scheme: dark)">
-  <img src="assets/jcge_logo_light.png" alt="JCGE" style="max-width: 130px; height: auto;">
+  <img src="assets/jcge_logo_light.png" alt="JCGE" style="max-width: 130px; height: auto; align: left;">
 </picture>
 ```
 
