@@ -31,4 +31,5 @@ deploydocs(
     repo = "github.com/equicirco/JCGE.git",
     branch = "gh-pages",
     devbranch = "main",
+    versions = nothing,
 )

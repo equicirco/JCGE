@@ -3,7 +3,7 @@ title: JCGE - Julia Computable General Equilibrium Framework.
 message: >-
   A - Initial public release of framework documentation.
 type: software
-doi: ""
+doi: 10.5281/zenodo.18282436
 authors:
   - given-names: Riccardo
     family-names: Boero
@@ -12,7 +12,7 @@ authors:
     affiliation: NILU
 identifiers:
   - type: doi
-    value: ""
+    value: 10.5281/zenodo.18282436
     description: This DOI represents all software versions.
 repository-code: "https://github.com/equicirco/JCGE"
 url: "https://JCGE.org"

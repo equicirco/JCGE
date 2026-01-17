@@ -20,17 +20,18 @@ If you use JCGE in your CGE models, please cite it as:
 
 ```
 Boero, R. JCGE - Julia Computable General Equilibrium Framework [software], 2026
-DOI: 
+DOI: 10.5281/zenodo.18282436
+URL: https://doi.org/10.5281/zenodo.18282436
 ```
 
 BibTeX:
 
 ```bibtex
-@software{boero_jcge_2025,
-  title        = {JCGE - Julia Computable General Equilibrium Framework.},
+@software{boero_jcge_2026,
+  title        = {JCGE - Julia Computable General Equilibrium Framework},
   author       = {Boero, Riccardo},
   year         = {2026},
-  doi          = {},
+  doi          = {10.5281/zenodo.18282436},
   url          = {https://JCGE.org}
 }
 ```
