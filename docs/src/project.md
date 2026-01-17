@@ -23,9 +23,3 @@ fits together, how to model with it, and where to find the right package for a t
 - Detailed package APIs (see each package documentation site)
 - Solver implementation details
 - Package-level release notes
-
-## Roadmap (short)
-
-- Stabilize package interfaces and shared data schema.
-- Expand reference models and validation coverage.
-- Improve onboarding material for new modelers.
