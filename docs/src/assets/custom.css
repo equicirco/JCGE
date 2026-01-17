@@ -1,4 +1,4 @@
-.jcge-logo {
+.jcge-sidebar-logo {
   display: flex;
   justify-content: center;
   align-items: center;
@@ -6,11 +6,10 @@
   width: 100%;
 }
 
-.jcge-logo img {
+.jcge-sidebar-logo img {
   display: block;
-  max-width: 160px;
+  max-width: 140px;
   height: auto;
-  margin: 0 auto;
 }
 
 .jcge-logo-dark {

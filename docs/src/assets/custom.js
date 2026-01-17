@@ -1,44 +1,27 @@
 document.addEventListener("DOMContentLoaded", () => {
-  const sidebar = document.querySelector(".docs-sidebar") || document.querySelector("nav");
+  const sidebar = document.querySelector(".docs-sidebar");
   if (!sidebar) {
+    return;
+  }
+
+  if (sidebar.querySelector("#jcge-sidebar-logo")) {
+    return;
+  }
+
+  const packageName = sidebar.querySelector(".docs-package-name");
+  if (!packageName) {
     return;
   }
 
   const base = (window.documenterBaseURL || ".").replace(/\/$/, "");
 
-  const header =
-    sidebar.querySelector(".docs-package-name") ||
-    sidebar.querySelector(".docs-sidebar-header") ||
-    sidebar.querySelector(".docs-header") ||
-    sidebar;
+  const wrapper = document.createElement("div");
+  wrapper.id = "jcge-sidebar-logo";
+  wrapper.className = "jcge-sidebar-logo";
+  wrapper.innerHTML = `
+    <img class="jcge-logo-light" src="${base}/assets/jcge_logo_light.png" alt="JCGE">
+    <img class="jcge-logo-dark" src="${base}/assets/jcge_logo_dark.png" alt="JCGE">
+  `;
 
-  if (header.querySelector("#jcge-sidebar-logo")) {
-    return;
-  }
-
-  header.innerHTML = "";
-
-  const link =
-    document.querySelector("a.docs-logo") ||
-    document.querySelector("a.docs-sidebar-title") ||
-    document.querySelector("a#documenter-home");
-
-  const logoLink = document.createElement("a");
-  logoLink.id = "jcge-sidebar-logo";
-  logoLink.className = "jcge-logo";
-  logoLink.href = link ? link.href : "/";
-
-  const logoLight = document.createElement("img");
-  logoLight.className = "jcge-logo-light";
-  logoLight.src = `${base}/assets/jcge_logo_light.png`;
-  logoLight.alt = "JCGE";
-
-  const logoDark = document.createElement("img");
-  logoDark.className = "jcge-logo-dark";
-  logoDark.src = `${base}/assets/jcge_logo_dark.png`;
-  logoDark.alt = "JCGE";
-
-  logoLink.appendChild(logoLight);
-  logoLink.appendChild(logoDark);
-  header.prepend(logoLink);
+  sidebar.insertBefore(wrapper, packageName);
 });
