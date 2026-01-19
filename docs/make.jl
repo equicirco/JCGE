@@ -6,6 +6,7 @@ makedocs(
         prettyurls = get(ENV, "CI", "false") == "true",
         inventory_version = "dev",
         assets = [
+            "assets/favicon.ico",
             "assets/logo-theme.js",
             "assets/logo.css",
         ],
