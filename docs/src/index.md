@@ -32,6 +32,7 @@ If you are looking for package-level APIs, start with the
 - [Getting Started](getting-started.md): install packages and run your first model
 - [Packages](packages.md): what each package does in the ecosystem
 - [Guides](guides/modeling.md): modeling, calibration, output, and imports
+- [AI Agent Interface](guides/agents.md): use JCGE through MCP-compatible AI agents
 - [Contact & citation](contact.md): how to cite and who to reach
 
 ## Ecosystem at a glance

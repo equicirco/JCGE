@@ -31,6 +31,7 @@ makedocs(
             "Calibration" => "guides/calibration.md",
             "Output & Reporting" => "guides/output.md",
             "Imports" => "guides/imports.md",
+            "AI Agent Interface" => "guides/agents.md",
         ],
         "Contact & Citation" => "contact.md",
     ],

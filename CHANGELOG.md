@@ -12,6 +12,8 @@ Security: For vulnerabilities.
 
 ## [A] - 2026-01-17
 ### Added
+- AI Agent Interface guide covering `JCGEAgentInterface`, MCP server use,
+  registry naming, Docker image use, and the available service categories.
 - Documentation site scaffolding with Documenter config and build setup.
 - Landing page explaining JCGE scope, architecture, and ecosystem map.
 - Getting Started guide covering installation and a reference model run.

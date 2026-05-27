@@ -13,7 +13,7 @@ summarizes responsibilities and typical usage.
 | `JCGEExamples` | Reference models | Canonical model ports and tests |
 | `JCGEImportData` | Canonical IO/SAM schema | Convert external data to CSV inputs |
 | `JCGEImportMPSGE` | MPSGE.jl importer | Translate MPSGE objects to RunSpecs |
-| `JCGEAgentInterface` | MCP-compatible interface for agents | Tooling for AI integrations |
+| `JCGEAgentInterface` | MCP-compatible interface for agents | AI-assisted discovery, modeling guidance, solving, validation, and reporting |
 
 Each package has its own documentation site and API reference. This repository
 keeps the ecosystem narrative consistent, but package-specific details belong in
@@ -32,3 +32,8 @@ those package docs.
 | `JCGEImportData` | <https://github.com/equicirco/JCGEImportData.jl> | <https://ImportData.JCGE.org> |
 | `JCGEImportMPSGE` | <https://github.com/equicirco/JCGEImportMPSGE.jl> | <https://ImportMPSGE.JCGE.org> |
 | `JCGEAgentInterface` | <https://github.com/equicirco/JCGEAgentInterface.jl> | <https://AgentInterface.JCGE.org> |
+
+For agent-based use, see the [AI Agent Interface guide](guides/agents.md). The
+released MCP server is registered as `io.github.equicirco/JCGEAgentInterface.jl`
+and the container image is published as
+`ghcr.io/equicirco/jcge-agentinterface-mcp:<release-version>`.

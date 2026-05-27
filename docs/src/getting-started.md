@@ -48,6 +48,19 @@ steps include inspecting reports and exporting tables via `JCGEOutput`.
 For MCP models, PATHSolver is required. See the [Imports guide](guides/imports.md)
 for license setup.
 
+## Agent interface
+
+If you want to use JCGE through an MCP-compatible AI assistant, add
+`JCGEAgentInterface` to the same Julia environment:
+
+```julia
+import Pkg
+Pkg.add("JCGEAgentInterface")
+```
+
+The [AI Agent Interface guide](guides/agents.md) explains the registered MCP
+server, Docker image, and model-development services.
+
 ## Next steps
 
 - Read the [Modeling guide](guides/modeling.md) to understand blocks and model structure.
