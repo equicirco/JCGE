@@ -25,6 +25,11 @@ report.ok || error("Model validation failed")
 result = run!(spec; optimizer=Ipopt.Optimizer)
 ```
 
+`run!` compiles the closure conditions marked `:enforce` and evaluates any
+conditions marked `:accounting_check` after solution. The latter remain in the
+equation inventory but are not supplied to the solver. See
+[Closures & Checks](closures.md) for setup and residual inspection.
+
 ## Solvers
 
 - NLP models: Ipopt (`Ipopt.Optimizer`)
@@ -90,5 +95,6 @@ independently.
 ## Next steps
 
 - [Blocks guide](blocks.md) for reusable components.
+- [Closures & Checks](closures.md) for closure diagnostics.
 - [Calibration guide](calibration.md) for data workflows and schema details.
 - [Output guide](output.md) for reporting and exports.

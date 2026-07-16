@@ -47,6 +47,11 @@ components fully compatible with the runtime and output tooling.
 - Avoid hard-coded sector/factor counts; always work with sets.
 - All equations are registered with block and tag metadata to enable rendering
   and reporting.
+- `closure_condition(block, tag, indices...)` constructs the stable key for an
+  equation when a model needs to mark it as an accounting check.
+
+See [Closures & Checks](closures.md) for the role declaration and runtime
+behaviour.
 
 See the `JCGEBlocks` documentation at <https://Blocks.JCGE.org> for the full block
 catalog and parameters.

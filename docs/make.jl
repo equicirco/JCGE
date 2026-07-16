@@ -26,6 +26,7 @@ makedocs(
         "Packages" => "packages.md",
         "Guides" => [
             "Modeling" => "guides/modeling.md",
+            "Closures & Checks" => "guides/closures.md",
             "Running Models" => "guides/running.md",
             "Blocks" => "guides/blocks.md",
             "Calibration" => "guides/calibration.md",

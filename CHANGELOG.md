@@ -10,6 +10,13 @@ Removed: For features removed in this release.
 Fixed: For any bug fixes.
 Security: For vulnerabilities.
 
+## [B] - 2026-07-16
+### Added
+- Cross-package guide for closure-condition roles and post-solution accounting
+  checks, covering Core, Blocks, Runtime, and Output.
+- Links and package-overview descriptions aligned with closure-aware modeling,
+  solving, and reporting.
+
 ## [A] - 2026-01-17
 ### Added
 - AI Agent Interface guide covering `JCGEAgentInterface`, MCP server use,

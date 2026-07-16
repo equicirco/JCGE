@@ -13,6 +13,16 @@ text = render_equations(result; format=:markdown)
 
 Rendered equations are derived from the equation AST, not solver objects.
 
+Use `show_condition_roles=true` to label solver-enforced equations and
+post-solution accounting checks in the listing:
+
+```julia
+text = render_equations(result;
+    format=:markdown,
+    show_condition_roles=true,
+)
+```
+
 Use this to:
 
 - Audit model structure.
@@ -24,6 +34,10 @@ Use this to:
 Results are stored in a canonical `Results` object with primals/duals and
 metadata. Export helpers include JSON, CSV, Arrow/Parquet, and a tidy
 long-table form for analysis.
+
+Post-solution accounting residuals are available as
+`results.accounting_checks`. They are included in tidy exports with
+`kind = :accounting_check` and as zero-dual constraints in DualSignals output.
 
 Typical workflows include:
 
@@ -46,3 +60,4 @@ for each run and merge on keys.
 
 - [Running guide](running.md) for scenario workflows.
 - [Modeling guide](modeling.md) for block-level inspection.
+- [Closures & Checks](closures.md) for the corresponding model and runtime setup.

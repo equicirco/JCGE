@@ -5,11 +5,11 @@ summarizes responsibilities and typical usage.
 
 | Package | Purpose | Typical Use |
 |---|---|---|
-| `JCGECore` | RunSpec, sections, sets/mappings, scenarios, validation | Define model structure and constraints |
-| `JCGEBlocks` | Reusable CGE blocks | Assemble production/household/market systems |
-| `JCGERuntime` | Compilation, solver execution, and experiment workflows | Solve a RunSpec and run parameter/policy batches |
+| `JCGECore` | RunSpec, sections, sets/mappings, scenarios, validation, and closure-condition roles | Define model structure and closure choices |
+| `JCGEBlocks` | Reusable CGE blocks and stable equation-condition keys | Assemble production/household/market systems and declare accounting checks |
+| `JCGERuntime` | Role-aware compilation, solver execution, residual diagnostics, and experiment workflows | Solve a RunSpec and run parameter/policy batches |
 | `JCGECalibrate` | SAM loading and calibration | Derive parameters and starting values |
-| `JCGEOutput` | Rendering and results containers | Export equations, tidy results, DualSignals |
+| `JCGEOutput` | Equation rendering, results containers, and accounting-check reporting | Export equations, tidy results, and DualSignals |
 | `JCGEExamples` | Reference models | Canonical model ports and tests |
 | `JCGEImportData` | Canonical IO/SAM schema | Convert external data to CSV inputs |
 | `JCGEImportMPSGE` | MPSGE.jl importer | Translate MPSGE objects to RunSpecs |
@@ -37,3 +37,6 @@ For agent-based use, see the [AI Agent Interface guide](guides/agents.md). The
 released MCP server is registered as `io.github.equicirco/JCGEAgentInterface.jl`
 and the container image is published as
 `ghcr.io/equicirco/jcge-agentinterface-mcp:<release-version>`.
+
+For solver conditions, retained accounting identities, and their reporting,
+see [Closures & Checks](guides/closures.md).

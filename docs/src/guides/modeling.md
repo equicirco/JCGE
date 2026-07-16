@@ -61,6 +61,12 @@ The [Blocks guide](blocks.md) gives concrete examples and parameterization detai
 Closures specify which variables are fixed and which adjust. A numeraire
 normalizes the price level and avoids indeterminacy.
 
+When an identity is implied by the selected closure, retain it as an accounting
+check rather than an additional solver constraint. This preserves complete
+equation reporting without creating a redundant system. See
+[Closures & Checks](closures.md) for the declaration pattern and residual
+diagnostics.
+
 ## 3. Validate
 
 ```julia
@@ -103,5 +109,6 @@ Typical outputs include:
 ## Next steps
 
 - [Blocks guide](blocks.md) for reusable components and parameterization.
+- [Closures & Checks](closures.md) for solver conditions and post-solution identities.
 - [Calibration guide](calibration.md) for data workflows and schema details.
 - [Running guide](running.md) for solvers, scenarios, and batch execution.
