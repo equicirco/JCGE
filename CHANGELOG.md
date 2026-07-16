@@ -10,7 +10,7 @@ Removed: For features removed in this release.
 Fixed: For any bug fixes.
 Security: For vulnerabilities.
 
-## [B] - 2026-07-16
+## [B] - Unreleased
 ### Added
 - Cross-package guide for closure-condition roles and post-solution accounting
   checks, covering Core, Blocks, Runtime, and Output.
