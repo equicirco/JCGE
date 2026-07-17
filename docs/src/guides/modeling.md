@@ -18,6 +18,8 @@ Key ideas:
 - Data should be mapped into the canonical schema before building blocks.
 - Calibration outputs become model parameters and initial values.
 - Keep data transformations explicit so the pipeline is reproducible.
+- Keep observed physical quantities, their units, and their driver mappings in
+  a separate calibrated data layer when they are needed for reporting.
 
 ## 2. Build a RunSpec
 
@@ -53,6 +55,8 @@ JCGEBlocks provides a library of reusable economic blocks. Typical models mix:
 - Market clearing blocks.
 - Demand or institutional behavior blocks.
 - Closure and numeraire blocks.
+- Auxiliary-quantity blocks when a calibrated supplementary quantity must
+  enter the equilibrium equations.
 
 The [Blocks guide](blocks.md) gives concrete examples and parameterization details.
 
@@ -98,6 +102,17 @@ Typical outputs include:
 - Equation listings for verification.
 - Report tables by sector or account.
 - Scenario comparison exports.
+- Physical-flow projections and signed physical-balance checks, referenced to
+  the solved zero-policy baseline.
+
+Physical quantities can be treated in two different ways. Use
+`JCGEOutput` satellite reporting when they are derived from solved model
+drivers and do not alter equilibrium. Create a solved baseline reference once,
+then project every scenario against that reference; this reproduces the
+observed baseline quantity exactly while retaining any calibration difference
+for inspection. If a quantity instead constrains production, demand, or a
+market identity, represent it in the model through the generic auxiliary
+quantity blocks described in the [Blocks guide](blocks.md).
 
 ## Tips for building models
 

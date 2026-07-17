@@ -22,6 +22,12 @@ Calibration produces:
 - Starting values for levels and prices.
 - Consistent mappings that align data with model sets.
 
+When a model reports physical quantities, keep their observed baseline values,
+units, and mappings to model-volume drivers alongside the monetary
+calibration data. These anchors are not SAM accounts: they provide the input
+to `JCGEOutput` satellite reporting and retain a traceable connection between
+the monetary model and the physical data layer.
+
 ## Typical workflow
 
 ```julia

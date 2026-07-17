@@ -24,11 +24,13 @@ The JCGE ecosystem is built as a set of focused packages that connect through sh
 data structures and explicit interfaces:
 
 - Core abstractions and schemas live in `JCGECore`.
-- Reusable modeling blocks are defined in `JCGEBlocks`.
+- Reusable economic blocks and domain-neutral auxiliary-quantity equations are
+  defined in `JCGEBlocks`.
 - Model execution, solver orchestration, and generic experiment workflows run
   through `JCGERuntime`.
 - Calibration workflows live in `JCGECalibrate`.
-- Reporting and export live in `JCGEOutput`.
+- Reporting, export, and baseline-referenced satellite quantities live in
+  `JCGEOutput`.
 - Reference models and end-to-end examples live in `JCGEExamples`.
 - Data ingestion is handled by `JCGEImportData` and `JCGEImportMPSGE`.
 
@@ -37,6 +39,8 @@ data structures and explicit interfaces:
 - Modularity over monoliths.
 - Explicit data schemas and traceable transformations.
 - Separation between model structure, calibration, runtime, and reporting.
+- Physical quantities represented consistently through calibrated anchors,
+  solved baseline references, and explicitly declared units.
 - Reproducible workflows that scale from small to large models.
 - Clear boundaries between packages with stable interfaces.
 

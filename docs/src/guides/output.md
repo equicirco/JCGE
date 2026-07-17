@@ -45,6 +45,43 @@ Typical workflows include:
 - Writing tidy outputs for dashboards or notebooks.
 - Archiving scenario runs for reproducibility.
 
+## Physical satellite quantities
+
+Satellite reporting links solved model-volume drivers to calibrated quantities
+outside the monetary CGE accounts, such as physical flows, energy use,
+emissions, stocks, or technical indicators. An anchor records a stable
+identifier, a declared unit, an observed baseline quantity, its model driver,
+and the corresponding calibration driver. The anchors are model data, not
+hard-coded reporting values.
+
+```julia
+using JCGEOutput
+
+anchors = calibration.physical_anchors
+reference = satellite_reference(baseline_result, anchors)
+
+baseline_quantities = satellite_projection(baseline_result, anchors;
+    reference=reference)
+scenario_quantities = satellite_projection(scenario_result, anchors;
+    reference=reference)
+
+calibration_differences = satellite_calibration_report(reference, anchors)
+checks = satellite_balances(scenario_quantities, calibration.physical_balances)
+```
+
+`satellite_reference` stores the solved zero-policy value of every driver.
+Using that reference makes the baseline projection reproduce its observed
+physical quantities exactly and gives every scenario the same denominator.
+`satellite_calibration_report` makes any difference between monetary
+calibration inputs and solved driver values visible rather than silently
+absorbing it. `satellite_balances` evaluates signed post-solution identities;
+all terms in a balance must share a declared unit.
+
+Satellite reporting does not add an equation or constraint to the equilibrium
+model. If a quantity must alter production, demand, capacity, or a market
+identity, define it structurally with the generic auxiliary-quantity blocks in
+`JCGEBlocks` instead.
+
 ## SAM-style reporting
 
 `sam_from_solution` can map model flows back to a SAM-like table. This is

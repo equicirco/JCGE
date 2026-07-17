@@ -16,6 +16,10 @@ Security: For vulnerabilities.
   checks, covering Core, Blocks, Runtime, and Output.
 - Links and package-overview descriptions aligned with closure-aware modeling,
   solving, and reporting.
+- Cross-package guidance for calibrated physical satellite quantities,
+  baseline-referenced projections, and post-solution physical-balance checks.
+- Documentation distinguishing reporting-only satellite quantities from
+  auxiliary quantities that participate in the equilibrium system.
 
 ## [A] - 2026-01-17
 ### Added

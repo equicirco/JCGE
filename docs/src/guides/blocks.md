@@ -25,6 +25,8 @@ Most models mix a small set of block categories:
 - Market clearing blocks for goods and factors.
 - Income and demand blocks for institutions.
 - Closure and numeraire blocks.
+- Auxiliary-quantity blocks for calibrated quantities that must enter model
+  equations but are not monetary SAM accounts.
 
 Organize blocks into sections so the model structure is readable and easy to
 diagnose.
@@ -34,6 +36,21 @@ diagnose.
 Blocks take parameters from calibrated data. Keep parameter names consistent
 across blocks so calibration outputs can be reused. Prefer explicit mappings
 over implicit defaults when building large models.
+
+## Auxiliary quantities
+
+`quantity_link`, `quantity_transformation`, `quantity_balance`, and
+`quantity_capacity` add a small, general algebra for supplementary quantities
+that must participate in equilibrium conditions. They are intentionally
+domain- and unit-agnostic: mappings define relationships, while coefficients
+and capacities are supplied by the model's calibration data.
+
+Use a link to connect a quantity to an existing model variable, a
+transformation for coefficient-based conversion, a signed balance for an
+identity, and a capacity for an upper limit. Inputs must be defined by an
+earlier block. Use these blocks only when the quantity changes the equilibrium
+system; use `JCGEOutput` satellite reporting when the quantity is reported
+from solved model drivers without adding an equilibrium condition.
 
 ## Extending blocks
 

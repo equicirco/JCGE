@@ -6,10 +6,10 @@ summarizes responsibilities and typical usage.
 | Package | Purpose | Typical Use |
 |---|---|---|
 | `JCGECore` | RunSpec, sections, sets/mappings, scenarios, validation, and closure-condition roles | Define model structure and closure choices |
-| `JCGEBlocks` | Reusable CGE blocks and stable equation-condition keys | Assemble production/household/market systems and declare accounting checks |
+| `JCGEBlocks` | Reusable CGE blocks, auxiliary-quantity equations, and stable equation-condition keys | Assemble production/household/market systems, make supplementary quantities endogenous, and declare accounting checks |
 | `JCGERuntime` | Role-aware compilation, solver execution, residual diagnostics, and experiment workflows | Solve a RunSpec and run parameter/policy batches |
 | `JCGECalibrate` | SAM loading and calibration | Derive parameters and starting values |
-| `JCGEOutput` | Equation rendering, results containers, and accounting-check reporting | Export equations, tidy results, and DualSignals |
+| `JCGEOutput` | Equation rendering, results containers, accounting-check reporting, and satellite quantities | Export equations, tidy results, physical-flow projections, balance checks, and DualSignals |
 | `JCGEExamples` | Reference models | Canonical model ports and tests |
 | `JCGEImportData` | Canonical IO/SAM schema | Convert external data to CSV inputs |
 | `JCGEImportMPSGE` | MPSGE.jl importer | Translate MPSGE objects to RunSpecs |
